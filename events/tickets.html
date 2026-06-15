@@ -12,7 +12,6 @@
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
-        /* Ambient animated Tropical Sunset fluid background */
         body {
             background-color: #0a0402;
             color: #ffffff;
@@ -42,7 +41,6 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* High-End iOS 26 Hyper-Transparent Liquid Glass Header */
         header {
             position: fixed;
             top: 24px;
@@ -140,7 +138,6 @@
             width: 80%;
         }
 
-        /* --- MOBILE MENU STYLES --- */
         .hamburger {
             display: none;
             flex-direction: column;
@@ -210,7 +207,6 @@
             text-shadow: 0 0 20px rgba(255, 140, 66, 0.6);
         }
 
-        /* --- TICKETS SECTION --- */
         .ticket-wrapper {
             min-height: 100vh;
             padding: 160px 20px 80px;
@@ -259,6 +255,7 @@
             display: flex;
             flex-direction: column;
             gap: 30px;
+            position: relative;
         }
 
         .input-group {
@@ -359,6 +356,12 @@
             box-shadow: 0 15px 35px rgba(255, 140, 66, 0.5);
         }
 
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .success-overlay {
             display: none;
             flex-direction: column;
@@ -451,12 +454,12 @@
                 <div class="input-group">
                     <label>Select Pass Type</label>
                     <div class="tier-selection">
-                        <div class="tier-card active" onclick="selectTier(this)">
+                        <div class="tier-card active" onclick="selectTier(this, 'General Admission')">
                             <h3>General Admission</h3>
                             <p>Access to the main festival grounds, beach stages, and public events.</p>
                             <div class="price-tag">FREE</div>
                         </div>
-                        <div class="tier-card" onclick="selectTier(this)">
+                        <div class="tier-card" onclick="selectTier(this, 'VIP Backstage')">
                             <h3>VIP Backstage</h3>
                             <p>Exclusive aura, meet & greet access, and VIP lounge entry.</p>
                             <div class="price-tag">150 Robux</div>
@@ -464,7 +467,7 @@
                     </div>
                 </div>
 
-                <button class="submit-btn" onclick="claimTicket()">Claim Ticket & Get Link</button>
+                <button id="submit-btn" class="submit-btn" onclick="claimTicket()">Claim Ticket</button>
             </div>
 
             <div id="success-area" class="success-overlay">
@@ -501,25 +504,63 @@
             });
         });
 
-        // Ticket Selection Logic
-        function selectTier(element) {
+        // Track selected tier
+        let currentTier = "General Admission";
+
+        function selectTier(element, tierName) {
             document.querySelectorAll('.tier-card').forEach(card => card.classList.remove('active'));
             element.classList.add('active');
+            currentTier = tierName;
         }
 
-        // Claim Ticket Logic
+        // Email Submission Logic
         function claimTicket() {
-            const username = document.getElementById('roblox-user').value.trim();
+            const usernameInput = document.getElementById('roblox-user');
+            const username = usernameInput.value.trim();
+            const btn = document.getElementById('submit-btn');
             
             if(!username) {
                 alert('Please enter your Roblox username first!');
+                usernameInput.focus();
                 return;
             }
 
-            // Hide form, show success
-            document.getElementById('ticket-form').style.display = 'none';
-            document.getElementById('display-user').innerText = username;
-            document.getElementById('success-area').classList.add('show');
+            // Change button state
+            btn.innerText = "Securing Pass...";
+            btn.disabled = true;
+
+            // ==========================================
+            // REPLACE THIS EMAIL WITH YOUR ACTUAL EMAIL!
+            // ==========================================
+            const YOUR_EMAIL = "kuraihanaofficial@gmail.com"; 
+
+            // Send silent email to you via FormSubmit API
+            fetch(`https://formsubmit.co/ajax/${YOUR_EMAIL}`, {
+                method: "POST",
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    _subject: "🎟️ New Queefychella Ticket Claim!",
+                    RobloxUsername: username,
+                    TicketType: currentTier
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Hide form, show gorgeous success screen
+                document.getElementById('ticket-form').style.display = 'none';
+                document.getElementById('display-user').innerText = username;
+                document.getElementById('success-area').classList.add('show');
+            })
+            .catch(error => {
+                // Fallback in case of error
+                console.log(error);
+                alert("Something went wrong. Please try again.");
+                btn.innerText = "Claim Ticket";
+                btn.disabled = false;
+            });
         }
     </script>
 </body>
