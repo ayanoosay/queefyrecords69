@@ -518,56 +518,39 @@
     <script>
         const artistTarget = "Sarah Yamaguchi"; 
         
-        fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(artistTarget)}&entity=album&limit=30`)
+        fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(artistTarget)}&entity=album&limit=10`)
             .then(response => response.json())
             .then(data => {
-                // Safety net: If RouteNote hasn't sent the music live to stores yet, stop here.
-                // This keeps your custom placeholder HTML perfectly visible!
+                // If nothing is returned live yet, exit and leave placeholders perfectly intact
                 if (!data.results || data.results.length === 0) return; 
 
-                // Sort everything found by release date descending (newest first)
-                let sortedReleases = data.results.sort((a, b) => new Date(b.releaseDate) - new Date(a.releaseDate));
+                // Sort all discovered live releases by newest date first
+                let liveReleases = data.results.sort((a, b) => new Date(b.releaseDate) - new Date(a.releaseDate));
 
-                // Separate out Full Albums vs Singles/EPs based on track count
-                let albums = sortedReleases.filter(item => item.trackCount > 3);
-                let singles = sortedReleases.filter(item => item.trackCount <= 3); 
+                // Find the existing placeholder cards on the page
+                const cards = document.querySelectorAll('.discography-grid .release-card');
 
-                // Filter strategy: Grab the absolute newest album, and the 2 newest singles
-                let finalSelection = [];
-                if (albums.length > 0) finalSelection.push(albums[0]);
-                finalSelection = finalSelection.concat(singles.slice(0, 2));
+                // Fill cards incrementally from left to right with whatever is live
+                liveReleases.forEach((release, index) => {
+                    if (index >= cards.length) return; // Prevent breaking if there are more releases than cards
 
-                // If somehow nothing filtered out, safety default to top 3 items
-                if (finalSelection.length === 0) {
-                    finalSelection = sortedReleases.slice(0, 3);
-                }
-
-                // Locate the grid element and clear out your placeholder HTML elements safely
-                const discographyGrid = document.querySelector('.discography-grid');
-                discographyGrid.innerHTML = ''; 
-
-                // Build and inject the updated dynamic cards
-                finalSelection.forEach(release => {
-                    // Apple's API serves a tiny 100x100 preview. 
-                    // This regex intercepts the string and upgrades it to an ultra-crisp 600x600 layout asset.
+                    // Intercept small images and map them to crisp high-res layout assets
                     let dynamicArtwork = release.artworkUrl100.replace('100x100bb', '600x600bb');
                     let releaseYear = release.releaseDate ? release.releaseDate.substring(0, 4) : '2026';
                     let releaseType = release.trackCount > 3 ? "Album" : "Single";
 
-                    discographyGrid.innerHTML += `
-                    <div class="release-card">
-                        <div class="album-art-wrapper">
-                            <img src="${dynamicArtwork}" alt="${release.collectionName}" class="album-art" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100%\' height=\'100%\' fill=\'%23d8a7ff\'/></svg>'">
-                        </div>
-                        <div class="release-info">
-                            <h3>${release.collectionName}</h3>
-                            <p>${releaseType} &bull; ${releaseYear}</p>
-                        </div>
-                    </div>`;
+                    // Select and inject the real metadata safely directly onto the specific card slot
+                    const imgElement = cards[index].querySelector('.album-art');
+                    const titleElement = cards[index].querySelector('.release-info h3');
+                    const infoElement = cards[index].querySelector('.release-info p');
+
+                    if (imgElement) imgElement.src = dynamicArtwork;
+                    if (titleElement) titleElement.textContent = release.collectionName;
+                    if (infoElement) infoElement.innerHTML = `${releaseType} &bull; ${releaseYear}`;
                 });
             })
             .catch(error => {
-                console.log("Auto discography fetch engine online. Awaiting distributed assets: ", error);
+                console.log("Auto discography engine waiting for assets to propagate: ", error);
             });
     </script>
 </body>
