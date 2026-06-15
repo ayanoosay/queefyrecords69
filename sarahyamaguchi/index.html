@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sarah Yamaguchi | Queefy Records69</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -92,7 +93,10 @@
             background: linear-gradient(135deg, #ffffff 0%, #d8a7ff 30%, #9d4edd 70%, #ffffff 100%);
             background-size: 200% 200%;
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
+            color: transparent;
+            display: inline-block;
             animation: textGradientFlow 6s ease infinite;
         }
 
@@ -242,7 +246,10 @@
             background: linear-gradient(135deg, #ffffff 0%, #d8a7ff 40%, #9d4edd 60%, #ffffff 100%);
             background-size: 200% 200%;
             -webkit-background-clip: text;
+            background-clip: text; 
             -webkit-text-fill-color: transparent;
+            color: transparent; 
+            display: inline-block; 
             animation: textGradientFlow 5s ease-in-out infinite;
         }
 
@@ -286,9 +293,7 @@
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(216, 167, 255, 0.3);
-            box-shadow: 
-                0 15px 35px rgba(0,0,0,0.3),
-                inset 0 1px 1px rgba(255,255,255,0.2);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.2);
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -296,9 +301,7 @@
             transform: translateY(-4px);
             border-color: #d8a7ff;
             background: linear-gradient(135deg, #d8a7ff 0%, #9d4edd 100%);
-            box-shadow: 
-                0 20px 40px rgba(157, 78, 221, 0.35),
-                0 0 20px rgba(216, 167, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(157, 78, 221, 0.35), 0 0 20px rgba(216, 167, 255, 0.2);
         }
 
         .section {
@@ -316,7 +319,10 @@
             background: linear-gradient(135deg, #ffffff 0%, rgba(216, 167, 255, 0.8) 50%, #ffffff 100%);
             background-size: 200% 200%;
             -webkit-background-clip: text;
+            background-clip: text; 
             -webkit-text-fill-color: transparent;
+            color: transparent; 
+            display: inline-block; 
             animation: textGradientFlow 7s ease-in-out infinite;
         }
 
@@ -441,10 +447,10 @@
         <p>Pioneering the next wave of hyper-digital Hyperpop. Glitchy synths, ethereal vocals, and a neon-soaked pulse that dictates the underground rhythm.</p>
         
         <div class="platforms-container">
-            <a href="#" class="platform-btn">Listen on Spotify</a>
-            <a href="#" class="platform-btn">Apple Music</a>
-            <a href="#" class="platform-btn">YouTube Music</a>
-            <a href="#" class="platform-btn">Amazon Music</a>
+            <a href="https://open.spotify.com/" target="_blank" class="platform-btn">Listen on Spotify</a>
+            <a href="https://music.apple.com/" target="_blank" class="platform-btn">Apple Music</a>
+            <a href="https://youtube.com/" target="_blank" class="platform-btn">YouTube Music</a>
+            <a href="https://music.amazon.com/" target="_blank" class="platform-btn">Amazon Music</a>
         </div>
     </section>
 
@@ -490,7 +496,6 @@
     </footer>
 
     <script>
-        // --- Navigation Burger Script ---
         const hamburger = document.getElementById('hamburger');
         const mobileMenu = document.getElementById('mobile-menu');
         const mobileLinks = document.querySelectorAll('.mobile-link');
@@ -516,42 +521,53 @@
     </script>
 
     <script>
-        const artistTarget = "Sarah Yamaguchi"; 
+        // Your specific Google Sheet Link
+        const csvLink = "https://docs.google.com/spreadsheets/d/1zDvlgSW9p2-fb2A7b95jtwTg8v-6blxDaAoOm-Y_kl0/export?format=csv";
         
-        fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(artistTarget)}&entity=album&limit=10`)
-            .then(response => response.json())
-            .then(data => {
-                // If nothing is returned live yet, exit and leave placeholders perfectly intact
-                if (!data.results || data.results.length === 0) return; 
+        // Target artist for this page
+        const targetArtist = "Sarah Yamaguchi";
 
-                // Sort all discovered live releases by newest date first
-                let liveReleases = data.results.sort((a, b) => new Date(b.releaseDate) - new Date(a.releaseDate));
+        Papa.parse(csvLink, {
+            download: true,
+            header: true,
+            complete: function(results) {
+                // Filter the sheet rows for just this specific artist
+                let data = results.data.filter(row => row["Artist Name"] && row["Artist Name"].trim() === targetArtist);
+                
+                // If there's no data in the sheet yet, just keep the hardcoded placeholders!
+                if (data.length === 0) return; 
 
-                // Find the existing placeholder cards on the page
+                // Reverse the data so newest form submissions (bottom of sheet) appear first
+                data.reverse();
+
+                // Select the 3 cards on the page
                 const cards = document.querySelectorAll('.discography-grid .release-card');
+                
+                // Fill out the cards one by one
+                data.forEach((release, index) => {
+                    // Stop if they submitted more than 3 releases
+                    if (index >= cards.length) return;
 
-                // Fill cards incrementally from left to right with whatever is live
-                liveReleases.forEach((release, index) => {
-                    if (index >= cards.length) return; // Prevent breaking if there are more releases than cards
+                    // Pull data from the exact Google Form column headers
+                    let title = release["Release Title"] || "Unknown Title";
+                    let type = release["Release Type"] || "Single";
+                    let year = release["Release Year"] || "2026";
+                    let artUrl = release["Artwork Image URL (Direct Link)"] || "album1.png";
 
-                    // Intercept small images and map them to crisp high-res layout assets
-                    let dynamicArtwork = release.artworkUrl100.replace('100x100bb', '600x600bb');
-                    let releaseYear = release.releaseDate ? release.releaseDate.substring(0, 4) : '2026';
-                    let releaseType = release.trackCount > 3 ? "Album" : "Single";
-
-                    // Select and inject the real metadata safely directly onto the specific card slot
+                    // Update the HTML securely
                     const imgElement = cards[index].querySelector('.album-art');
                     const titleElement = cards[index].querySelector('.release-info h3');
                     const infoElement = cards[index].querySelector('.release-info p');
 
-                    if (imgElement) imgElement.src = dynamicArtwork;
-                    if (titleElement) titleElement.textContent = release.collectionName;
-                    if (infoElement) infoElement.innerHTML = `${releaseType} &bull; ${releaseYear}`;
+                    if (imgElement) imgElement.src = artUrl.trim();
+                    if (titleElement) titleElement.textContent = title;
+                    if (infoElement) infoElement.innerHTML = `${type} &bull; ${year}`;
                 });
-            })
-            .catch(error => {
-                console.log("Auto discography engine waiting for assets to propagate: ", error);
-            });
+            },
+            error: function(err) {
+                console.error("Could not fetch the Google Sheet:", err);
+            }
+        });
     </script>
 </body>
 </html>
