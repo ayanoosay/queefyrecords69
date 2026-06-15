@@ -13,7 +13,6 @@
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
-        /* Ambient animated neon space fluid background */
         body {
             background-color: #030008;
             color: #ffffff;
@@ -37,14 +36,12 @@
             filter: blur(40px);
         }
 
-        /* Global Gradient Animation Keyframes */
         @keyframes liquidText {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
 
-        /* High-End iOS 26 Hyper-Transparent Liquid Glass Header with Chromatic Aberration Borders */
         header {
             position: fixed;
             top: 24px;
@@ -57,20 +54,15 @@
             align-items: center;
             padding: 12px 28px;
             border-radius: 30px;
-            
-            /* Ultra-high transparency layout */
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
             backdrop-filter: blur(40px) saturate(240%);
             -webkit-backdrop-filter: blur(40px) saturate(240%);
             border: 1px solid rgba(255, 255, 255, 0.15);
-            
-            /* Multi-layered shadows simulating micro chromatic dispersion prism along the glass rims */
             box-shadow: 
-                -0.6px 0 1px rgba(255, 0, 128, 0.4),  /* Red/Magenta edge bleed left */
-                0.6px 0 1px rgba(0, 229, 255, 0.4),  /* Cyan edge bleed right */
-                0 10px 40px rgba(0, 0, 0, 0.5),      /* Underneath deep drop shadow */
-                inset 0 1px 1px rgba(255, 255, 255, 0.3); /* Specular top surface reflection */
-            
+                -0.6px 0 1px rgba(255, 0, 128, 0.4),  
+                0.6px 0 1px rgba(0, 229, 255, 0.4),  
+                0 10px 40px rgba(0, 0, 0, 0.5),      
+                inset 0 1px 1px rgba(255, 255, 255, 0.3); 
             z-index: 1000;
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -79,6 +71,8 @@
             display: flex;
             align-items: center;
             gap: 14px;
+            position: relative;
+            z-index: 1001; /* Keeps logo above mobile menu */
         }
 
         .brand-logo {
@@ -94,7 +88,6 @@
             font-size: 1.25rem;
             font-weight: 800;
             letter-spacing: -0.3px;
-            /* Animated Gradient */
             background: linear-gradient(135deg, #ffffff 0%, #ff73ca 50%, #30d5ff 100%);
             background-size: 200% 200%;
             animation: liquidText 4s ease infinite;
@@ -102,7 +95,8 @@
             -webkit-text-fill-color: transparent;
         }
 
-        nav a {
+        /* Desktop Nav */
+        .desktop-nav a {
             color: rgba(255, 255, 255, 0.75);
             text-decoration: none;
             margin-left: 30px;
@@ -114,12 +108,12 @@
             padding: 6px 0;
         }
 
-        nav a:hover {
+        .desktop-nav a:hover {
             color: #ffffff;
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
         }
 
-        nav a::after {
+        .desktop-nav a::after {
             content: '';
             position: absolute;
             bottom: 0;
@@ -132,11 +126,101 @@
             transform: translateX(-50%);
         }
 
-        nav a:hover::after {
+        .desktop-nav a:hover::after {
             width: 80%;
         }
 
-        /* Hero Layout Container */
+        /* --- MOBILE MENU STYLES --- */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 30px;
+            height: 20px;
+            cursor: pointer;
+            z-index: 1001; /* Keeps icon above the glass overlay */
+        }
+
+        .hamburger span {
+            display: block;
+            height: 2px;
+            width: 100%;
+            background-color: #ffffff;
+            border-radius: 2px;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        /* Hamburger Morph Animation */
+        .hamburger.active span:nth-child(1) {
+            transform: translateY(9px) rotate(45deg);
+            background-color: #ff3bb4;
+        }
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        .hamburger.active span:nth-child(3) {
+            transform: translateY(-9px) rotate(-45deg);
+            background-color: #00bfff;
+        }
+
+        /* Liquid Glass Full Screen Overlay */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, rgba(3, 0, 8, 0.7) 0%, rgba(17, 5, 28, 0.8) 100%);
+            backdrop-filter: blur(40px) saturate(240%);
+            -webkit-backdrop-filter: blur(40px) saturate(240%);
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(-5%);
+        }
+
+        .mobile-menu.active {
+            opacity: 1;
+            pointer-events: all;
+            transform: translateY(0);
+        }
+
+        .mobile-link {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(20px);
+            opacity: 0;
+        }
+
+        .mobile-menu.active .mobile-link {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Staggered spring animations for the links */
+        .mobile-menu.active .mobile-link:nth-child(1) { transition-delay: 0.1s; }
+        .mobile-menu.active .mobile-link:nth-child(2) { transition-delay: 0.15s; }
+        .mobile-menu.active .mobile-link:nth-child(3) { transition-delay: 0.2s; }
+        .mobile-menu.active .mobile-link:nth-child(4) { transition-delay: 0.25s; }
+
+        .mobile-link:hover, .mobile-link:active {
+            color: #ffffff;
+            transform: scale(1.1);
+            text-shadow: 0 0 20px rgba(255, 59, 180, 0.6);
+        }
+        /* --- END MOBILE MENU STYLES --- */
+
         .hero {
             min-height: 90vh;
             display: flex;
@@ -171,7 +255,6 @@
             letter-spacing: -1.5px;
             margin-bottom: 15px;
             line-height: 1.1;
-            /* Animated Gradient */
             background: linear-gradient(135deg, #ffffff 15%, #ff46bd 55%, #00e5ff 100%);
             background-size: 200% 200%;
             animation: liquidText 6s ease infinite;
@@ -214,7 +297,6 @@
                 0 0 20px rgba(0, 191, 255, 0.2);
         }
 
-        /* Main Sections layout */
         .section {
             padding: 100px 6% 120px;
             max-width: 1400px;
@@ -232,14 +314,12 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* 8-Artist Multi-Grid System */
         .roster-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 40px;
         }
 
-        /* Premium iOS 26 Liquid Glass Artist Block Cards */
         .artist-card {
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
             backdrop-filter: blur(30px) saturate(180%);
@@ -247,16 +327,13 @@
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 32px;
             overflow: hidden;
-            box-shadow: 
-                0 20px 45px rgba(0,0,0,0.25), 
-                inset 0 1px 1px rgba(255,255,255,0.2);
+            box-shadow: 0 20px 45px rgba(0,0,0,0.25), inset 0 1px 1px rgba(255,255,255,0.2);
             transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            position: relative; /* CRUCIAL for the invisible link overlay */
+            position: relative; 
             display: flex;
             flex-direction: column;
         }
 
-        /* INVISIBLE LINK OVERLAY - Keeps the grid from breaking */
         .card-link-overlay {
             position: absolute;
             top: 0;
@@ -267,14 +344,11 @@
             text-decoration: none;
         }
 
-        /* Hover animation engine mimicking deep glass interaction */
         .artist-card:hover {
             transform: translateY(-12px) scale(1.02);
             border-color: rgba(0, 191, 255, 0.5);
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 100%);
-            box-shadow: 
-                0 35px 60px rgba(0, 191, 255, 0.15),
-                0 15px 30px rgba(255, 59, 180, 0.1);
+            box-shadow: 0 35px 60px rgba(0, 191, 255, 0.15), 0 15px 30px rgba(255, 59, 180, 0.1);
         }
 
         .artist-img-wrapper {
@@ -286,7 +360,6 @@
             flex-shrink: 0;
         }
 
-        /* Deep multi-layered background flare effects within each photo container */
         .artist-img-wrapper::before {
             content: '';
             position: absolute;
@@ -334,9 +407,7 @@
             transition: color 0.3s ease;
         }
 
-        .artist-card:hover .artist-info h3 {
-            color: #ff73ca;
-        }
+        .artist-card:hover .artist-info h3 { color: #ff73ca; }
 
         .artist-info p {
             color: #00bfff;
@@ -352,10 +423,9 @@
             flex-wrap: wrap;
             margin-top: auto;
             position: relative;
-            z-index: 10; /* CRUCIAL: Keeps streaming buttons clickable above the overlay */
+            z-index: 10; 
         }
 
-        /* Glass pill links for platform streaming */
         .stream-links a {
             background: rgba(255, 255, 255, 0.05);
             color: rgba(255,255,255,0.9);
@@ -392,7 +462,8 @@
         @media (max-width: 768px) {
             .hero h1 { font-size: 2.8rem; }
             header { top: 12px; padding: 10px 20px; width: 95%; }
-            nav { display: none; }
+            .desktop-nav { display: none; } /* Hide desktop links on phone */
+            .hamburger { display: flex; } /* Show hamburger on phone */
             .hero-logo-large { width: 180px; height: 180px; }
             .section { padding: 60px 4% 80px; }
             .roster-grid { gap: 25px; }
@@ -406,13 +477,27 @@
             <img src="logo.jpeg" alt="Logo" class="brand-logo">
             <div class="logo-text">Queefy Records69</div>
         </div>
-        <nav>
+        
+        <nav class="desktop-nav">
             <a href="#home">Home</a>
             <a href="#roster">Roster</a>
             <a href="./events/">Events</a>
             <a href="./onlyqueefs/">OnlyQueefs</a>
         </nav>
+
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
     </header>
+
+    <div class="mobile-menu" id="mobile-menu">
+        <a href="#home" class="mobile-link">Home</a>
+        <a href="#roster" class="mobile-link">Roster</a>
+        <a href="./events/" class="mobile-link">Events</a>
+        <a href="./onlyqueefs/" class="mobile-link">OnlyQueefs</a>
+    </div>
 
     <section id="home" class="hero">
         <img src="logo.jpeg" alt="Queefy Records69 Logo" class="hero-logo-large">
@@ -568,9 +653,31 @@
         &copy; 2026 Queefy Records69. Curated for the core. Closed roster.
     </footer>
 
+    <script>
+        const hamburger = document.getElementById('hamburger');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+            
+            // Prevent background scrolling when menu is open
+            if(mobileMenu.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Close menu and restore scroll when clicking a link
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                mobileMenu.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+        });
+    </script>
 </body>
 </html>
-
-
-
-
