@@ -58,8 +58,8 @@
             -webkit-backdrop-filter: blur(40px) saturate(240%);
             border: 1px solid rgba(216, 167, 255, 0.25);
             box-shadow: 
-                -0.6px 0 1px rgba(216, 167, 255, 0.5),
-                0.6px 0 1px rgba(157, 78, 221, 0.5),
+                -0.6px 0 1px rgba(216, 167, 255, 0.5), 
+                0.6px 0 1px rgba(157, 78, 221, 0.5),  
                 0 10px 40px rgba(0, 0, 0, 0.6), 
                 inset 0 1px 1px rgba(255, 255, 255, 0.2);
             z-index: 1000;
@@ -72,7 +72,7 @@
             gap: 14px;
             text-decoration: none;
             position: relative;
-            z-index: 1001; 
+            z-index: 1001;
         }
 
         .brand-logo {
@@ -229,7 +229,9 @@
             transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .artist-avatar-large:hover { transform: scale(1.04) rotate(-2deg); }
+        .artist-avatar-large:hover {
+            transform: scale(1.04) rotate(-2deg);
+        }
 
         .hero h1 {
             font-size: 4.8rem;
@@ -284,7 +286,9 @@
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(216, 167, 255, 0.3);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.2);
+            box-shadow: 
+                0 15px 35px rgba(0,0,0,0.3),
+                inset 0 1px 1px rgba(255,255,255,0.2);
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -292,7 +296,9 @@
             transform: translateY(-4px);
             border-color: #d8a7ff;
             background: linear-gradient(135deg, #d8a7ff 0%, #9d4edd 100%);
-            box-shadow: 0 20px 40px rgba(157, 78, 221, 0.35), 0 0 20px rgba(216, 167, 255, 0.2);
+            box-shadow: 
+                0 20px 40px rgba(157, 78, 221, 0.35),
+                0 0 20px rgba(216, 167, 255, 0.2);
         }
 
         .section {
@@ -355,7 +361,9 @@
             transition: transform 0.5s ease;
         }
 
-        .release-card:hover .album-art { transform: scale(1.04); }
+        .release-card:hover .album-art {
+            transform: scale(1.04);
+        }
 
         .release-info h3 {
             font-size: 1.3rem;
@@ -399,16 +407,16 @@
 <body>
 
     <header>
-        <a href="../index.html" class="brand">
-            <img src="../logo.jpeg" alt="Logo" class="brand-logo" onerror="this.style.display='none'">
+        <a href="https://queefyrecords69.github.io/queefyrecords/" class="brand">
+            <img src="../logo.jpeg" alt="" class="brand-logo" onerror="this.style.display='none'">
             <div class="logo-text">Queefy Records69</div>
         </a>
         
         <nav class="desktop-nav">
-            <a href="../index.html">Home</a>
-            <a href="../index.html#roster">Roster</a>
-            <a href="../events/">Events</a>
-            <a href="../onlyqueefs/">OnlyQueefs</a>
+            <a href="https://queefyrecords69.github.io/queefyrecords/">Home</a>
+            <a href="https://queefyrecords69.github.io/queefyrecords/#roster">Roster</a>
+            <a href="https://queefyrecords69.github.io/queefyrecords/events">Events</a>
+            <a href="https://queefyrecords69.github.io/queefyrecords/onlyqueefs">OnlyQueefs</a>
         </nav>
 
         <div class="hamburger" id="hamburger">
@@ -419,14 +427,14 @@
     </header>
 
     <div class="mobile-menu" id="mobile-menu">
-        <a href="../index.html" class="mobile-link">Home</a>
-        <a href="../index.html#roster" class="mobile-link">Roster</a>
-        <a href="../events/" class="mobile-link">Events</a>
-        <a href="../onlyqueefs/" class="mobile-link">OnlyQueefs</a>
+        <a href="https://queefyrecords69.github.io/queefyrecords/" class="mobile-link">Home</a>
+        <a href="https://queefyrecords69.github.io/queefyrecords/#roster" class="mobile-link">Roster</a>
+        <a href="https://queefyrecords69.github.io/queefyrecords/events" class="mobile-link">Events</a>
+        <a href="https://queefyrecords69.github.io/queefyrecords/onlyqueefs" class="mobile-link">OnlyQueefs</a>
     </div>
 
     <section id="profile" class="hero">
-        <img src="../sarahyamaguchi.png" alt="Sarah Yamaguchi" class="artist-avatar-large" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100%\' height=\'100%\' fill=\'%23d8a7ff\'/></svg>'">
+        <img src="../sarahyamaguchi.png" alt="" class="artist-avatar-large" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100%\' height=\'100%\' fill=\'%23d8a7ff\'/></svg>'">
         
         <h1>Sarah Yamaguchi</h1>
         <div class="genre-tag">Hyperpop</div>
@@ -435,8 +443,8 @@
         <div class="platforms-container">
             <a href="#" class="platform-btn">Listen on Spotify</a>
             <a href="#" class="platform-btn">Apple Music</a>
-            <a href="#" class="platform-btn">YouTube</a>
-            <a href="#" class="platform-btn">Amazon</a>
+            <a href="#" class="platform-btn">YouTube Music</a>
+            <a href="#" class="platform-btn">Amazon Music</a>
         </div>
     </section>
 
@@ -482,6 +490,7 @@
     </footer>
 
     <script>
+        // --- Navigation Burger Script ---
         const hamburger = document.getElementById('hamburger');
         const mobileMenu = document.getElementById('mobile-menu');
         const mobileLinks = document.querySelectorAll('.mobile-link');
@@ -489,6 +498,7 @@
         hamburger.addEventListener('click', () => {
             hamburger.classList.toggle('active');
             mobileMenu.classList.toggle('active');
+            
             if(mobileMenu.classList.contains('active')) {
                 document.body.style.overflow = 'hidden';
             } else {
@@ -503,6 +513,62 @@
                 document.body.style.overflow = 'auto';
             });
         });
+    </script>
+
+    <script>
+        const artistTarget = "Sarah Yamaguchi"; 
+        
+        fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(artistTarget)}&entity=album&limit=30`)
+            .then(response => response.json())
+            .then(data => {
+                // Safety net: If RouteNote hasn't sent the music live to stores yet, stop here.
+                // This keeps your custom placeholder HTML perfectly visible!
+                if (!data.results || data.results.length === 0) return; 
+
+                // Sort everything found by release date descending (newest first)
+                let sortedReleases = data.results.sort((a, b) => new Date(b.releaseDate) - new Date(a.releaseDate));
+
+                // Separate out Full Albums vs Singles/EPs based on track count
+                let albums = sortedReleases.filter(item => item.trackCount > 3);
+                let singles = sortedReleases.filter(item => item.trackCount <= 3); 
+
+                // Filter strategy: Grab the absolute newest album, and the 2 newest singles
+                let finalSelection = [];
+                if (albums.length > 0) finalSelection.push(albums[0]);
+                finalSelection = finalSelection.concat(singles.slice(0, 2));
+
+                // If somehow nothing filtered out, safety default to top 3 items
+                if (finalSelection.length === 0) {
+                    finalSelection = sortedReleases.slice(0, 3);
+                }
+
+                // Locate the grid element and clear out your placeholder HTML elements safely
+                const discographyGrid = document.querySelector('.discography-grid');
+                discographyGrid.innerHTML = ''; 
+
+                // Build and inject the updated dynamic cards
+                finalSelection.forEach(release => {
+                    // Apple's API serves a tiny 100x100 preview. 
+                    // This regex intercepts the string and upgrades it to an ultra-crisp 600x600 layout asset.
+                    let dynamicArtwork = release.artworkUrl100.replace('100x100bb', '600x600bb');
+                    let releaseYear = release.releaseDate ? release.releaseDate.substring(0, 4) : '2026';
+                    let releaseType = release.trackCount > 3 ? "Album" : "Single";
+
+                    discographyGrid.innerHTML += `
+                    <div class="release-card">
+                        <div class="album-art-wrapper">
+                            <img src="${dynamicArtwork}" alt="${release.collectionName}" class="album-art" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100%\' height=\'100%\' fill=\'%23d8a7ff\'/></svg>'">
+                        </div>
+                        <div class="release-info">
+                            <h3>${release.collectionName}</h3>
+                            <p>${releaseType} &bull; ${releaseYear}</p>
+                        </div>
+                    </div>`;
+                });
+            })
+            .catch(error => {
+                console.log("Auto discography fetch engine online. Awaiting distributed assets: ", error);
+            });
     </script>
 </body>
 </html>
