@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Tickets | Queefychella</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        /* Ambient animated Tropical Sunset fluid background */
+        body {
+            background-color: #0a0402;
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -20%;
+            left: -20%;
+            width: 140%;
+            height: 140%;
+            background: 
+                radial-gradient(circle at 15% 25%, rgba(255, 61, 144, 0.2) 0%, transparent 40%),
+                radial-gradient(circle at 85% 30%, rgba(255, 140, 66, 0.18) 0%, transparent 45%),
+                radial-gradient(circle at 50% 80%, rgba(0, 200, 180, 0.12) 0%, transparent 50%);
+            z-index: -1;
+            filter: blur(50px);
+        }
+
+        @keyframes textGradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* High-End iOS 26 Hyper-Transparent Liquid Glass Header */
+        header {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 92%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 28px;
+            border-radius: 30px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+            backdrop-filter: blur(40px) saturate(240%);
+            -webkit-backdrop-filter: blur(40px) saturate(240%);
+            border: 1px solid rgba(255, 140, 66, 0.25);
+            box-shadow: 
+                -0.6px 0 1px rgba(255, 61, 144, 0.5),
+                0.6px 0 1px rgba(255, 140, 66, 0.5),
+                0 10px 40px rgba(0, 0, 0, 0.6), 
+                inset 0 1px 1px rgba(255, 255, 255, 0.2);
+            z-index: 1000;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+            position: relative;
+            z-index: 1001;
+        }
+
+        .brand-logo {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(255, 140, 66, 0.6);
+            object-fit: cover;
+            box-shadow: 0 0 15px rgba(255, 61, 144, 0.3);
+            background: linear-gradient(135deg, #ff3d90, #ff8c42);
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            background: linear-gradient(135deg, #ffffff 0%, #ff3d90 30%, #ff8c42 70%, #ffffff 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            background-clip: text; 
+            -webkit-text-fill-color: transparent;
+            color: transparent; 
+            display: inline-block; 
+            animation: textGradientFlow 6s ease infinite;
+        }
+
+        .desktop-nav a {
+            color: rgba(255, 255, 255, 0.75);
+            text-decoration: none;
+            margin-left: 30px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: -0.1px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            padding: 6px 0;
+        }
+
+        .desktop-nav a.active {
+            color: #ff8c42;
+            text-shadow: 0 0 10px rgba(255, 140, 66, 0.6);
+        }
+
+        .desktop-nav a:hover {
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(255, 61, 144, 0.6);
+        }
+
+        .desktop-nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #ff3d90, #ff8c42);
+            border-radius: 10px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateX(-50%);
+        }
+
+        .desktop-nav a:hover::after, .desktop-nav a.active::after {
+            width: 80%;
+        }
+
+        /* --- MOBILE MENU STYLES --- */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 30px;
+            height: 20px;
+            cursor: pointer;
+            z-index: 1001; 
+        }
+
+        .hamburger span {
+            display: block;
+            height: 2px;
+            width: 100%;
+            background-color: #ffffff;
+            border-radius: 2px;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .hamburger.active span:nth-child(1) { transform: translateY(9px) rotate(45deg); background-color: #ff3d90; }
+        .hamburger.active span:nth-child(2) { opacity: 0; transform: translateX(-20px); }
+        .hamburger.active span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); background-color: #ff8c42; }
+
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, rgba(10, 4, 2, 0.8) 0%, rgba(20, 5, 10, 0.9) 100%);
+            backdrop-filter: blur(40px) saturate(240%);
+            -webkit-backdrop-filter: blur(40px) saturate(240%);
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(-5%);
+        }
+
+        .mobile-menu.active { opacity: 1; pointer-events: all; transform: translateY(0); }
+
+        .mobile-link {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(20px);
+            opacity: 0;
+        }
+
+        .mobile-menu.active .mobile-link { transform: translateY(0); opacity: 1; }
+        .mobile-menu.active .mobile-link:nth-child(1) { transition-delay: 0.1s; }
+        .mobile-menu.active .mobile-link:nth-child(2) { transition-delay: 0.15s; }
+        .mobile-menu.active .mobile-link:nth-child(3) { transition-delay: 0.2s; }
+        .mobile-menu.active .mobile-link:nth-child(4) { transition-delay: 0.25s; }
+
+        .mobile-link:hover, .mobile-link:active {
+            color: #ffffff;
+            transform: scale(1.1);
+            text-shadow: 0 0 20px rgba(255, 140, 66, 0.6);
+        }
+
+        /* --- TICKETS SECTION --- */
+        .ticket-wrapper {
+            min-height: 100vh;
+            padding: 160px 20px 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .ticket-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .ticket-header h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            letter-spacing: -1.5px;
+            background: linear-gradient(135deg, #ffffff 0%, #ff3d90 50%, #ff8c42 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            display: inline-block;
+            animation: textGradientFlow 5s ease-in-out infinite;
+        }
+
+        .ticket-header p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.1rem;
+            margin-top: 10px;
+            max-width: 500px;
+            margin-inline: auto;
+        }
+
+        .ticket-box {
+            width: 100%;
+            max-width: 600px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 32px;
+            padding: 40px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .input-group label {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.8);
+            margin-left: 5px;
+        }
+
+        .roblox-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            font-size: 1.1rem;
+            padding: 16px 20px;
+            border-radius: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .roblox-input:focus {
+            border-color: #ff3d90;
+            background: rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 15px rgba(255, 61, 144, 0.3);
+        }
+
+        .tier-selection {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .tier-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tier-card.active {
+            background: linear-gradient(135deg, rgba(255, 61, 144, 0.15), rgba(255, 140, 66, 0.1));
+            border-color: #ff8c42;
+            box-shadow: 0 10px 25px rgba(255, 140, 66, 0.2);
+        }
+
+        .tier-card h3 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-bottom: 5px;
+            color: #ffffff;
+        }
+
+        .tier-card.active h3 {
+            color: #ff8c42;
+        }
+
+        .tier-card p {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.4;
+        }
+
+        .price-tag {
+            margin-top: 15px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: #00c8b4;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #ff3d90 0%, #ff8c42 100%);
+            color: #ffffff;
+            border: none;
+            padding: 18px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(255, 61, 144, 0.4);
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(255, 140, 66, 0.5);
+        }
+
+        .success-overlay {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 20px;
+            height: 100%;
+        }
+
+        .success-overlay.show {
+            display: flex;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #00c8b4, #008f80);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0, 200, 180, 0.4);
+        }
+
+        .success-icon svg {
+            width: 40px;
+            height: 40px;
+            fill: #ffffff;
+        }
+
+        @media (max-width: 768px) {
+            header { top: 12px; padding: 10px 20px; width: 95%; }
+            .desktop-nav { display: none; }
+            .hamburger { display: flex; }
+            .ticket-header h1 { font-size: 2.5rem; }
+            .tier-selection { grid-template-columns: 1fr; }
+            .ticket-box { padding: 30px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="../index.html" class="brand">
+            <img src="../logo.jpeg" alt="Logo" class="brand-logo" onerror="this.style.display='none'">
+            <div class="logo-text">Queefy Records69</div>
+        </a>
+        
+        <nav class="desktop-nav">
+            <a href="../index.html">Home</a>
+            <a href="../index.html#roster">Roster</a>
+            <a href="index.html" class="active">Events</a>
+            <a href="../onlyqueefs/">OnlyQueefs</a>
+        </nav>
+
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </header>
+
+    <div class="mobile-menu" id="mobile-menu">
+        <a href="../index.html" class="mobile-link">Home</a>
+        <a href="../index.html#roster" class="mobile-link">Roster</a>
+        <a href="index.html" class="mobile-link" style="color: #ff8c42; text-shadow: 0 0 20px rgba(255, 140, 66, 0.6);">Events</a>
+        <a href="../onlyqueefs/" class="mobile-link">OnlyQueefs</a>
+    </div>
+
+    <main class="ticket-wrapper">
+        <div class="ticket-header">
+            <h1>Secure Your Pass</h1>
+            <p>Enter your Roblox details to be added to the official Queefychella entry list.</p>
+        </div>
+
+        <div class="ticket-box">
+            <div id="ticket-form" style="display: flex; flex-direction: column; gap: 30px;">
+                <div class="input-group">
+                    <label for="roblox-user">Roblox Username</label>
+                    <input type="text" id="roblox-user" class="roblox-input" placeholder="e.g. QueefyFan123" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Select Pass Type</label>
+                    <div class="tier-selection">
+                        <div class="tier-card active" onclick="selectTier(this)">
+                            <h3>General Admission</h3>
+                            <p>Access to the main festival grounds, beach stages, and public events.</p>
+                            <div class="price-tag">FREE</div>
+                        </div>
+                        <div class="tier-card" onclick="selectTier(this)">
+                            <h3>VIP Backstage</h3>
+                            <p>Exclusive aura, meet & greet access, and VIP lounge entry.</p>
+                            <div class="price-tag">150 Robux</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="submit-btn" onclick="claimTicket()">Claim Ticket & Get Link</button>
+            </div>
+
+            <div id="success-area" class="success-overlay">
+                <div class="success-icon">
+                    <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                </div>
+                <h2>You're In, <span id="display-user"></span>!</h2>
+                <p style="color: rgba(255,255,255,0.7); line-height: 1.5;">Your username has been added to the guestlist. Make sure to join the official Roblox experience on August 14th.</p>
+                <a href="#" class="submit-btn" style="text-decoration: none; width: 100%; text-align: center; margin-top: 20px;">Join Roblox Game</a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const hamburger = document.getElementById('hamburger');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+            if(mobileMenu.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                mobileMenu.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+        });
+
+        // Ticket Selection Logic
+        function selectTier(element) {
+            document.querySelectorAll('.tier-card').forEach(card => card.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        // Claim Ticket Logic
+        function claimTicket() {
+            const username = document.getElementById('roblox-user').value.trim();
+            
+            if(!username) {
+                alert('Please enter your Roblox username first!');
+                return;
+            }
+
+            // Hide form, show success
+            document.getElementById('ticket-form').style.display = 'none';
+            document.getElementById('display-user').innerText = username;
+            document.getElementById('success-area').classList.add('show');
+        }
+    </script>
+</body>
+</html>
