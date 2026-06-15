@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kurai Hana | Queefy Records69</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        /* Ambient animated neon pink fluid background customized for Kurai Hana */
+        body {
+            background-color: #0c050a;
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -20%;
+            left: -20%;
+            width: 140%;
+            height: 140%;
+            background: 
+                radial-gradient(circle at 15% 25%, rgba(236, 166, 192, 0.2) 0%, transparent 40%),
+                radial-gradient(circle at 85% 30%, rgba(210, 127, 149, 0.18) 0%, transparent 45%),
+                radial-gradient(circle at 50% 80%, rgba(236, 166, 192, 0.12) 0%, transparent 50%);
+            z-index: -1;
+            filter: blur(50px);
+        }
+
+        /* Text Gradient Animation */
+        @keyframes textGradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* High-End iOS 26 Hyper-Transparent Liquid Glass Header with Soft Pink Chromatic Borders */
+        header {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 92%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 28px;
+            border-radius: 30px;
+            
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+            backdrop-filter: blur(40px) saturate(240%);
+            -webkit-backdrop-filter: blur(40px) saturate(240%);
+            border: 1px solid rgba(236, 166, 192, 0.25);
+            
+            box-shadow: 
+                -0.6px 0 1px rgba(236, 166, 192, 0.5),  /* Soft pink edge bleed left */
+                0.6px 0 1px rgba(210, 127, 149, 0.5),   /* Deeper pink edge bleed right */
+                0 10px 40px rgba(0, 0, 0, 0.6), 
+                inset 0 1px 1px rgba(255, 255, 255, 0.2);
+            
+            z-index: 1000;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+        }
+
+        /* Beautiful gradient fallback if the image logo doesn't load */
+        .brand-logo {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(236, 166, 192, 0.6);
+            object-fit: cover;
+            box-shadow: 0 0 15px rgba(236, 166, 192, 0.3);
+            background: linear-gradient(135deg, #eca6c0, #d27f95);
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            
+            background: linear-gradient(135deg, #ffffff 0%, #eca6c0 30%, #d27f95 70%, #ffffff 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: textGradientFlow 6s ease infinite;
+        }
+
+        nav a {
+            color: rgba(255, 255, 255, 0.75);
+            text-decoration: none;
+            margin-left: 30px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: -0.1px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            padding: 6px 0;
+        }
+
+        nav a:hover {
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(236, 166, 192, 0.6);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #eca6c0, #d27f95);
+            border-radius: 10px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateX(-50%);
+        }
+
+        nav a:hover::after {
+            width: 80%;
+        }
+
+        /* Artist Profile Hero Layout */
+        .hero {
+            min-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 180px 20px 60px;
+        }
+
+        /* Large avatar layout with built-in glass container background if image fails */
+        .artist-avatar-large {
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            box-shadow: 
+                0 0 60px rgba(236, 166, 192, 0.4), 
+                0 0 120px rgba(210, 127, 149, 0.25),
+                inset 0 0 20px rgba(255, 255, 255, 0.2);
+            margin-bottom: 35px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            object-fit: cover;
+            background: linear-gradient(135deg, rgba(236, 166, 192, 0.3), rgba(210, 127, 149, 0.1));
+            backdrop-filter: blur(10px);
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .artist-avatar-large:hover {
+            transform: scale(1.04) rotate(-2deg);
+        }
+
+        .hero h1 {
+            font-size: 4.8rem;
+            font-weight: 900;
+            letter-spacing: -1.5px;
+            margin-bottom: 10px;
+            line-height: 1.1;
+            
+            background: linear-gradient(135deg, #ffffff 0%, #eca6c0 40%, #d27f95 60%, #ffffff 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: textGradientFlow 5s ease-in-out infinite;
+        }
+
+        .genre-tag {
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #eca6c0;
+            font-weight: 700;
+            margin-bottom: 25px;
+            text-shadow: 0 0 15px rgba(236, 166, 192, 0.4);
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 620px;
+            margin-bottom: 40px;
+            font-weight: 400;
+            line-height: 1.6;
+            letter-spacing: -0.2px;
+        }
+
+        /* Streaming Hub Matrix */
+        .platforms-container {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 700px;
+        }
+
+        .platform-btn {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+            color: #ffffff;
+            padding: 14px 32px;
+            text-decoration: none;
+            font-weight: 700;
+            border-radius: 50px;
+            font-size: 0.95rem;
+            letter-spacing: -0.1px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(236, 166, 192, 0.3);
+            box-shadow: 
+                0 15px 35px rgba(0,0,0,0.3),
+                inset 0 1px 1px rgba(255,255,255,0.2);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .platform-btn:hover {
+            transform: translateY(-4px);
+            border-color: #eca6c0;
+            background: linear-gradient(135deg, #eca6c0 0%, #d27f95 100%);
+            box-shadow: 
+                0 20px 40px rgba(210, 127, 149, 0.35),
+                0 0 20px rgba(236, 166, 192, 0.2);
+        }
+
+        /* Sub-sections layout */
+        .section {
+            padding: 80px 6% 120px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 2.6rem;
+            font-weight: 800;
+            letter-spacing: -0.8px;
+            margin-bottom: 50px;
+            text-align: center;
+            
+            background: linear-gradient(135deg, #ffffff 0%, rgba(236, 166, 192, 0.8) 50%, #ffffff 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: textGradientFlow 7s ease-in-out infinite;
+        }
+
+        /* Premium Discography Layout */
+        .discography-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 35px;
+        }
+
+        .release-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.2);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .release-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(236, 166, 192, 0.4);
+            box-shadow: 0 30px 50px rgba(210, 127, 149, 0.15);
+        }
+
+        .album-art-wrapper {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            position: relative;
+            background: linear-gradient(135deg, #1b0f19, #0f080e);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .album-art {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .release-card:hover .album-art {
+            transform: scale(1.04);
+        }
+
+        .release-info h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            margin-bottom: 4px;
+            color: #ffffff;
+        }
+
+        .release-info p {
+            color: #eca6c0;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        footer {
+            text-align: center;
+            padding: 80px 0;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: -0.1px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            background: linear-gradient(to top, rgba(12, 5, 10, 0.8), transparent);
+        }
+
+        /* Mobile responsive configurations */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 3.2rem; }
+            header { top: 12px; padding: 10px 20px; width: 95%; }
+            nav { display: none; }
+            .artist-avatar-large { width: 200px; height: 200px; }
+            .section { padding: 60px 4% 80px; }
+            .discography-grid { gap: 25px; }
+            .platform-btn { width: 100%; text-align: center; padding: 14px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="https://queefyrecords69.github.io/queefyrecords/" class="brand">
+            <img src="logo.jpeg" alt="" class="brand-logo" onerror="this.style.display='none'">
+            <div class="logo-text">Queefy Records69</div>
+        </a>
+        <nav>
+            <a href="https://queefyrecords69.github.io/queefyrecords/">Home</a>
+            <a href="https://queefyrecords69.github.io/queefyrecords/#roster">Roster</a>
+            <a href="https://queefyrecords69.github.io/queefyrecords/events">Events</a>
+        </nav>
+    </header>
+
+    <section id="profile" class="hero">
+        <img src="kuraihana.jpeg" alt="" class="artist-avatar-large" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100%\' height=\'100%\' fill=\'%23eca6c0\'/></svg>'">
+        <h1>Kurai Hana</h1>
+        <div class="genre-tag">Pop Rock</div>
+        <p>Melding heavy sonic landscapes with hyper-vivid, fragile melodies. Pushing the absolute parameters of alternative pop rock under the modern underground paradigm.</p>
+        
+        <div class="platforms-container">
+            <a href="#" class="platform-btn">Listen on Spotify</a>
+            <a href="#" class="platform-btn">Apple Music</a>
+            <a href="#" class="platform-btn">YouTube Music</a>
+            <a href="#" class="platform-btn">Amazon Music</a>
+        </div>
+    </section>
+
+    <section id="discography" class="section">
+        <h2 class="section-title">Latest Releases</h2>
+        <div class="discography-grid">
+            
+            <div class="release-card">
+                <div class="album-art-wrapper">
+                    <img src="album1.jpeg" alt="" class="album-art" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100%\' height=\'100%\' fill=\'%23d27f95\'/></svg>'">
+                </div>
+                <div class="release-info">
+                    <h3>Like You</h3>
+                    <p>Single &bull; 2026 &bull; Upcoming</p>
+                </div>
+            </div>
+
+            <div class="release-card">
+                <div class="album-art-wrapper">
+                    <img src="album2.png" alt="" class="album-art" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100%\' height=\'100%\' fill=\'%23eca6c0\'/></svg>'">
+                </div>
+                <div class="release-info">
+                    <h3>HYPERSLUT</h3>
+                    <p>Mixtape &bull; 2026</p>
+                </div>
+            </div>
+
+            <div class="release-card">
+                <div class="album-art-wrapper">
+                    <img src="album3.jpeg" alt="" class="album-art" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100%\' height=\'100%\' fill=\'%23d27f95\'/></svg>'">
+                </div>
+                <div class="release-info">
+                    <h3>Tel A'DejAviv</h3>
+                    <p>Single &bull; 2026</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <footer>
+        &copy; 2026 Queefy Records69. Curated for the core. Closed roster.
+    </footer>
+
+</body>
+</html>
