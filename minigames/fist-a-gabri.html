@@ -74,6 +74,439 @@
             transform: translateY(25px) scaleY(0.85) scaleX(0.95);
         }
 
+        /* Hide custom fist when system pointer enters normal interaction zones */
+        body.hide-custom-cursor {
+            cursor: auto !important;
+        }
+        body.hide-custom-cursor #custom-fist-cursor {
+            display: none !important;
+        }
+
+        /* Fluid Dripping Particle Drop Tracer */
+        .drip-particle {
+            position: fixed;
+            width: 8px;
+            height: 14px;
+            background: #30d5ff;
+            box-shadow: 0 0 4px #30d5ff;
+            pointer-events: none;
+            z-index: 9998;
+            animation: dropDown 0.5s steps(6, end) forwards;
+        }
+
+        @keyframes dropDown {
+            0% { transform: translateY(0) scaleY(1); opacity: 1; }
+            100% { transform: translateY(50px) scaleY(0.4); opacity: 0; }
+        }
+
+        header {
+            position: fixed;
+            top: 24px; left: 50%; transform: translateX(-50%);
+            width: 92%; max-width: 1200px;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 28px; border-radius: 30px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+            backdrop-filter: blur(40px) saturate(240%);
+            -webkit-backdrop-filter: blur(40px) saturate(240%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            /* Restore system cursor within navigation container */
+            cursor: pointer !important;
+        }
+
+        .brand { display: flex; align-items: center; gap: 14px; text-decoration: none; cursor: pointer !important; }
+        .brand-logo { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid rgba(255, 59, 180, 0.6); }
+        .logo-text {
+            font-size: 1.15rem; font-weight: 800; letter-spacing: -0.3px;
+            background: linear-gradient(135deg, #ffffff 0%, #ff73ca 50%, #30d5ff 100%);
+            background-size: 200% 200%;
+            animation: liquidText 4s ease infinite;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .desktop-nav a {
+            color: rgba(255, 255, 255, 0.75); text-decoration: none;
+            font-size: 0.9rem; font-weight: 600; cursor: pointer !important;
+        }
+        .desktop-nav a:hover { color: #ff73ca; }
+
+        /* 🖥️ Amplified PC Scale Controls */
+        .arcade-cabinet {
+            background: #140727;
+            border: 4px solid #ff3bb4;
+            border-radius: 12px;
+            width: 92%; max-width: 720px; /* Made cabinet wider on PC */
+            padding: 24px;
+            box-shadow: 0 0 30px rgba(255, 59, 180, 0.3), inset 0 0 15px rgba(0,0,0,0.8);
+            margin-top: 120px;
+            position: relative;
+        }
+
+        .game-hud {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; padding: 12px 20px;
+            background: #000000; border: 2px solid #30d5ff; border-radius: 4px;
+            box-shadow: 0 0 10px rgba(48, 213, 255, 0.3);
+        }
+
+        .hud-item { font-size: 1.3rem; font-weight: bold; color: #fff; text-shadow: 0 0 4px #fff; }
+        .hud-item span { color: #30d5ff; text-shadow: 0 0 8px #30d5ff; }
+        #score-val { color: #ff73ca; text-shadow: 0 0 8px #ff73ca; }
+
+        /* 🟩 Retro Whack-A-Mole Green Arena Field */
+        .mole-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            width: 100%;
+            height: 500px; /* Made layout area taller on PC */
+            background-color: #1a7a2a; /* Rich arcade field green background */
+            background-image: 
+                radial-gradient(#249436 20%, transparent 20%),
+                radial-gradient(#1e852f 20%, transparent 20%);
+            background-size: 16px 16px;
+            background-position: 0 0, 8px 8px;
+            border-radius: 8px;
+            padding: 24px;
+            border: 4px solid #0b3a0f;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Scanline CRT glass overlay look */
+        .mole-grid::after {
+            content: " ";
+            display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 0, 0.06));
+            z-index: 8; background-size: 100% 4px, 6px 100%; pointer-events: none;
+        }
+
+        .grid-hole {
+            background: #091a0c;
+            border-radius: 50%;
+            border: 4px solid #050d06;
+            box-shadow: inset 0 12px 14px rgba(0,0,0,0.85);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 👤 Gabri target head image element */
+        .mole-target {
+            width: 115%;
+            height: 115%;
+            object-fit: contain;
+            position: absolute;
+            bottom: -130%; /* Kept hidden below the frame edge vector */
+            transition: bottom 0.1s steps(4); /* Chonky arcade step translation transition */
+            cursor: none;
+            z-index: 5;
+        }
+
+        .mole-target.up {
+            bottom: -15%; /* Pops up perfectly inside the hole field box zone */
+        }
+
+        .screen-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(3, 0, 8, 0.95);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 10; border-radius: 4px; text-align: center; padding: 20px;
+        }
+
+        .screen-overlay h2 {
+            font-size: 2.5rem; font-weight: bold; margin-bottom: 12px;
+            color: #ff3bb4; text-shadow: 0 0 8px #ff3bb4;
+        }
+
+        .screen-overlay p { color: #30d5ff; margin-bottom: 24px; font-size: 1rem; max-width: 460px; line-height: 1.4; }
+
+        .start-btn {
+            background: #ff3bb4;
+            color: white; border: 2px solid #fff; padding: 12px 36px;
+            font-size: 1rem; font-weight: bold;
+            box-shadow: 0 6px 0 #b31d77, 0 10px 15px rgba(0,0,0,0.4);
+            transition: all 0.1s steps(2);
+            cursor: pointer !important;
+        }
+        .start-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #b31d77; }
+
+        .hit-effect {
+            position: absolute; pointer-events: none;
+            font-size: 1.2rem; font-weight: bold; color: #30d5ff;
+            text-shadow: 0 0 6px #30d5ff; animation: pixelFloat 0.3s steps(4) forwards;
+            z-index: 6;
+        }
+
+        @keyframes pixelFloat {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
+
+        /* 📱 Responsive Mobile Overrides */
+        @media (max-width: 768px) {
+            header { top: 12px; padding: 10px 20px; width: 95%; }
+            .arcade-cabinet { margin-top: 85px; padding: 12px; max-width: 580px; }
+            .game-hud { margin-bottom: 12px; padding: 10px; }
+            .hud-item { font-size: 1rem; }
+            .mole-grid { gap: 10px; padding: 12px; height: auto; aspect-ratio: 1 / 1; }
+            .screen-overlay h2 { font-size: 1.6rem; }
+            .screen-overlay p { font-size: 0.8rem; margin-bottom: 16px; }
+            .start-btn { padding: 8px 24px; font-size: 0.9rem; }
+            #custom-fist-cursor { width: 65px; height: 65px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="custom-fist-cursor">
+        <img src="fist.png" alt="Wet Fist" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23ff3bb4\'><rect x=\'6\' y=\'6\' width=\'12\' height=\'12\'/></svg>'">
+    </div>
+
+    <header id="header-menu">
+        <a href="index.html" class="brand">
+            <img src="../logo.jpeg" alt="Logo" class="brand-logo">
+            <div class="logo-text">Queefy Arcade</div>
+        </a>
+        <nav class="desktop-nav">
+            <a href="index.html">← EXIT</a>
+        </nav>
+    </header>
+
+    <div class="arcade-cabinet">
+        <div class="game-hud">
+            <div class="hud-item">SCORE: <span id="score-val">000</span></div>
+            <div class="hud-item">TIME: <span id="time-val">30</span>S</div>
+        </div>
+
+        <div class="mole-grid" id="game-grid">
+            <div class="screen-overlay" id="overlay">
+                <h2 id="overlay-title">FIST-A-GABRI</h2>
+                <p id="overlay-desc">OMG! GABRI IS SO FUCKING HORNY... BUT, THIS IS NOT REALLY A FISTING GAME, QUICKLY SMACK GABRI BEFORE SHE GETS MOIST AF!.</p>
+                <button class="start-btn" id="action-btn" onclick="startGame()">INSERT COIN</button>
+            </div>
+
+            <div class="grid-hole"><img src="gabrihead.png" class="mole-target" data-index="0" onpointerdown="whackMole(this, event)"></div>
+            <div class="grid-hole"><img src="gabrihead.png" class="mole-target" data-index="1" onpointerdown="whackMole(this, event)"></div>
+            <div class="grid-hole"><img src="gabrihead.png" class="mole-target" data-index="2" onpointerdown="whackMole(this, event)"></div>
+            <div class="grid-hole"><img src="gabrihead.png" class="mole-target" data-index="3" onpointerdown="whackMole(this, event)"></div>
+            <div class="grid-hole"><img src="gabrihead.png" class="mole-target" data-index="4" onpointerdown="whackMole(this, event)"></div>
+            <div class="grid-hole"><img src="gabrihead.png" class="mole-target" data-index="5" onpointerdown="whackMole(this, event)"></div>
+            <div class="grid-hole"><img src="gabrihead.png" class="mole-target" data-index="6" onpointerdown="whackMole(this, event)"></div>
+            <div class="grid-hole"><img src="gabrihead.png" class="mole-target" data-index="7" onpointerdown="whackMole(this, event)"></div>
+            <div class="grid-hole"><img src="gabrihead.png" class="mole-target" data-index="8" onpointerdown="whackMole(this, event)"></div>
+        </div>
+    </div>
+
+    <script>
+        let score = 0;
+        let timeLeft = 30;
+        let gameActive = false;
+        let currentActiveMole = null;
+        let lastIndex = -1; // Stores previous hole location index
+        let moleTimeout = null;
+        let countdownTimer = null;
+        
+        const initialSpawnDelay = 1250; 
+        const minimumSpawnDelay = 450;  
+
+        const cursor = document.getElementById('custom-fist-cursor');
+        const gridHoles = document.querySelectorAll('.mole-target');
+        const overlay = document.getElementById('overlay');
+        const overlayTitle = document.getElementById('overlay-title');
+        const overlayDesc = document.getElementById('overlay-desc');
+        const actionBtn = document.getElementById('action-btn');
+        const headerMenu = document.getElementById('header-menu');
+        
+        const scoreVal = document.getElementById('score-val');
+        const timeVal = document.getElementById('time-val');
+
+        // Capture mouse movement coordinates
+        window.addEventListener('mousemove', (e) => {
+            cursor.style.left = `${e.clientX}px`;
+            cursor.style.top = `${e.clientY}px`;
+            
+            // Generate fluid wet trails dripping down
+            if (Math.random() < 0.15 && !document.body.classList.contains('hide-custom-cursor')) {
+                spawnPixelDrip(e.clientX, e.clientY);
+            }
+        });
+
+        // ⚙️ Core Cursor Switching Logic Handles
+        headerMenu.addEventListener('mouseenter', () => { document.body.classList.add('hide-custom-cursor'); });
+        headerMenu.addEventListener('mouseleave', () => { document.body.classList.remove('hide-custom-cursor'); });
+        overlay.addEventListener('mouseenter', () => { document.body.classList.add('hide-custom-cursor'); });
+        overlay.addEventListener('mouseleave', () => { document.body.classList.remove('hide-custom-cursor'); });
+
+        window.addEventListener('touchmove', (e) => {
+            if(e.touches.length > 0) {
+                cursor.style.left = `${e.touches[0].clientX}px`;
+                cursor.style.top = `${e.touches[0].clientY}px`;
+            }
+        }, { passive: true });
+
+        function spawnPixelDrip(x, y) {
+            const particle = document.createElement('div');
+            particle.className = 'drip-particle';
+            particle.style.left = `${x + (Math.floor(Math.random() * 24) - 12)}px`;
+            particle.style.top = `${y + 30}px`;
+            document.body.appendChild(particle);
+            setTimeout(() => particle.remove(), 500);
+        }
+
+        function startGame() {
+            score = 0;
+            timeLeft = 30;
+            gameActive = true;
+            lastIndex = -1; 
+            scoreVal.innerText = '000';
+            timeVal.innerText = timeLeft;
+            overlay.style.display = 'none';
+            document.body.classList.remove('hide-custom-cursor');
+
+            startCountdown();
+            nextMoleCycle();
+        }
+
+        function startCountdown() {
+            clearInterval(countdownTimer);
+            countdownTimer = setInterval(() => {
+                timeLeft--;
+                timeVal.innerText = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function getCurrentDelay() {
+            if (timeLeft > 15) {
+                return initialSpawnDelay;
+            }
+            const finalPhaseProgress = (15 - timeLeft) / 15;
+            const delayRange = initialSpawnDelay - minimumSpawnDelay;
+            
+            return initialSpawnDelay - (delayRange * finalPhaseProgress);
+        }
+
+        function nextMoleCycle() {
+            if (!gameActive) return;
+
+            if (currentActiveMole) {
+                currentActiveMole.classList.remove('up');
+            }
+
+            let randomIndex;
+            do {
+                randomIndex = Math.floor(Math.random() * gridHoles.length);
+            } while (randomIndex === lastIndex);
+
+            lastIndex = randomIndex; 
+            currentActiveMole = gridHoles[randomIndex];
+            currentActiveMole.classList.add('up');
+
+            let currentDelay = getCurrentDelay();
+
+            clearTimeout(moleTimeout);
+            moleTimeout = setTimeout(() => {
+                nextMoleCycle();
+            }, currentDelay);
+        }
+
+        function whackMole(element, event) {
+            if (!gameActive || !element.classList.contains('up')) return;
+            
+            score += 10;
+            scoreVal.innerText = String(score).padStart(3, '0');
+            
+            element.classList.remove('up');
+            
+            const hitX = event.clientX || (event.touches && event.touches[0]?.clientX);
+            const hitY = event.clientY || (event.touches && event.touches[0]?.clientY);
+            spawnHitVisual(element.parentElement, hitX, hitY);
+            
+            clearTimeout(moleTimeout);
+            nextMoleCycle();
+        }
+
+        function spawnHitVisual(parentSlot, clientX, clientY) {
+            if(!clientX || !clientY) return;
+            const rect = parentSlot.getBoundingClientRect();
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+
+            const effect = document.createElement('div');
+            effect.className = 'hit-effect';
+            effect.style.left = `${x}px`;
+            effect.style.top = `${y}px`;
+            
+            const textOptions = ['💦 SPLAT!', '💦 WACK!', '💦 FIST!', '💦 SMASH!'];
+            effect.innerText = textOptions[Math.floor(Math.random() * textOptions.length)];
+
+            parentSlot.appendChild(effect);
+            setTimeout(() => effect.remove(), 300);
+        }
+
+        function endGame() {
+            gameActive = false;
+            clearTimeout(moleTimeout);
+            clearInterval(countdownTimer);
+            
+            gridHoles.forEach(h => h.classList.remove('up'));
+
+            overlayTitle.innerText = "GAME OVER";
+            overlayDesc.innerHTML = `GABRI IS NO LONGER HORNY... WELL AT LEAST NOT FOR NOW.<br><br>TOTAL SCORE RATINGS: <span style='color:#ff73ca; font-weight:bold;'>${String(score).padStart(3, '0')} PTS</span>`;
+            actionBtn.innerText = "CONTINUE?";
+            overlay.style.display = 'flex';
+            document.body.classList.add('hide-custom-cursor');
+        }
+    </script>
+</body>
+</html>            align-items: center;
+            justify-content: center;
+            cursor: none !important;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -20%; left: -20%; width: 140%; height: 140%;
+            background: 
+                radial-gradient(circle at 15% 25%, rgba(255, 59, 180, 0.15) 0%, transparent 35%),
+                radial-gradient(circle at 85% 30%, rgba(0, 191, 255, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 50% 80%, rgba(255, 0, 128, 0.08) 0%, transparent 45%);
+            z-index: -1;
+            filter: blur(40px);
+        }
+
+        /* 💦 Wet Pixel Follower Controller Handle Cursor */
+        #custom-fist-cursor {
+            position: fixed;
+            width: 90px;
+            height: 90px;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+        }
+
+        #custom-fist-cursor img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transform-origin: bottom center;
+            transition: transform 0.04s ease-out;
+        }
+
+        /* 👊 Up and Down Smashing Punch Motion */
+        body:active #custom-fist-cursor img {
+            transform: translateY(25px) scaleY(0.85) scaleX(0.95);
+        }
+
         /* Fluid Dripping Particle Drop Tracer */
         .drip-particle {
             position: fixed;
