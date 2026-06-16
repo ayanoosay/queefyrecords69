@@ -127,28 +127,23 @@
         }
 
         /* Environment Stage Graphics Modifiers */
-        .bg-underground {
-            background: linear-gradient(to bottom, #0f051d, #250936);
-        }
-        .bg-forest {
-            background: linear-gradient(to bottom, #051a11, #0f381d);
-        }
-        .bg-space {
-            background: linear-gradient(to bottom, #02020f, #070b24);
-        }
+        .bg-underground { background: linear-gradient(to bottom, #0f051d, #250936); }
+        .bg-forest { background: linear-gradient(to bottom, #051a11, #0f381d); }
+        .bg-space { background: linear-gradient(to bottom, #02020f, #070b24); }
 
-        /* Ambient background star/dust layers */
         .bg-particle {
             position: absolute; background: rgba(255, 255, 255, 0.4); pointer-events: none;
         }
 
-        /* 👤 Player Sprite Layer Frame Configurations */
+        /* 👤 Player Sprite Layer Frame Configurations - UPDATED SIZE */
         #player-sarah {
             position: absolute;
-            width: 55px; height: 55px;
+            width: 75px; height: 75px;
             left: 80px; top: 200px;
             z-index: 5;
             object-fit: contain;
+            transform: rotate(0deg);
+            transition: transform 0.1s linear;
         }
 
         .invincible {
@@ -257,29 +252,28 @@
     </div>
 
     <script>
-        // Game structural properties coordinates trackers
         let player = {
             x: 80, y: 200,
             vy: 0, vx: 0,
-            width: 55, height: 55,
-            targetY: 200, speedX: 7,
-            jumpStrength: -6.5, gravity: 0.32
+            width: 75, height: 75, // Scaled up player bounds
+            speedX: 9.5,          // Heightened strafe accuracy velocity
+            jumpStrength: -7.2,   // Balanced vertical kick
+            gravity: 0.38         // Heavier drop gravity values
         };
 
         let score = 0;
         let lives = 3;
         let gameActive = false;
         let invincibilityFrames = 0;
-        let currentStage = 1; // 1: Underground, 2: Forest, 3: Space
+        let currentStage = 1; 
 
         let obstaclesList = [];
         let particlesList = [];
         
         let loopRef = null;
         let obstacleSpawnTimer = 0;
-        let obstacleSpawnRate = 90; // Frame loop scale intervals matching deployment tracking checks
+        let obstacleSpawnRate = 75; // Faster obstacle spawn loops rate
 
-        // Mobile button state maps tracking matrices
         let mobileLeftActive = false;
         let mobileRightActive = false;
 
@@ -293,12 +287,10 @@
         const overlayDesc = document.getElementById('overlay-desc');
         const actionBtn = document.getElementById('action-btn');
 
-        // Dynamic State Sprites preloading configuration check tracks
         const spriteUp = new Image(); spriteUp.src = 'sarahup.png';
         const spriteMid = new Image(); spriteMid.src = 'sarahmid.png';
         const spriteDown = new Image(); spriteDown.src = 'sarahdown.png';
 
-        // Keyboard tracking bindings processing maps
         let keyboardKeys = {};
         window.addEventListener('keydown', (e) => {
             keyboardKeys[e.code] = true;
@@ -324,15 +316,18 @@
             currentStage = 1;
             gameActive = true;
             invincibilityFrames = 0;
+            
             obstaclesList.forEach(obs => obs.el.remove());
             obstaclesList = [];
             particlesList.forEach(p => p.el.remove());
             particlesList = [];
             
             player.y = 200;
+            player.x = 80;
             player.vy = 0;
             player.vx = 0;
 
+            sarahSprite.style.transform = "rotate(0deg)"; // Reset rotation transformations
             scoreVal.innerText = '000';
             stageName.innerText = "THE UNDERGROUND";
             viewport.className = "game-viewport bg-underground";
@@ -340,7 +335,6 @@
 
             overlay.style.display = 'none';
             
-            // Seed ambient cosmic background space tracking particles array matrix sets
             for (let i = 0; i < 15; i++) {
                 spawnAmbientParticle(true);
             }
@@ -361,7 +355,6 @@
         }
 
         function processPhysicsVelocity() {
-            // Horizontal strafe tracking loop evaluations
             player.vx = 0;
             if (keyboardKeys['KeyA'] || keyboardKeys['ArrowLeft'] || mobileLeftActive) {
                 player.vx = -player.speedX;
@@ -370,12 +363,10 @@
                 player.vx = player.speedX;
             }
 
-            // Apply gravity translation curves
             player.vy += player.gravity;
             player.y += player.vy;
             player.x += player.vx;
 
-            // Constrain screen ceiling and floor boundaries securely
             if (player.y < 0) { player.y = 0; player.vy = 0; }
             const maxFloorY = viewport.clientHeight - player.height;
             if (player.y > maxFloorY) { player.y = maxFloorY; player.vy = 0; }
@@ -384,7 +375,6 @@
             const maxRightX = viewport.clientWidth - player.width;
             if (player.x > maxRightX) player.x = maxRightX;
 
-            // Real-time animation transformation states parsing matching vector velocities
             if (player.vy < -1.5) {
                 sarahSprite.src = spriteUp.complete ? 'sarahup.png' : sarahSprite.src;
             } else if (player.vy > 2) {
@@ -393,7 +383,6 @@
                 sarahSprite.src = spriteMid.complete ? 'sarahmid.png' : sarahSprite.src;
             }
 
-            // Render coordinates positioning matrix configurations
             sarahSprite.style.top = `${player.y}px`;
             sarahSprite.style.left = `${player.x}px`;
 
@@ -404,11 +393,10 @@
         }
 
         function processStageProgression() {
-            score += 0.1; // Accumulate ticks framing loop translation metrics smoothly
+            score += 0.15; // Score climbs slightly faster
             let displayScore = Math.floor(score);
             scoreVal.innerText = String(displayScore).padStart(3, '0');
 
-            // Threshold tracking parameters context rules switching backgrounds
             if (displayScore >= 260 && currentStage !== 3) {
                 currentStage = 3;
                 stageName.innerText = "SPACE DEEP";
@@ -427,20 +415,18 @@
                 spawnDynamicObstacle();
             }
 
-            // Compute speed modifications parsing score benchmarks
-            let movementSpeed = 3.5 + Math.floor(Math.floor(score) / 80) * 0.8;
+            // Upgraded speed velocity calculations curve mapping
+            let movementSpeed = 5.2 + Math.floor(Math.floor(score) / 60) * 1.1;
 
             for (let i = obstaclesList.length - 1; i >= 0; i--) {
                 let obs = obstaclesList[i];
                 obs.x -= movementSpeed;
                 obs.el.style.left = `${obs.x}px`;
 
-                // Run collision bounding calculations
                 if (checkCollision(player, obs)) {
                     triggerPlayerHit();
                 }
 
-                // Cull out-of-bounds nodes cleanly
                 if (obs.x < -60) {
                     obs.el.remove();
                     obstaclesList.splice(i, 1);
@@ -452,12 +438,10 @@
             const el = document.createElement('img');
             el.className = 'obstacle';
             
-            // Randomly pick asset models matrix categories matching stage theme profiles
             const options = ['spider.png', 'web.png', 'calisoga.png'];
             const chosenAsset = options[Math.floor(Math.random() * options.length)];
             el.src = chosenAsset;
             
-            // Render basic inline vector fallback graphic nodes safely if custom images aren't present yet
             el.onerror = function() {
                 this.src = 'data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%2300bfff\'><rect x=\'4\' y=\'4\' width=\'16\' height=\'16\'/></svg>';
             };
@@ -472,17 +456,17 @@
             obstaclesList.push({
                 el: el,
                 x: spawnX, y: spawnY,
-                width: 40, height: 40
+                width: 42, height: 42
             });
         }
 
         function checkCollision(rect1, rect2) {
-            // Squeeze padding buffers slightly to give cleaner retro hitbox parameters
+            // Tighter pixel padding alignment fields maximizing hazard friction profile
             return (
-                rect1.x + 8 < rect2.x + rect2.width &&
-                rect1.x + rect1.width - 8 > rect2.x &&
-                rect1.y + 8 < rect2.y + rect2.height &&
-                rect1.y + rect1.height - 8 > rect2.y
+                rect1.x + 12 < rect2.x + rect2.width &&
+                rect1.x + rect1.width - 12 > rect2.x &&
+                rect1.y + 12 < rect2.y + rect2.height &&
+                rect1.y + rect1.height - 12 > rect2.y
             );
         }
 
@@ -491,10 +475,11 @@
 
             lives--;
             updateHeartsUI();
-            invincibilityFrames = 75; // ~1.5 seconds of protective grace window metrics
+            invincibilityFrames = 60; 
+            player.vy = -3; // Knockback slide bounce vertical pop
             sarahSprite.classList.add('invincible');
 
-            if (lives <= 0) endGame();
+            if (lives <= 0) triggerGameOverAnimation();
         }
 
         function updateHeartsUI() {
@@ -534,7 +519,6 @@
             el.style.left = `${spawnX}px`;
             el.style.top = `${spawnY}px`;
             
-            // Contextual coloration shifting matching environment parameters layers
             if (currentStage === 2) el.style.background = 'rgba(74, 222, 128, 0.3)';
             else if (currentStage === 3) el.style.background = 'rgba(147, 197, 253, 0.5)';
             else el.style.background = 'rgba(232, 121, 249, 0.25)';
@@ -543,11 +527,29 @@
             particlesList.push({ el: el, x: spawnX, speed: Math.random() * 1.5 + 0.5 });
         }
 
-        function endGame() {
+        // 🎬 Game Over Downward Spin Fall Animation Engine Module
+        function triggerGameOverAnimation() {
             gameActive = false;
             cancelAnimationFrame(loopRef);
-            sarahSprite.classList.remove('invincible');
+            
+            let fallRotation = 0;
+            let animateFallInterval = setInterval(() => {
+                player.vy += 0.5; // Rapid gravity calculation pull
+                player.y += player.vy;
+                fallRotation += 18; // Spin velocity rotation speed vector
+                
+                sarahSprite.style.top = `${player.y}px`;
+                sarahSprite.style.transform = `rotate(${fallRotation}deg)`;
 
+                // Once completely fallen clear below screen window frame, reveal gameover text layout modal
+                if (player.y > viewport.clientHeight + 100) {
+                    clearInterval(animateFallInterval);
+                    displayGameOverModal();
+                }
+            }, 20);
+        }
+
+        function displayGameOverModal() {
             overlayTitle.innerText = "DIALOUT LOSS";
             overlayDesc.innerHTML = `Matrix integrity compromised across stages.<br><br>Final Flight Record score: <span style='color:#30d5ff; font-weight:bold;'>${String(Math.floor(score)).padStart(3, '0')} PTS</span>`;
             actionBtn.innerText = "INSERT COIN REBOOT";
