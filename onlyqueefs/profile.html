@@ -88,10 +88,12 @@
 
         .feed-wrapper { padding: 20px; }
         .queef-post { padding: 20px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
-        .post-content { margin: 10px 0; font-size: 1.05rem; }
-        .post-media { width: 100%; border-radius: 12px; max-height: 400px; object-fit: cover; }
-        .action-btn { display: flex; align-items: center; gap: 6px; color: rgba(255,255,255,0.5); cursor: pointer; }
-        .action-btn svg { width: 18px; height: 18px; fill: currentColor; }
+        .post-content { margin: 10px 0; font-size: 1.05rem; white-space: pre-wrap; word-break: break-word; }
+        .post-content a { color: #30d5ff; text-decoration: none; }
+        .post-media { width: 100%; border-radius: 12px; max-height: 400px; object-fit: cover; margin-top: 10px; margin-bottom: 10px; }
+        .post-actions { display: flex; gap: 25px; margin-top: 15px; }
+        .action-btn { display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.5); cursor: pointer; font-size: 0.95rem; font-weight: 600; transition: all 0.2s; }
+        .action-btn svg { width: 20px; height: 20px; fill: currentColor; }
         .action-btn.liked { color: #ff3bb4; }
         .loading-text { text-align: center; color: rgba(255,255,255,0.5); padding: 30px; }
     </style>
@@ -125,10 +127,23 @@
     </main>
 
     <script>
-        // Setup backend endpoints
         const SUPABASE_URL = "https://ybrlwkrqgsdfwwkjvtsv.supabase.co"; 
         const SUPABASE_ANON_KEY = "sb_publishable_HKZYaWXO2UgTjRUomm7M1w_tB1d47ET";
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Fixed: Use safe App instance namespace to prevent variable shadowing global crashes
+        const supabaseApp = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let currentUser = null;
+        let userIpIdentifier = "anon_guest";
+
+        async function fetchUserIP() {
+            try {
+                let response = await fetch("https://api.ipify.org?format=json");
+                let data = await response.json();
+                if(data && data.ip) {
+                    userIpIdentifier = "00000000-0000-0000-0000-" + data.ip.replace(/\./g, "").slice(0, 12).padStart(12, '0');
+                }
+            } catch(err) { console.log("IP fallback fetch issue:", err); }
+        }
 
         const csvLink = "https://docs.google.com/spreadsheets/d/1pYMnzTwBwkopjhsTPxVgu_vAxg39o9uxmRb3e2oaMZo/export?format=csv";
 
@@ -152,59 +167,113 @@
         document.getElementById('prof-handle').innerText = profile.handle;
         document.getElementById('prof-bio').innerHTML = profile.bio;
 
-        if (csvLink) {
-            Papa.parse(csvLink, {
-                download: true,
-                header: true,
-                complete: async function(results) {
-                    let filteredPosts = results.data.filter(post => post["Artist Name"] === currentArtist).reverse();
-                    const feed = document.getElementById('dynamic-profile-feed');
-                    feed.innerHTML = "";
+        function linkifyContent(text) {
+            if(!text) return "";
+            const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            return escaped.replace(urlRegex, (url) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`);
+        }
 
-                    const { data: dbLikes } = await supabase.from('likes').select('*');
-                    const { data: session } = await supabase.auth.getSession();
-                    let loggedInUser = session?.session?.user || null;
+        function generatePostId(artist, content) {
+            let combined = (artist || "") + (content || "");
+            let hash = 0;
+            for (let i = 0; i < combined.length; i++) {
+                hash = (hash << 5) - hash + combined.charCodeAt(i);
+                hash |= 0;
+            }
+            return "qf_" + Math.abs(hash);
+        }
 
-                    if(filteredPosts.length === 0) {
-                        feed.innerHTML = '<div class="loading-text">No posts yet from this artist.</div>';
-                        return;
-                    }
+        async function initProfileFeed() {
+            await fetchUserIP();
+            
+            // Get user authentication context safely
+            const { data: sessionData } = await supabaseApp.auth.getSession();
+            currentUser = sessionData?.session?.user || null;
 
-                    filteredPosts.forEach(post => {
-                        let content = post["Post Content"] || "";
-                        let mediaUrl = post["Media URL"];
-                        let time = post["Timestamp"] ? post["Timestamp"].split(" ")[0] : "Just now";
+            if (csvLink) {
+                Papa.parse(csvLink, {
+                    download: true,
+                    header: true,
+                    complete: async function(results) {
+                        let filteredPosts = results.data.filter(post => post["Artist Name"] === currentArtist).reverse();
+                        const feed = document.getElementById('dynamic-profile-feed');
+                        feed.innerHTML = "";
 
-                        let uniquePostId = (currentArtist + content).replace(/[^a-zA-Z0-9]/g, "").slice(0, 30);
-                        let postLikesCount = dbLikes?.filter(l => l.post_id === uniquePostId).length || 0;
-                        let userHasLiked = dbLikes?.some(l => l.post_id === uniquePostId && l.user_id === loggedInUser?.id) || false;
+                        let dbLikes = [];
+                        try {
+                            const { data: likesRes } = await supabaseApp.from('likes').select('*');
+                            if (likesRes) dbLikes = likesRes;
+                        } catch (err) { console.log("Database lookup bypass:", err); }
 
-                        let heartClass = userHasLiked ? "action-btn like-btn liked" : "action-btn like-btn";
-
-                        let mediaHTML = '';
-                        if (mediaUrl && mediaUrl.trim() !== "") {
-                            if (mediaUrl.toLowerCase().includes('.mp4') || mediaUrl.toLowerCase().includes('.webm')) {
-                                mediaHTML = `<video src="${mediaUrl.trim()}" class="post-media" controls autoplay muted loop></video>`;
-                            } else {
-                                mediaHTML = `<img src="${mediaUrl.trim()}" alt="Media" class="post-media">`;
-                            }
+                        if(filteredPosts.length === 0) {
+                            feed.innerHTML = '<div class="loading-text">No posts yet from this artist.</div>';
+                            return;
                         }
 
-                        feed.innerHTML += `
-                        <div class="queef-post">
-                            <div class="post-content">${content}</div>
-                            ${mediaHTML}
-                            <div class="post-actions">
-                                <div class="${heartClass}" data-post-id="${uniquePostId}">
-                                    <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                                    <span class="like-count">${postLikesCount}</span>
+                        filteredPosts.forEach(post => {
+                            let content = post["Post Content"] || "";
+                            let mediaUrl = post["Media URL"];
+                            let time = post["Timestamp"] ? post["Timestamp"].split(" ")[0] : "Just now";
+
+                            // Fixed: Match the unique hashed post identification algorithm of the index feed
+                            let uniquePostId = generatePostId(currentArtist, content);
+                            let postLikesCount = dbLikes.filter(l => l.post_id === uniquePostId).length;
+                            
+                            let currentViewerId = currentUser ? currentUser.id : userIpIdentifier;
+                            let userHasLiked = dbLikes.some(l => l.post_id === uniquePostId && l.user_id === currentViewerId) || localStorage.getItem("liked_" + uniquePostId) === "true";
+
+                            let heartClass = userHasLiked ? "action-btn like-btn liked" : "action-btn like-btn";
+
+                            let mediaHTML = '';
+                            if (mediaUrl && mediaUrl.trim() !== "") {
+                                if (mediaUrl.toLowerCase().includes('.mp4') || mediaUrl.toLowerCase().includes('.webm')) {
+                                    mediaHTML = `<video src="${mediaUrl.trim()}" class="post-media" controls autoplay muted loop></video>`;
+                                } else {
+                                    mediaHTML = `<img src="${mediaUrl.trim()}" alt="Media" class="post-media">`;
+                                }
+                            }
+
+                            feed.innerHTML += `
+                            <div class="queef-post">
+                                <div class="post-content">${linkifyContent(content)}</div>
+                                ${mediaHTML}
+                                <div class="post-actions">
+                                    <div class="${heartClass}" data-post-id="${uniquePostId}">
+                                        <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                                        <span class="like-count">${postLikesCount}</span>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>`;
-                    });
-                }
-            });
+                            </div>`;
+                        });
+
+                        // Enable real-time interactive likes inside the profile page lists directly
+                        document.querySelectorAll('.like-btn').forEach(btn => {
+                            btn.addEventListener('click', async function() {
+                                let postId = this.getAttribute('data-post-id');
+                                let countSpan = this.querySelector('.like-count');
+                                let currentCount = parseInt(countSpan.innerText);
+                                let targetUserId = currentUser ? currentUser.id : userIpIdentifier;
+
+                                if (this.classList.contains('liked')) {
+                                    this.classList.remove('liked');
+                                    countSpan.innerText = currentCount - 1;
+                                    localStorage.removeItem("liked_" + postId);
+                                    await supabaseApp.from('likes').delete().match({ post_id: postId, user_id: targetUserId });
+                                } else {
+                                    this.classList.add('liked');
+                                    countSpan.innerText = currentCount + 1;
+                                    localStorage.setItem("liked_" + postId, "true");
+                                    await supabaseApp.from('likes').insert([{ post_id: postId, user_id: targetUserId }]);
+                                }
+                            });
+                        });
+                    }
+                });
+            }
         }
+
+        initProfileFeed();
     </script>
 </body>
 </html>
