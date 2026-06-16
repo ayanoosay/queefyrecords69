@@ -5,16 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="../favicon.ico?v=2">
     
-    <title>Arcade | Queefy Records69</title>
-    <meta name="title" content="Arcade | Queefy Records69">
-    <meta name="description" content="Enter the digital playground of Queefy Records69. Play official mini-games inspired by our roster.">
+    <title>FIST-A-GABRI | Arcade Grid</title>
 
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://queefyrecords69.com/minigames/">
-    <meta property="og:title" content="Arcade | Queefy Records69">
-    <meta property="og:description" content="Enter the digital playground of Queefy Records69. Play official mini-games inspired by our roster.">
+    <meta property="og:title" content="FIST-A-GABRI | Queefy Arcade">
+    <meta property="og:description" content="Whack-a-Gabri! Grab your wet fist controller and beat the pixel grid.">
     <meta property="og:image" content="https://ayanoosay.github.io/queefyrecords69/logo.jpeg">
-
     <meta name="theme-color" content="#ff3bb4">
 
     <style>
@@ -22,481 +18,453 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Courier New', Courier, monospace, -apple-system, sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            /* Hard pixel graphics rendering layout toggle */
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
         }
 
         body {
             background-color: #030008;
             color: #ffffff;
             min-height: 100vh;
-            overflow-x: hidden;
+            overflow: hidden;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: none !important;
         }
 
         body::before {
             content: '';
             position: fixed;
-            top: -20%;
-            left: -20%;
-            width: 140%;
-            height: 140%;
+            top: -20%; left: -20%; width: 140%; height: 140%;
             background: 
-                radial-gradient(circle at 15% 25%, rgba(255, 59, 180, 0.18) 0%, transparent 35%),
-                radial-gradient(circle at 85% 30%, rgba(0, 191, 255, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 50% 80%, rgba(255, 0, 128, 0.1) 0%, transparent 45%);
+                radial-gradient(circle at 15% 25%, rgba(255, 59, 180, 0.15) 0%, transparent 35%),
+                radial-gradient(circle at 85% 30%, rgba(0, 191, 255, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 50% 80%, rgba(255, 0, 128, 0.08) 0%, transparent 45%);
             z-index: -1;
             filter: blur(40px);
         }
 
-        @keyframes liquidText {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        /* 💦 Wet Pixel Follower Controller Handle Cursor */
+        #custom-fist-cursor {
+            position: fixed;
+            width: 90px;
+            height: 90px;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+        }
+
+        #custom-fist-cursor img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transform-origin: bottom center;
+            transition: transform 0.04s ease-out;
+        }
+
+        /* 👊 Up and Down Smashing Punch Motion */
+        body:active #custom-fist-cursor img {
+            transform: translateY(25px) scaleY(0.85) scaleX(0.95);
+        }
+
+        /* Hide custom fist when system pointer enters normal interaction zones */
+        body.hide-custom-cursor {
+            cursor: auto !important;
+        }
+        body.hide-custom-cursor #custom-fist-cursor {
+            display: none !important;
+        }
+
+        /* Fluid Dripping Particle Drop Tracer */
+        .drip-particle {
+            position: fixed;
+            width: 8px;
+            height: 14px;
+            background: #30d5ff;
+            box-shadow: 0 0 4px #30d5ff;
+            pointer-events: none;
+            z-index: 9998;
+            animation: dropDown 0.5s steps(6, end) forwards;
+        }
+
+        @keyframes dropDown {
+            0% { transform: translateY(0) scaleY(1); opacity: 1; }
+            100% { transform: translateY(50px) scaleY(0.4); opacity: 0; }
         }
 
         header {
             position: fixed;
-            top: 24px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 92%;
-            max-width: 1200px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 28px;
-            border-radius: 30px;
+            top: 24px; left: 50%; transform: translateX(-50%);
+            width: 92%; max-width: 1200px;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 28px; border-radius: 30px;
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
             backdrop-filter: blur(40px) saturate(240%);
             -webkit-backdrop-filter: blur(40px) saturate(240%);
             border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 
-                -0.6px 0 1px rgba(255, 0, 128, 0.4),  
-                0.6px 0 1px rgba(0, 229, 255, 0.4),  
-                0 10px 40px rgba(0, 0, 0, 0.5),      
-                inset 0 1px 1px rgba(255, 255, 255, 0.3); 
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
             z-index: 1000;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            /* Restore system cursor within navigation container */
+            cursor: pointer !important;
         }
 
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            position: relative;
-            z-index: 1001;
-        }
-
-        .brand-logo {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            border: 1.5px solid rgba(255, 59, 180, 0.6);
-            object-fit: cover;
-            box-shadow: 0 0 15px rgba(255, 59, 180, 0.3);
-        }
-
+        .brand { display: flex; align-items: center; gap: 14px; text-decoration: none; cursor: pointer !important; }
+        .brand-logo { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid rgba(255, 59, 180, 0.6); }
         .logo-text {
-            font-size: 1.25rem;
-            font-weight: 800;
-            letter-spacing: -0.3px;
+            font-size: 1.15rem; font-weight: 800; letter-spacing: -0.3px;
             background: linear-gradient(135deg, #ffffff 0%, #ff73ca 50%, #30d5ff 100%);
             background-size: 200% 200%;
             animation: liquidText 4s ease infinite;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
         .desktop-nav a {
-            color: rgba(255, 255, 255, 0.75);
-            text-decoration: none;
-            margin-left: 30px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            letter-spacing: -0.1px;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            color: rgba(255, 255, 255, 0.75); text-decoration: none;
+            font-size: 0.9rem; font-weight: 600; cursor: pointer !important;
+        }
+        .desktop-nav a:hover { color: #ff73ca; }
+
+        /* 🖥️ Amplified PC Scale Controls */
+        .arcade-cabinet {
+            background: #140727;
+            border: 4px solid #ff3bb4;
+            border-radius: 12px;
+            width: 92%; max-width: 720px; /* Made cabinet wider on PC */
+            padding: 24px;
+            box-shadow: 0 0 30px rgba(255, 59, 180, 0.3), inset 0 0 15px rgba(0,0,0,0.8);
+            margin-top: 120px;
             position: relative;
-            padding: 6px 0;
         }
 
-        .desktop-nav a:hover {
-            color: #ffffff;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        .game-hud {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; padding: 12px 20px;
+            background: #000000; border: 2px solid #30d5ff; border-radius: 4px;
+            box-shadow: 0 0 10px rgba(48, 213, 255, 0.3);
         }
 
-        .desktop-nav a.active {
-            color: #ff73ca;
-            text-shadow: 0 0 15px rgba(255, 59, 180, 0.5);
-        }
+        .hud-item { font-size: 1.3rem; font-weight: bold; color: #fff; text-shadow: 0 0 4px #fff; }
+        .hud-item span { color: #30d5ff; text-shadow: 0 0 8px #30d5ff; }
+        #score-val { color: #ff73ca; text-shadow: 0 0 8px #ff73ca; }
 
-        .desktop-nav a::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            width: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #ff3bb4, #00bfff);
-            border-radius: 10px;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            transform: translateX(-50%);
-        }
-
-        .desktop-nav a:hover::after, .desktop-nav a.active::after {
-            width: 80%;
-        }
-
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            justify-content: space-between;
-            width: 30px;
-            height: 20px;
-            cursor: pointer;
-            z-index: 1001; 
-        }
-
-        .hamburger span {
-            display: block;
-            height: 2px;
+        /* 🟩 Retro Whack-A-Mole Green Arena Field */
+        .mole-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
             width: 100%;
-            background-color: #ffffff;
-            border-radius: 2px;
-            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            height: 500px; /* Made layout area taller on PC */
+            background-color: #1a7a2a; /* Rich arcade field green background */
+            background-image: 
+                radial-gradient(#249436 20%, transparent 20%),
+                radial-gradient(#1e852f 20%, transparent 20%);
+            background-size: 16px 16px;
+            background-position: 0 0, 8px 8px;
+            border-radius: 8px;
+            padding: 24px;
+            border: 4px solid #0b3a0f;
+            position: relative;
+            overflow: hidden;
         }
 
-        .hamburger.active span:nth-child(1) {
-            transform: translateY(9px) rotate(45deg);
-            background-color: #ff3bb4;
-        }
-        .hamburger.active span:nth-child(2) {
-            opacity: 0;
-            transform: translateX(-20px);
-        }
-        .hamburger.active span:nth-child(3) {
-            transform: translateY(-9px) rotate(-45deg);
-            background-color: #00bfff;
+        /* Scanline CRT glass overlay look */
+        .mole-grid::after {
+            content: " ";
+            display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 0, 0.06));
+            z-index: 8; background-size: 100% 4px, 6px 100%; pointer-events: none;
         }
 
-        .mobile-menu {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background: linear-gradient(135deg, rgba(3, 0, 8, 0.7) 0%, rgba(17, 5, 28, 0.8) 100%);
-            backdrop-filter: blur(40px) saturate(240%);
-            -webkit-backdrop-filter: blur(40px) saturate(240%);
-            z-index: 999;
+        .grid-hole {
+            background: #091a0c;
+            border-radius: 50%;
+            border: 4px solid #050d06;
+            box-shadow: inset 0 12px 14px rgba(0,0,0,0.85);
+            position: relative;
+            overflow: hidden;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 40px;
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            transform: translateY(-5%);
         }
 
-        .mobile-menu.active {
-            opacity: 1;
-            pointer-events: all;
-            transform: translateY(0);
-        }
-
-        .mobile-link {
-            color: rgba(255, 255, 255, 0.6);
-            text-decoration: none;
-            font-size: 2.2rem;
-            font-weight: 800;
-            letter-spacing: -1px;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            transform: translateY(20px);
-            opacity: 0;
-        }
-
-        .mobile-menu.active .mobile-link {
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        .mobile-menu.active .mobile-link:nth-child(1) { transition-delay: 0.1s; }
-        .mobile-menu.active .mobile-link:nth-child(2) { transition-delay: 0.15s; }
-        .mobile-menu.active .mobile-link:nth-child(3) { transition-delay: 0.2s; }
-        .mobile-menu.active .mobile-link:nth-child(4) { transition-delay: 0.25s; }
-        .mobile-menu.active .mobile-link:nth-child(5) { transition-delay: 0.3s; }
-
-        .mobile-link:hover, .mobile-link:active {
-            color: #ffffff;
-            transform: scale(1.1);
-            text-shadow: 0 0 20px rgba(255, 59, 180, 0.6);
-        }
-
-        .arcade-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 160px 4% 120px;
-        }
-
-        .arcade-header {
-            text-align: center;
-            margin-bottom: 60px;
-        }
-
-        .arcade-header h1 {
-            font-size: 4rem;
-            font-weight: 900;
-            letter-spacing: -1.5px;
-            margin-bottom: 15px;
-            background: linear-gradient(135deg, #ffffff 15%, #ff46bd 55%, #00e5ff 100%);
-            background-size: 200% 200%;
-            animation: liquidText 6s ease infinite;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .arcade-header p {
-            font-size: 1.2rem;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .games-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 40px;
-        }
-
-        .game-card {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
-            backdrop-filter: blur(30px) saturate(180%);
-            -webkit-backdrop-filter: blur(30px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 32px;
-            overflow: hidden;
-            box-shadow: 0 20px 45px rgba(0,0,0,0.25), inset 0 1px 1px rgba(255,255,255,0.2);
-            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .game-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            border-color: rgba(255, 59, 180, 0.5);
-            box-shadow: 0 35px 60px rgba(255, 59, 180, 0.2), 0 15px 30px rgba(0, 191, 255, 0.1);
-        }
-
-        .game-img-wrapper {
-            width: 100%;
-            height: 240px;
-            position: relative;
-            background: linear-gradient(135deg, #1d0324, #030f24);
-            overflow: hidden;
-        }
-
-        .game-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .game-card:hover .game-img {
-            transform: scale(1.05);
-        }
-
-        .game-info {
-            padding: 28px;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-        }
-
-        .game-info h3 {
-            font-size: 1.6rem;
-            font-weight: 800;
-            letter-spacing: -0.4px;
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, #ffffff 0%, #ff73ca 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .game-info p {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.95rem;
-            line-height: 1.4;
-            margin-bottom: 24px;
-        }
-
-        .play-btn {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.03) 100%);
-            color: #ffffff;
-            text-align: center;
-            padding: 14px;
-            text-decoration: none;
-            font-weight: 700;
-            border-radius: 50px;
-            font-size: 0.95rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            margin-top: auto;
-        }
-
-        .game-card:hover .play-btn {
-            background: linear-gradient(135deg, #ff3bb4 0%, #00bfff 100%);
-            border-color: transparent;
-            box-shadow: 0 10px 25px rgba(255, 59, 180, 0.4);
-        }
-
-        .locked-card {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .locked-card:hover {
-            transform: none;
-            border-color: rgba(255, 255, 255, 0.12);
-            box-shadow: 0 20px 45px rgba(0,0,0,0.25);
-        }
-
-        .badge {
+        /* 👤 Gabri target head image element */
+        .mole-target {
+            width: 115%;
+            height: 115%;
+            object-fit: contain;
             position: absolute;
-            top: 16px;
-            right: 16px;
-            background: rgba(3, 0, 8, 0.6);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            z-index: 2;
+            bottom: -130%; /* Kept hidden below the frame edge vector */
+            transition: bottom 0.1s steps(4); /* Chonky arcade step translation transition */
+            cursor: none;
+            z-index: 5;
         }
 
-        .badge.new {
-            border-color: #00e5ff;
-            color: #00e5ff;
+        .mole-target.up {
+            bottom: -15%; /* Pops up perfectly inside the hole field box zone */
         }
 
-        footer {
-            text-align: center;
-            padding: 80px 0;
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 0.9rem;
-            font-weight: 500;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            background: linear-gradient(to top, rgba(5, 1, 12, 0.8), transparent);
-            margin-top: auto;
+        .screen-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(3, 0, 8, 0.95);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 10; border-radius: 4px; text-align: center; padding: 20px;
         }
 
+        .screen-overlay h2 {
+            font-size: 2.5rem; font-weight: bold; margin-bottom: 12px;
+            color: #ff3bb4; text-shadow: 0 0 8px #ff3bb4;
+        }
+
+        .screen-overlay p { color: #30d5ff; margin-bottom: 24px; font-size: 1rem; max-width: 460px; line-height: 1.4; }
+
+        .start-btn {
+            background: #ff3bb4;
+            color: white; border: 2px solid #fff; padding: 12px 36px;
+            font-size: 1rem; font-weight: bold;
+            box-shadow: 0 6px 0 #b31d77, 0 10px 15px rgba(0,0,0,0.4);
+            transition: all 0.1s steps(2);
+            cursor: pointer !important;
+        }
+        .start-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #b31d77; }
+
+        .hit-effect {
+            position: absolute; pointer-events: none;
+            font-size: 1.2rem; font-weight: bold; color: #30d5ff;
+            text-shadow: 0 0 6px #30d5ff; animation: pixelFloat 0.3s steps(4) forwards;
+            z-index: 6;
+        }
+
+        @keyframes pixelFloat {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
+
+        /* 📱 Responsive Mobile Overrides */
         @media (max-width: 768px) {
-            .arcade-header h1 { font-size: 2.8rem; }
             header { top: 12px; padding: 10px 20px; width: 95%; }
-            .desktop-nav { display: none; }
-            .hamburger { display: flex; }
-            .games-grid { gap: 25px; }
+            .arcade-cabinet { margin-top: 85px; padding: 12px; max-width: 580px; }
+            .game-hud { margin-bottom: 12px; padding: 10px; }
+            .hud-item { font-size: 1rem; }
+            .mole-grid { gap: 10px; padding: 12px; height: auto; aspect-ratio: 1 / 1; }
+            .screen-overlay h2 { font-size: 1.6rem; }
+            .screen-overlay p { font-size: 0.8rem; margin-bottom: 16px; }
+            .start-btn { padding: 8px 24px; font-size: 0.9rem; }
+            #custom-fist-cursor { width: 65px; height: 65px; }
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="brand">
-            <img src="../logo.jpeg" alt="Logo" class="brand-logo">
-            <div class="logo-text">Queefy Records69</div>
-        </div>
-        
-        <nav class="desktop-nav">
-            <a href="../index.html">Home</a>
-            <a href="../index.html#roster">Roster</a>
-            <a href="../events/">Events</a>
-            <a href="../onlyqueefs/">OnlyQueefs</a>
-            <a href="#" class="active">Minigames</a>
-        </nav>
-
-        <div class="hamburger" id="hamburger">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-    </header>
-
-    <div class="mobile-menu" id="mobile-menu">
-        <a href="../index.html" class="mobile-link">Home</a>
-        <a href="../index.html#roster" class="mobile-link">Roster</a>
-        <a href="../events/" class="mobile-link">Events</a>
-        <a href="../onlyqueefs/" class="mobile-link">OnlyQueefs</a>
-        <a href="#" class="mobile-link">Minigames</a>
+    <div id="custom-fist-cursor">
+        <img src="fist.png" alt="Wet Fist" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23ff3bb4\'><rect x=\'6\' y=\'6\' width=\'12\' height=\'12\'/></svg>'">
     </div>
 
-    <main class="arcade-container">
-        <div class="arcade-header">
-            <h1>The Arcade</h1>
-            <p>Roster-inspired digital anomalies.</p>
+    <header id="header-menu">
+        <a href="index.html" class="brand">
+            <img src="../logo.jpeg" alt="Logo" class="brand-logo">
+            <div class="logo-text">Queefy Arcade</div>
+        </a>
+        <nav class="desktop-nav">
+            <a href="index.html">← EXIT</a>
+        </nav>
+    </header>
+
+    <div class="arcade-cabinet">
+        <div class="game-hud">
+            <div class="hud-item">SCORE: <span id="score-val">000</span></div>
+            <div class="hud-item">TIME: <span id="time-val">30</span>S</div>
         </div>
 
-        <div class="games-grid">
-            
-            <div class="game-card">
-                <span class="badge new">LIVE</span>
-                <div class="game-img-wrapper">
-                    <img src="fistagabri.jpeg" alt="FIST-A-GABRI" class="game-img">
-                </div>
-                <div class="game-info">
-                    <h3>FIST-A-GABRI</h3>
-                    <p>Oh my god! Gabri is horny AF. Play the game and fix this ASAP!</p>
-                    <a href="./fist-a-gabri.html" class="play-btn">Launch Game</a>
-                </div>
+        <div class="mole-grid" id="game-grid">
+            <div class="screen-overlay" id="overlay">
+                <h2 id="overlay-title">FIST-A-GABRI</h2>
+                <p id="overlay-desc">OMG! GABRI IS SO FUCKING HORNY... BUT, THIS IS NOT REALLY A FISTING GAME, QUICKLY SMACK GABRI BEFORE SHE GETS MOIST AF!.</p>
+                <button class="start-btn" id="action-btn" onclick="startGame()">INSERT COIN</button>
             </div>
 
-            <div class="game-card locked-card">
-                <span class="badge">LOCKED</span>
-                <div class="game-img-wrapper">
-                    <img src="../logo.jpeg" alt="Coming Soon" class="game-img" style="filter: grayscale(1) blur(2px);">
-                </div>
-                <div class="game-info">
-                    <h3>???</h3>
-                    <p>UPCOMING</p>
-                    <a href="#" class="play-btn" style="pointer-events: none;">Unavailable</a>
-                </div>
-            </div>
-
+            <div class="grid-hole"><img src="gabrihead.png" class="mole-target" data-index="0" onpointerdown="whackMole(this, event)"></div>
+            <div class="grid-hole"><img src="gabrihead.png" class="mole-target" data-index="1" onpointerdown="whackMole(this, event)"></div>
+            <div class="grid-hole"><img src="gabrihead.png" class="mole-target" data-index="2" onpointerdown="whackMole(this, event)"></div>
+            <div class="grid-hole"><img src="gabrihead.png" class="mole-target" data-index="3" onpointerdown="whackMole(this, event)"></div>
+            <div class="grid-hole"><img src="gabrihead.png" class="mole-target" data-index="4" onpointerdown="whackMole(this, event)"></div>
+            <div class="grid-hole"><img src="gabrihead.png" class="mole-target" data-index="5" onpointerdown="whackMole(this, event)"></div>
+            <div class="grid-hole"><img src="gabrihead.png" class="mole-target" data-index="6" onpointerdown="whackMole(this, event)"></div>
+            <div class="grid-hole"><img src="gabrihead.png" class="mole-target" data-index="7" onpointerdown="whackMole(this, event)"></div>
+            <div class="grid-hole"><img src="gabrihead.png" class="mole-target" data-index="8" onpointerdown="whackMole(this, event)"></div>
         </div>
-    </main>
-
-    <footer>
-        © 2026 Queefy Records69. Curated for the core. Closed roster.
-    </footer>
+    </div>
 
     <script>
-        const hamburger = document.getElementById('hamburger');
-        const mobileMenu = document.getElementById('mobile-menu');
-        const mobileLinks = document.querySelectorAll('.mobile-link');
+        let score = 0;
+        let timeLeft = 30;
+        let gameActive = false;
+        let currentActiveMole = null;
+        let lastIndex = -1; // Stores previous hole location index
+        let moleTimeout = null;
+        let countdownTimer = null;
+        
+        const initialSpawnDelay = 1250; 
+        const minimumSpawnDelay = 450;  
 
-        hamburger.addEventListener('click', () => {
-            hamburger.classList.toggle('active');
-            mobileMenu.classList.toggle('active');
+        const cursor = document.getElementById('custom-fist-cursor');
+        const gridHoles = document.querySelectorAll('.mole-target');
+        const overlay = document.getElementById('overlay');
+        const overlayTitle = document.getElementById('overlay-title');
+        const overlayDesc = document.getElementById('overlay-desc');
+        const actionBtn = document.getElementById('action-btn');
+        const headerMenu = document.getElementById('header-menu');
+        
+        const scoreVal = document.getElementById('score-val');
+        const timeVal = document.getElementById('time-val');
+
+        // Capture mouse movement coordinates
+        window.addEventListener('mousemove', (e) => {
+            cursor.style.left = `${e.clientX}px`;
+            cursor.style.top = `${e.clientY}px`;
             
-            if(mobileMenu.classList.contains('active')) {
-                document.body.style.overflow = 'hidden';
-            } else {
-                document.body.style.overflow = 'auto';
+            // Generate fluid wet trails dripping down
+            if (Math.random() < 0.15 && !document.body.classList.contains('hide-custom-cursor')) {
+                spawnPixelDrip(e.clientX, e.clientY);
             }
         });
 
-        mobileLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                hamburger.classList.remove('active');
-                mobileMenu.classList.remove('active');
-                document.body.style.overflow = 'auto';
-            });
-        });
+        // ⚙️ Core Cursor Switching Logic Handles
+        headerMenu.addEventListener('mouseenter', () => { document.body.classList.add('hide-custom-cursor'); });
+        headerMenu.addEventListener('mouseleave', () => { document.body.classList.remove('hide-custom-cursor'); });
+        overlay.addEventListener('mouseenter', () => { document.body.classList.add('hide-custom-cursor'); });
+        overlay.addEventListener('mouseleave', () => { document.body.classList.remove('hide-custom-cursor'); });
+
+        window.addEventListener('touchmove', (e) => {
+            if(e.touches.length > 0) {
+                cursor.style.left = `${e.touches[0].clientX}px`;
+                cursor.style.top = `${e.touches[0].clientY}px`;
+            }
+        }, { passive: true });
+
+        function spawnPixelDrip(x, y) {
+            const particle = document.createElement('div');
+            particle.className = 'drip-particle';
+            particle.style.left = `${x + (Math.floor(Math.random() * 24) - 12)}px`;
+            particle.style.top = `${y + 30}px`;
+            document.body.appendChild(particle);
+            setTimeout(() => particle.remove(), 500);
+        }
+
+        function startGame() {
+            score = 0;
+            timeLeft = 30;
+            gameActive = true;
+            lastIndex = -1; 
+            scoreVal.innerText = '000';
+            timeVal.innerText = timeLeft;
+            overlay.style.display = 'none';
+            document.body.classList.remove('hide-custom-cursor');
+
+            startCountdown();
+            nextMoleCycle();
+        }
+
+        function startCountdown() {
+            clearInterval(countdownTimer);
+            countdownTimer = setInterval(() => {
+                timeLeft--;
+                timeVal.innerText = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function getCurrentDelay() {
+            if (timeLeft > 15) {
+                return initialSpawnDelay;
+            }
+            const finalPhaseProgress = (15 - timeLeft) / 15;
+            const delayRange = initialSpawnDelay - minimumSpawnDelay;
+            
+            return initialSpawnDelay - (delayRange * finalPhaseProgress);
+        }
+
+        function nextMoleCycle() {
+            if (!gameActive) return;
+
+            if (currentActiveMole) {
+                currentActiveMole.classList.remove('up');
+            }
+
+            let randomIndex;
+            do {
+                randomIndex = Math.floor(Math.random() * gridHoles.length);
+            } while (randomIndex === lastIndex);
+
+            lastIndex = randomIndex; 
+            currentActiveMole = gridHoles[randomIndex];
+            currentActiveMole.classList.add('up');
+
+            let currentDelay = getCurrentDelay();
+
+            clearTimeout(moleTimeout);
+            moleTimeout = setTimeout(() => {
+                nextMoleCycle();
+            }, currentDelay);
+        }
+
+        function whackMole(element, event) {
+            if (!gameActive || !element.classList.contains('up')) return;
+            
+            score += 10;
+            scoreVal.innerText = String(score).padStart(3, '0');
+            
+            element.classList.remove('up');
+            
+            const hitX = event.clientX || (event.touches && event.touches[0]?.clientX);
+            const hitY = event.clientY || (event.touches && event.touches[0]?.clientY);
+            spawnHitVisual(element.parentElement, hitX, hitY);
+            
+            clearTimeout(moleTimeout);
+            nextMoleCycle();
+        }
+
+        function spawnHitVisual(parentSlot, clientX, clientY) {
+            if(!clientX || !clientY) return;
+            const rect = parentSlot.getBoundingClientRect();
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+
+            const effect = document.createElement('div');
+            effect.className = 'hit-effect';
+            effect.style.left = `${x}px`;
+            effect.style.top = `${y}px`;
+            
+            const textOptions = ['💦 SPLAT!', '💦 WACK!', '💦 FIST!', '💦 SMASH!'];
+            effect.innerText = textOptions[Math.floor(Math.random() * textOptions.length)];
+
+            parentSlot.appendChild(effect);
+            setTimeout(() => effect.remove(), 300);
+        }
+
+        function endGame() {
+            gameActive = false;
+            clearTimeout(moleTimeout);
+            clearInterval(countdownTimer);
+            
+            gridHoles.forEach(h => h.classList.remove('up'));
+
+            overlayTitle.innerText = "GAME OVER";
+            overlayDesc.innerHTML = `GABRI IS NO LONGER HORNY... WELL AT LEAST NOT FOR NOW.<br><br>TOTAL SCORE RATINGS: <span style='color:#ff73ca; font-weight:bold;'>${String(score).padStart(3, '0')} PTS</span>`;
+            actionBtn.innerText = "CONTINUE?";
+            overlay.style.display = 'flex';
+            document.body.classList.add('hide-custom-cursor');
+        }
     </script>
 </body>
 </html>
