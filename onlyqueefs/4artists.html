@@ -55,7 +55,6 @@
         .portal-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(0, 191, 255, 0.3); }
         .portal-btn:disabled { background: #555; cursor: not-allowed; box-shadow: none; }
 
-        .file-upload-wrapper { position: relative; width: 100%; }
         .hidden-workflow { display: none; }
     </style>
 </head>
@@ -85,7 +84,17 @@
             <form onsubmit="publishLivePost(event)">
                 <div class="form-group">
                     <label>Publishing Identity</label>
-                    <select id="artistSelect" class="portal-select"></select>
+                    <select id="artistSelect" class="portal-select">
+                        <option value="Sarah Yamaguchi">Sarah Yamaguchi</option>
+                        <option value="Gabri Hannah">Gabri Hannah</option>
+                        <option value="Kurai Hana">Kurai Hana</option>
+                        <option value="Stella Sukehiro">Stella Sukehiro</option>
+                        <option value="Mazie LaRosa">Mazie LaRosa</option>
+                        <option value="Anna Martinez">Anna Martinez</option>
+                        <option value="Bhad Belle">Bhad Belle</option>
+                        <option value="Billoga">Billoga</option>
+                        <option value="Queefy Records Official">Queefy Records Official</option>
+                    </select>
                 </div>
 
                 <div class="form-group">
@@ -108,13 +117,13 @@
         const SUPABASE_ANON_KEY = "sb_publishable_HKZYaWXO2UgTjRUomm7M1w_tB1d47ET";
         const supabaseApp = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Your secure whitelisted identities map array settings
-        const WHITELIST_MAPPING = {
-            "kuraihanaofficial@gmail.com": ["Kurai Hana", "Queefy Records Official"],
-            "sarahyamaguchi@queefyrecords.com": ["Sarah Yamaguchi"],
-            "gabrihannah@queefyrecords.com": ["Gabri Hannah"],
-            "stellasukehiro@queefyrecords.com": ["Stella Sukehiro"]
-        };
+        // Lazy whitelist array directory -> Simply adding an email here gives it absolute authority over ALL accounts
+        const GLOBAL_ARTIST_WHITELIST = [
+            "kuraihanaofficial@gmail.com",
+            "sarahyamaguchi@queefyrecords.com",
+            "gabrihannah@queefyrecords.com",
+            "stellasukehiro@queefyrecords.com"
+        ];
 
         window.onload = async () => {
             const { data: { session } } = await supabaseApp.auth.getSession();
@@ -143,8 +152,8 @@
 
         function verifyAndLoad(email) {
             const normalizedEmail = email.toLowerCase();
-            if (!WHITELIST_MAPPING[normalizedEmail]) {
-                alert("Access Denied: Your email address is not whitelisted as a label artist profile.");
+            if (!GLOBAL_ARTIST_WHITELIST.includes(normalizedEmail)) {
+                alert("Access Denied: Your email address is not whitelisted as a label manager or artist.");
                 supabaseApp.auth.signOut();
                 window.location.reload();
                 return;
@@ -153,13 +162,6 @@
             document.getElementById('auth-gate').style.display = 'none';
             document.getElementById('workspace-area').style.display = 'block';
             document.getElementById('portal-status').innerText = "Verified Profile: " + email;
-
-            // Generate choices dropdown strictly containing identities this specific artist owns
-            const select = document.getElementById('artistSelect');
-            select.innerHTML = "";
-            WHITELIST_MAPPING[normalizedEmail].forEach(identity => {
-                select.innerHTML += `<option value="${identity}">${identity}</option>`;
-            });
         }
 
         async function publishLivePost(e) {
@@ -176,7 +178,6 @@
             btn.disabled = true;
             let finalMediaUrl = "";
 
-            // Handle direct binary file stream transfers directly to your Storage Cloud Bucket
             if (file) {
                 const fileExt = file.name.split('.').pop();
                 const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
@@ -197,7 +198,6 @@
                 finalMediaUrl = data.publicUrl;
             }
 
-            // Write record values directly to database rows securely
             const { error } = await supabaseApp.from('posts').insert([
                 { artist_name: artist, post_content: content, media_url: finalMediaUrl }
             ]);
