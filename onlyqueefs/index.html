@@ -685,7 +685,6 @@
             return "qf_" + Math.abs(hash);
         }
 
-        // Extracted render loop into a separate function so it can safely be called by real-time updates
         function updateLikeCountersUI(postId) {
             const btn = document.querySelector(`.like-btn[data-post-id="${postId}"]`);
             if(!btn) return;
@@ -694,7 +693,7 @@
             if(countSpan) countSpan.innerText = totalLikes;
 
             let currentViewerId = currentUser ? currentUser.id : userIpIdentifier;
-            let userHasLiked = globalDbLikes.some(l => l.post_id === postId && l.user_id === currentViewerId) || localStorage.getItem("liked_" + postId) === "true";
+            let userHasLiked = globalDbLikes.some(l => l.post_id === postId && l.user_id === currentViewerId);
             
             if(userHasLiked) btn.classList.add('liked');
             else btn.classList.remove('liked');
@@ -761,7 +760,7 @@
                         let postLikesCount = globalDbLikes.filter(l => l.post_id === uniquePostId).length;
                         
                         let currentViewerId = currentUser ? currentUser.id : userIpIdentifier;
-                        let userHasLiked = globalDbLikes.some(l => l.post_id === uniquePostId && l.user_id === currentViewerId) || localStorage.getItem("liked_" + uniquePostId) === "true";
+                        let userHasLiked = globalDbLikes.some(l => l.post_id === uniquePostId && l.user_id === currentViewerId);
                         let heartClass = userHasLiked ? "action-btn like-btn liked" : "action-btn like-btn";
 
                         let mediaHTML = '';
@@ -826,26 +825,24 @@
                             let currentCount = parseInt(countSpan.innerText);
                             let targetUserId = currentUser ? currentUser.id : userIpIdentifier;
 
+                            // Local optimistic UI switch (Fires instantly on screen while DB syncs)
                             if (this.classList.contains('liked')) {
                                 this.classList.remove('liked');
                                 countSpan.innerText = currentCount - 1;
-                                localStorage.removeItem("liked_" + postId);
                                 await supabaseApp.from('likes').delete().match({ post_id: postId, user_id: targetUserId });
                             } else {
                                 this.classList.add('liked');
                                 countSpan.innerText = currentCount + 1;
-                                localStorage.setItem("liked_" + postId, "true");
                                 await supabaseApp.from('likes').insert([{ post_id: postId, user_id: targetUserId }]);
                             }
                         });
                     });
 
-                    // 📡 ACTIVATE REAL-TIME BROADCAST LISTENER CHANNELS 📡
+                    // 📡 REAL-TIME REAL-TIME SYNC CHANNELS 📡
                     supabaseApp
                         .channel('realtime-feed-updates')
                         .on('postgres_changes', { event: '*', schema: 'public', table: 'likes' }, payload => {
                             if (payload.eventType === 'INSERT') {
-                                // Add to cached arrays if it's missing
                                 if(!globalDbLikes.some(l => l.id === payload.new.id)) {
                                     globalDbLikes.push(payload.new);
                                 }
@@ -872,7 +869,6 @@
                             if(targetComment) targetComment.remove();
                         })
                         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, payload => {
-                            // If an artist posts, let them know right at the header instead of fracturing active inputs
                             alert(`New post dropped by ${payload.new.artist_name}! Refreshing timeline layout...`);
                             window.location.reload();
                         })
@@ -883,7 +879,6 @@
 
         async function submitComment(postId) {
             const errorLabel = document.getElementById(`error_${postId}`);
-            
             if(!currentUser) { 
                 if(errorLabel) errorLabel.style.display = "block";
                 return; 
@@ -909,15 +904,8 @@
 
         async function deleteComment(commentId, buttonElement) {
             if(!confirm("Are you sure you want to delete this comment?")) return;
-            
-            const { error } = await supabaseApp
-                .from('comments')
-                .delete()
-                .eq('id', commentId);
-
-            if(error) {
-                alert("Could not remove record: " + error.message);
-            }
+            const { error } = await supabaseApp.from('comments').delete().eq('id', commentId);
+            if(error) alert("Could not remove record: " + error.message);
         }
 
         function clearCommentError(postId) {
@@ -932,7 +920,8 @@
             mobileMenu.classList.toggle('active');
         });
 
-        initFeed();
+        // Trigger loop sequence setup
+        fetchUserIP().then(() => initFeed());
     </script>
 </body>
 </html>
