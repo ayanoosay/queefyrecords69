@@ -66,10 +66,12 @@
             height: 100%;
             object-fit: contain;
             transform-origin: bottom center;
+            transition: transform 0.04s ease-out;
         }
 
+        /* 👊 Up and Down Smashing Punch Motion */
         body:active #custom-fist-cursor img {
-            transform: scale(0.8) rotate(-15deg);
+            transform: translateY(25px) scaleY(0.85) scaleX(0.95);
         }
 
         /* Fluid Dripping Particle Drop Tracer */
@@ -181,7 +183,7 @@
             justify-content: center;
         }
 
-        /* 👤 Gabri target head image element - MADE BIGGER HERE */
+        /* 👤 Gabri target head image element */
         .mole-target {
             width: 115%;
             height: 115%;
@@ -260,7 +262,7 @@
         <div class="mole-grid" id="game-grid">
             <div class="screen-overlay" id="overlay">
                 <h2 id="overlay-title">FIST-A-GABRI</h2>
-                <p id="overlay-desc">ANOMALY DETECTED IN THE SOIL FIELDS! SMASH THE GABRI HEADSHOTS WITH YOUR WET FIST BEFORE THEY SLIDE UNDERGROUND.</p>
+                <p id="overlay-desc">OMG! GABRI IS SO FUCKING HORNY... BUT, THIS IS NOT REALLY A FISTING GAME, QUICKLY SMACK GABRI BEFORE SHE GETS MOIST AF!.</p>
                 <button class="start-btn" id="action-btn" onclick="startGame()">INSERT COIN</button>
             </div>
 
@@ -397,7 +399,7 @@
             gridHoles.forEach(h => h.classList.remove('up'));
 
             overlayTitle.innerText = "GAME OVER";
-            overlayDesc.innerHTML = `ANOMALY TIMEOUT CLEAR.<br><br>TOTAL SCORE RATINGS: <span style='color:#ff73ca; font-weight:bold;'>${String(score).padStart(3, '0')} PTS</span>`;
+            overlayDesc.innerHTML = `GABRI IS NO LONGER HORNY... WELL AT LEAST NOT FOR NOW.<br><br>TOTAL SCORE RATINGS: <span style='color:#ff73ca; font-weight:bold;'>${String(score).padStart(3, '0')} PTS</span>`;
             actionBtn.innerText = "CONTINUE?";
             overlay.style.display = 'flex';
         }
