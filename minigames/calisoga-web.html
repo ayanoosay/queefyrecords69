@@ -134,7 +134,6 @@
             background-size: auto 100%;
             opacity: 0;
             z-index: 2;
-            /* Incremental stepping function matching vintage visual styles */
             transition: opacity 0.8s steps(8, end);
             pointer-events: none;
         }
@@ -237,10 +236,6 @@
     </style>
 </head>
 <body>
-
-    <div id="custom-fist-cursor">
-        <img src="fist.png" alt="Wet Fist" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23ff3bb4\'><rect x=\'6\' y=\'6\' width=\'12\' height=\'12\'/></svg>'">
-    </div>
 
     <header>
         <a href="index.html" class="brand">
@@ -358,7 +353,7 @@
             sarahSprite.style.transform = "rotate(0deg)"; 
             scoreVal.innerText = '000';
             stageName.innerText = "THE UNDERGROUND";
-            viewport.style.backgroundImage = "url('underground.png')";
+            viewport.style.backgroundImage = "url('underground.jpeg')";
             bgTransitionLayer.className = "";
             bgTransitionLayer.style.backgroundImage = "none";
             updateHeartsUI();
@@ -430,31 +425,27 @@
             }
         }
 
-        // 🎞️ Active Parallax Blending Engine Module Handles
         function triggerStageTransition(nextStage, nextStageName, nextBgImage) {
             if (isTransitioning) return;
             isTransitioning = true;
             currentStage = nextStage;
             stageName.innerText = nextStageName;
 
-            // Load incoming background onto tracking overlap layer node
             bgTransitionLayer.style.backgroundImage = `url('${nextBgImage}')`;
             bgTransitionLayer.classList.add('fade-in');
 
-            // Synchronize final canvas assets swap clearing layer states after CSS transition window settles
             setTimeout(() => {
                 viewport.style.backgroundImage = `url('${nextBgImage}')`;
                 bgTransitionLayer.classList.remove('fade-in');
                 bgTransitionLayer.style.backgroundImage = "none";
                 isTransitioning = false;
-            }, 800); // Syncs directly with 0.8s CSS transitions config
+            }, 800); 
         }
 
         function processParallaxScrolling() {
             let scrollSpeed = 2.5 + Math.floor(Math.floor(score) / 100) * 0.5;
             bgScrollPosition -= scrollSpeed;
             
-            // Sync horizontal positions across both map layers during transition states
             viewport.style.backgroundPosition = `${bgScrollPosition}px 0px`;
             bgTransitionLayer.style.backgroundPosition = `${bgScrollPosition}px 0px`;
         }
@@ -568,4 +559,3 @@
     </script>
 </body>
 </html>
-
