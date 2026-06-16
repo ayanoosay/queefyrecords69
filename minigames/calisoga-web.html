@@ -120,7 +120,6 @@
             overflow: hidden;
             background-color: #000;
             background-repeat: repeat-x;
-            background-position: 0px 0px;
             background-size: auto 100%;
             z-index: 1;
         }
@@ -130,7 +129,6 @@
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
             background-repeat: repeat-x;
-            background-position: 0px 0px;
             background-size: auto 100%;
             opacity: 0;
             z-index: 2;
@@ -150,10 +148,10 @@
             z-index: 8; background-size: 100% 4px; pointer-events: none;
         }
 
-        /* 👤 MASSIVE PLAYER AVATAR BOUNDS */
+        /* 👤 SCALE PLAYER BOX BIGGER */
         #player-sarah {
             position: absolute;
-            width: 110px; height: 110px;
+            width: 120px; height: 120px; /* Made Sarah larger */
             left: 100px; top: 200px;
             z-index: 5;
             object-fit: contain;
@@ -173,7 +171,7 @@
         /* 👾 SCALED HAZARD OBSTACLES PROFILE */
         .obstacle {
             position: absolute;
-            width: 65px; height: 65px;
+            width: 70px; height: 70px; /* Made Spiders/Webs larger */
             object-fit: contain;
             z-index: 4;
         }
@@ -203,7 +201,7 @@
         }
         .start-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #1b8dae; }
 
-        /* 📱 CLEAN NON-ZOOMABLE MOBILE BUTTON INTERFACE LAYOUTS */
+        /* 📱 MOBILE BUTTON LAYOUT FIX */
         .mobile-controls {
             display: none;
             grid-template-columns: 1fr 1fr 1fr;
@@ -229,8 +227,8 @@
             .mobile-controls { display: grid; }
             .screen-overlay h2 { font-size: 1.8rem; }
             .screen-overlay p { font-size: 0.9rem; }
-            #player-sarah { width: 70px; height: 75px; }
-            .obstacle { width: 45px; height: 45px; }
+            #player-sarah { width: 80px; height: 80px; } 
+            .obstacle { width: 50px; height: 45px; }
             .hud-item { font-size: 1.1rem; }
         }
     </style>
@@ -277,7 +275,7 @@
         let player = {
             x: 100, y: 160,
             vy: 0, vx: 0,
-            width: 110, height: 110, 
+            width: 120, height: 120, 
             speedX: 12.5,          
             jumpStrength: -8.8,   
             gravity: 0.46         
@@ -290,6 +288,7 @@
         let currentStage = 1; 
         let bgScrollPosition = 0;
         let isTransitioning = false;
+        let textureWidth = 1024; // Default safe horizontal canvas texture scaling width loop check target
 
         let obstaclesList = [];
         let loopRef = null;
@@ -333,6 +332,17 @@
             player.vy = player.jumpStrength;
         }
 
+        // Dynamically measure running background image parameters to scale seamless mirroring accurately
+        function recalculateTextureBounds(imgUrl) {
+            const tempImg = new Image();
+            tempImg.src = imgUrl;
+            tempImg.onload = () => {
+                // Calculate scale ratio relative to cabinet viewport screen bounds height
+                let scaleRatio = viewport.clientHeight / tempImg.height;
+                textureWidth = tempImg.width * scaleRatio;
+            };
+        }
+
         function startGame() {
             score = 0;
             lives = 3;
@@ -353,7 +363,10 @@
             sarahSprite.style.transform = "rotate(0deg)"; 
             scoreVal.innerText = '000';
             stageName.innerText = "THE UNDERGROUND";
+            
             viewport.style.backgroundImage = "url('underground.jpeg')";
+            recalculateTextureBounds('underground.jpeg');
+
             bgTransitionLayer.className = "";
             bgTransitionLayer.style.backgroundImage = "none";
             updateHeartsUI();
@@ -431,6 +444,7 @@
             currentStage = nextStage;
             stageName.innerText = nextStageName;
 
+            recalculateTextureBounds(nextBgImage);
             bgTransitionLayer.style.backgroundImage = `url('${nextBgImage}')`;
             bgTransitionLayer.classList.add('fade-in');
 
@@ -446,8 +460,14 @@
             let scrollSpeed = 2.5 + Math.floor(Math.floor(score) / 100) * 0.5;
             bgScrollPosition -= scrollSpeed;
             
-            viewport.style.backgroundPosition = `${bgScrollPosition}px 0px`;
-            bgTransitionLayer.style.backgroundPosition = `${bgScrollPosition}px 0px`;
+            // Loop tracking wrapping point constraints calculation
+            let posA = bgScrollPosition % (textureWidth * 2);
+            let posB = (bgScrollPosition - textureWidth) % (textureWidth * 2);
+
+            let positionsCSS = `${posA}px 0px`;
+            
+            viewport.style.backgroundPosition = positionsCSS;
+            bgTransitionLayer.style.backgroundPosition = positionsCSS;
         }
 
         function processObstaclesEngine() {
@@ -497,16 +517,17 @@
             obstaclesList.push({
                 el: el,
                 x: spawnX, y: spawnY,
-                width: 52, height: 52
+                width: 60, height: 60 // Heightened collision margins profile tracking larger obstacle scales
             });
         }
 
+        // Hitbox collision calculation
         function checkCollision(rect1, rect2) {
             return (
-                rect1.x + 24 < rect2.x + rect2.width &&
-                rect1.x + rect1.width - 24 > rect2.x &&
-                rect1.y + 24 < rect2.y + rect2.height &&
-                rect1.y + rect1.height - 24 > rect2.y
+                rect1.x + 28 < rect2.x + rect2.width &&
+                rect1.x + rect1.width - 28 > rect2.x &&
+                rect1.y + 28 < rect2.y + rect2.height &&
+                rect1.y + rect1.height - 28 > rect2.y
             );
         }
 
