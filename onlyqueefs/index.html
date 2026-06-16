@@ -536,6 +536,7 @@
         let userIpIdentifier = "anon_guest";
         let isSignUpMode = false;
         const ADMIN_EMAIL = "kuraihanaofficial@gmail.com";
+        let globalDbLikes = [];
 
         const ARTIST_EMAILS_WHITELIST = [
             "kuraihanaofficial@gmail.com",
@@ -684,6 +685,21 @@
             return "qf_" + Math.abs(hash);
         }
 
+        // Extracted render loop into a separate function so it can safely be called by real-time updates
+        function updateLikeCountersUI(postId) {
+            const btn = document.querySelector(`.like-btn[data-post-id="${postId}"]`);
+            if(!btn) return;
+            const countSpan = btn.querySelector('.like-count');
+            const totalLikes = globalDbLikes.filter(l => l.post_id === postId).length;
+            if(countSpan) countSpan.innerText = totalLikes;
+
+            let currentViewerId = currentUser ? currentUser.id : userIpIdentifier;
+            let userHasLiked = globalDbLikes.some(l => l.post_id === postId && l.user_id === currentViewerId) || localStorage.getItem("liked_" + postId) === "true";
+            
+            if(userHasLiked) btn.classList.add('liked');
+            else btn.classList.remove('liked');
+        }
+
         if (csvLink) {
             Papa.parse(csvLink, {
                 download: true,
@@ -694,7 +710,6 @@
                     let csvPosts = results.data;
                     let combinedPostsList = [];
 
-                    // Parse legacy spreadsheet date formats out into real javascript objects
                     csvPosts.forEach(p => {
                         if (p["Artist Name"]) {
                             let csvDate = p["Timestamp"] ? new Date(p["Timestamp"]) : new Date();
@@ -708,7 +723,6 @@
                         }
                     });
 
-                    let dbLikes = [];
                     let dbComments = [];
 
                     try {
@@ -727,12 +741,11 @@
                         }
 
                         const { data: likesRes } = await supabaseApp.from('likes').select('*');
-                        if (likesRes) dbLikes = likesRes;
+                        if (likesRes) globalDbLikes = likesRes;
                         const { data: commsRes } = await supabaseApp.from('comments').select('*').order('created_at', { ascending: true });
                         if (commsRes) dbComments = commsRes;
                     } catch (err) { console.log("Database fetch bypassed:", err); }
 
-                    // Sort chronologically (Newest items strictly forced on top)
                     combinedPostsList.sort((a, b) => b.dateObj - a.dateObj);
 
                     const isAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
@@ -745,10 +758,10 @@
                         let profile = artistData[artistName] || { handle: "@artist", image: "../logo.jpeg" };
 
                         let uniquePostId = generatePostId(artistName, content);
-                        let postLikesCount = dbLikes.filter(l => l.post_id === uniquePostId).length;
+                        let postLikesCount = globalDbLikes.filter(l => l.post_id === uniquePostId).length;
                         
                         let currentViewerId = currentUser ? currentUser.id : userIpIdentifier;
-                        let userHasLiked = dbLikes.some(l => l.post_id === uniquePostId && l.user_id === currentViewerId) || localStorage.getItem("liked_" + uniquePostId) === "true";
+                        let userHasLiked = globalDbLikes.some(l => l.post_id === uniquePostId && l.user_id === currentViewerId) || localStorage.getItem("liked_" + uniquePostId) === "true";
                         let heartClass = userHasLiked ? "action-btn like-btn liked" : "action-btn like-btn";
 
                         let mediaHTML = '';
@@ -826,6 +839,44 @@
                             }
                         });
                     });
+
+                    // 📡 ACTIVATE REAL-TIME BROADCAST LISTENER CHANNELS 📡
+                    supabaseApp
+                        .channel('realtime-feed-updates')
+                        .on('postgres_changes', { event: '*', schema: 'public', table: 'likes' }, payload => {
+                            if (payload.eventType === 'INSERT') {
+                                // Add to cached arrays if it's missing
+                                if(!globalDbLikes.some(l => l.id === payload.new.id)) {
+                                    globalDbLikes.push(payload.new);
+                                }
+                                updateLikeCountersUI(payload.new.post_id);
+                            } else if (payload.eventType === 'DELETE') {
+                                globalDbLikes = globalDbLikes.filter(l => !(l.post_id === payload.old.post_id && l.user_id === payload.old.user_id));
+                                updateLikeCountersUI(payload.old.post_id);
+                            }
+                        })
+                        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'comments' }, payload => {
+                            const list = document.getElementById(`comments_list_${payload.new.post_id}`);
+                            if(list && !document.getElementById(`comment_item_${payload.new.id}`)) {
+                                const commentIsAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
+                                let deleteButtonHTML = commentIsAdmin ? `<button class="comment-delete-btn" onclick="deleteComment('${payload.new.id}', this)">🗑️</button>` : '';
+                                list.innerHTML += `
+                                <div class="comment-item" id="comment_item_${payload.new.id}">
+                                    <span><strong>${payload.new.username}:</strong> ${payload.new.comment_text}</span>
+                                    ${deleteButtonHTML}
+                                </div>`;
+                            }
+                        })
+                        .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'comments' }, payload => {
+                            const targetComment = document.getElementById(`comment_item_${payload.old.id}`);
+                            if(targetComment) targetComment.remove();
+                        })
+                        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, payload => {
+                            // If an artist posts, let them know right at the header instead of fracturing active inputs
+                            alert(`New post dropped by ${payload.new.artist_name}! Refreshing timeline layout...`);
+                            window.location.reload();
+                        })
+                        .subscribe();
                 }
             });
         }
@@ -851,18 +902,6 @@
             if(error) {
                 alert("Error submitting comment: " + error.message);
             } else {
-                const list = document.getElementById(`comments_list_${postId}`);
-                if(list && data && data[0]) {
-                    let commentId = data[0].id;
-                    const isAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
-                    let deleteButtonHTML = isAdmin ? `<button class="comment-delete-btn" onclick="deleteComment('${commentId}', this)">🗑️</button>` : '';
-                    
-                    list.innerHTML += `
-                    <div class="comment-item" id="comment_item_${commentId}">
-                        <span><strong>${username}:</strong> ${commentText}</span>
-                        ${deleteButtonHTML}
-                    </div>`;
-                }
                 if(inputField) inputField.value = "";
                 if(errorLabel) errorLabel.style.display = "none";
             }
@@ -878,9 +917,6 @@
 
             if(error) {
                 alert("Could not remove record: " + error.message);
-            } else {
-                const targetNode = document.getElementById(`comment_item_${commentId}`);
-                if(targetNode) targetNode.remove();
             }
         }
 
