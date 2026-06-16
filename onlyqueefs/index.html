@@ -136,48 +136,6 @@
             transform: scale(1.05);
         }
 
-        /* Social Login Modal Container */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 2000;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(3, 0, 8, 0.85);
-            backdrop-filter: blur(20px);
-            align-items: center;
-            justify-content: center;
-        }
-        .modal-content {
-            background: #110c1a;
-            border: 1px solid rgba(255,255,255,0.15);
-            padding: 30px;
-            border-radius: 24px;
-            max-width: 360px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-        }
-        .modal-content h3 { margin-bottom: 20px; font-weight: 800; font-size: 1.4rem; }
-        .social-login-btn {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 12px;
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.1);
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.2s;
-        }
-        .btn-google { background: white; color: black; }
-        .btn-apple { background: black; color: white; border-color: rgba(255,255,255,0.2); }
-        .btn-email { background: rgba(255,255,255,0.05); color: white; }
-        .social-login-btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
-        .close-modal { margin-top: 10px; color: rgba(255,255,255,0.4); font-size: 0.85rem; cursor: pointer; text-decoration: underline; }
-
         .hamburger {
             display: none;
             flex-direction: column;
@@ -204,10 +162,10 @@
         .mobile-menu {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100vh;
-            background: linear-gradient(135deg, rgba(3, 0, 8, 0.7) 0%, rgba(17, 5, 28, 0.8) 100%);
+            background: linear-gradient(135deg, rgba(3, 0, 8, 0.95) 0%, rgba(17, 5, 28, 0.98) 100%);
             backdrop-filter: blur(40px) saturate(240%);
             z-index: 999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 30px;
             opacity: 0; pointer-events: none; transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
             transform: translateY(-5%);
         }
@@ -217,9 +175,21 @@
         .mobile-link {
             color: rgba(255, 255, 255, 0.6);
             text-decoration: none;
-            font-size: 2.2rem;
+            font-size: 2rem;
             font-weight: 800;
             transition: all 0.4s;
+        }
+
+        .mobile-auth-btn {
+            background: linear-gradient(135deg, #ff3bb4 0%, #00bfff 100%);
+            border: none;
+            color: white;
+            padding: 12px 32px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1.1rem;
+            margin-top: 15px;
         }
 
         .feed-container {
@@ -300,7 +270,7 @@
             <a href="../index.html#roster">Roster</a>
             <a href="../events/">Events</a>
             <a href="#" class="active">OnlyQueefs</a>
-            <button class="auth-btn" id="login-btn" onclick="openAuthModal()">Sign In</button>
+            <button class="auth-btn" id="login-btn" onclick="toggleAuth()">Sign In / Up</button>
         </nav>
 
         <div class="hamburger" id="hamburger">
@@ -310,32 +280,17 @@
         </div>
     </header>
 
-    <div class="modal" id="authModal">
-        <div class="modal-content">
-            <h3>Join OnlyQueefs</h3>
-            <button class="social-login-btn btn-google" onclick="loginWithProvider('google')">
-                <img src="https://www.google.com/favicon.ico" width="16" alt="Google"> Continue with Google
-            </button>
-            <button class="social-login-btn btn-apple" onclick="loginWithProvider('apple')">
-                 Continue with Apple
-            </button>
-            <button class="social-login-btn btn-email" onclick="handleEmailAuthFallback()">
-                 Use Email / Password
-            </button>
-            <div class="close-modal" onclick="closeAuthModal()">Cancel</div>
-        </div>
-    </div>
-
     <div class="mobile-menu" id="mobile-menu">
         <a href="../index.html" class="mobile-link">Home</a>
         <a href="../index.html#roster" class="mobile-link">Roster</a>
         <a href="../events/" class="mobile-link">Events</a>
+        <button class="mobile-auth-btn" id="mobile-login-btn" onclick="toggleAuth()">Sign In / Up</button>
     </div>
 
     <div class="feed-container">
         <div class="feed-header">
             <h1>OnlyQueefs</h1>
-            <p>The official timeline timeline feed.</p>
+            <p>The official timeline feed.</p>
         </div>
 
         <div id="dynamic-feed">
@@ -349,45 +304,64 @@
         
         const supabaseApp = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let currentUser = null;
+        let userIpIdentifier = "anon_guest"; // Default anonymous tracking fallback string
+
+        // Asynchronously request public IP footprint right away when loading
+        async function fetchUserIP() {
+            try {
+                let response = await fetch("https://api.ipify.org?format=json");
+                let data = await response.json();
+                if(data && data.ip) {
+                    // Turn the string IP value into a unique format structure to match UUID variables safely
+                    userIpIdentifier = "00000000-0000-0000-0000-" + data.ip.replace(/\./g, "").slice(0, 12).padStart(12, '0');
+                }
+            } catch(err) {
+                console.log("IP fallback fetch issue:", err);
+            }
+        }
 
         supabaseApp.auth.onAuthStateChange((event, session) => {
             currentUser = session?.user || null;
             const loginBtn = document.getElementById('login-btn');
+            const mobileLoginBtn = document.getElementById('mobile-login-btn');
+            
+            const updateBtnText = (text) => {
+                if(loginBtn) loginBtn.innerText = text;
+                if(mobileLoginBtn) mobileLoginBtn.innerText = text;
+            };
+
             if (currentUser) {
-                loginBtn.innerText = "Log Out";
-                loginBtn.onclick = () => supabaseApp.auth.signOut();
+                updateBtnText("Log Out");
+                const logoutAction = () => { supabaseApp.auth.signOut(); closeMobileMenu(); };
+                if(loginBtn) loginBtn.onclick = logoutAction;
+                if(mobileLoginBtn) mobileLoginBtn.onclick = logoutAction;
             } else {
-                loginBtn.innerText = "Sign In";
-                loginBtn.onclick = () => openAuthModal();
+                updateBtnText("Sign In / Up");
+                const loginAction = () => { toggleAuth(); };
+                if(loginBtn) loginBtn.onclick = loginAction;
+                if(mobileLoginBtn) mobileLoginBtn.onclick = loginAction;
             }
         });
 
-        function openAuthModal() { document.getElementById('authModal').style.display = 'flex'; }
-        function closeAuthModal() { document.getElementById('authModal').style.display = 'none'; }
-
-        // Core Social Identity Handler (Requires configuration setup in Supabase Auth Panel)
-        async function loginWithProvider(providerName) {
-            closeAuthModal();
-            const { data, error } = await supabaseApp.auth.signInWithOAuth({
-                provider: providerName,
-                options: { redirectTo: window.location.origin + window.location.pathname }
-            });
-            if(error) alert("Authentication error: " + error.message);
+        function closeMobileMenu() {
+            hamburger.classList.remove('active');
+            mobileMenu.classList.remove('active');
         }
 
-        async function handleEmailAuthFallback() {
-            closeAuthModal();
+        async function toggleAuth() {
+            closeMobileMenu();
             const email = prompt("Enter your Email:");
             if(!email) return;
             const password = prompt("Enter your Password (min 6 characters):");
             if(!password) return;
 
             let { data, error } = await supabaseApp.auth.signInWithPassword({ email, password });
+            
             if (error) {
                 let signUp = confirm("Account not found. Sign Up with these credentials?");
                 if(signUp) {
-                    let { error: upErr } = await supabaseApp.auth.signUp({ email, password });
-                    if(upErr) alert("Error: " + upErr.message);
+                    let { data: upData, error: upErr } = await supabaseApp.auth.signUp({ email, password });
+                    if(upErr) alert("Error creating account: " + upErr.message);
                     else alert("Registration successful!");
                 }
             }
@@ -424,109 +398,116 @@
             return "qf_" + Math.abs(hash);
         }
 
-        if (csvLink) {
-            Papa.parse(csvLink, {
-                download: true,
-                header: true,
-                complete: async function(results) {
-                    const feed = document.getElementById('dynamic-feed');
-                    feed.innerHTML = ""; 
-                    let posts = results.data.reverse();
+        async function initFeed() {
+            await fetchUserIP(); // Run IP extractor step before rendering layout
 
-                    let dbLikes = [];
-                    let dbComments = [];
+            if (csvLink) {
+                Papa.parse(csvLink, {
+                    download: true,
+                    header: true,
+                    complete: async function(results) {
+                        const feed = document.getElementById('dynamic-feed');
+                        feed.innerHTML = ""; 
+                        let posts = results.data.reverse();
 
-                    try {
-                        const { data: likesRes } = await supabaseApp.from('likes').select('*');
-                        if (likesRes) dbLikes = likesRes;
-                        const { data: commsRes } = await supabaseApp.from('comments').select('*').order('created_at', { ascending: true });
-                        if (commsRes) dbComments = commsRes;
-                    } catch (err) { console.log("Database fetch bypassed:", err); }
+                        let dbLikes = [];
+                        let dbComments = [];
 
-                    posts.forEach(post => {
-                        if (!post["Artist Name"]) return;
+                        try {
+                            const { data: likesRes } = await supabaseApp.from('likes').select('*');
+                            if (likesRes) dbLikes = likesRes;
+                            const { data: commsRes } = await supabaseApp.from('comments').select('*').order('created_at', { ascending: true });
+                            if (commsRes) dbComments = commsRes;
+                        } catch (err) { console.log("Database fetch bypassed:", err); }
 
-                        let artistName = post["Artist Name"];
-                        let content = post["Post Content"] || "";
-                        let mediaUrl = post["Media URL"]; 
-                        let time = post["Timestamp"] ? post["Timestamp"].split(" ")[0] : "Just now";
-                        let profile = artistData[artistName] || { handle: "@artist", image: "../logo.jpeg" };
+                        posts.forEach(post => {
+                            if (!post["Artist Name"]) return;
 
-                        let uniquePostId = generatePostId(artistName, content);
-                        
-                        let postLikesCount = dbLikes.filter(l => l.post_id === uniquePostId).length;
-                        let userHasLiked = dbLikes.some(l => l.post_id === uniquePostId && l.user_id === currentUser?.id);
-                        let heartClass = userHasLiked ? "action-btn like-btn liked" : "action-btn like-btn";
+                            let artistName = post["Artist Name"];
+                            let content = post["Post Content"] || "";
+                            let mediaUrl = post["Media URL"]; 
+                            let time = post["Timestamp"] ? post["Timestamp"].split(" ")[0] : "Just now";
+                            let profile = artistData[artistName] || { handle: "@artist", image: "../logo.jpeg" };
 
-                        let mediaHTML = '';
-                        if (mediaUrl && mediaUrl.trim() !== "") {
-                            if (mediaUrl.toLowerCase().includes('.mp4') || mediaUrl.toLowerCase().includes('.webm')) {
-                                mediaHTML = `<video src="${mediaUrl.trim()}" class="post-media" controls autoplay muted loop></video>`;
-                            } else {
-                                mediaHTML = `<img src="${mediaUrl.trim()}" alt="Post Media" class="post-media">`;
-                            }
-                        }
-
-                        let postCommentsHTML = '';
-                        let currentPostComments = dbComments.filter(c => c.post_id === uniquePostId);
-                        currentPostComments.forEach(c => {
-                            postCommentsHTML += `<div class="comment-item"><strong>${c.username}:</strong> ${c.comment_text}</div>`;
-                        });
-
-                        let postHTML = `
-                        <div class="queef-post" id="card_${uniquePostId}">
-                            <div class="post-header">
-                                <a href="profile.html?artist=${encodeURIComponent(artistName)}" class="profile-click-wrapper">
-                                    <img src="${profile.image}" alt="${artistName}" class="post-avatar">
-                                    <div class="post-info">
-                                        <h4>${artistName} <span class="verified-badge"></span></h4>
-                                        <span>${profile.handle} • ${time}</span>
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="post-content">${linkifyContent(content)}</div>
-                            ${mediaHTML}
-                            <div class="post-actions">
-                                <div class="${heartClass}" data-post-id="${uniquePostId}">
-                                    <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                                    <span class="like-count">${postLikesCount}</span>
-                                </div>
-                            </div>
+                            let uniquePostId = generatePostId(artistName, content);
                             
-                            <div class="comments-section">
-                                <div class="comment-list" id="comments_list_${uniquePostId}">
-                                    ${postCommentsHTML}
-                                </div>
-                                <div class="comment-input-box">
-                                    <input type="text" id="input_${uniquePostId}" placeholder="Write a comment...">
-                                    <button class="comment-submit-btn" onclick="submitComment('${uniquePostId}')">Post</button>
-                                </div>
-                            </div>
-                        </div>`;
-                        
-                        feed.innerHTML += postHTML;
-                    });
+                            let postLikesCount = dbLikes.filter(l => l.post_id === uniquePostId).length;
+                            
+                            // Check likeness using authenticated user ID OR fallback IP address identifier layout string
+                            let currentViewerId = currentUser ? currentUser.id : userIpIdentifier;
+                            let userHasLiked = dbLikes.some(l => l.post_id === uniquePostId && l.user_id === currentViewerId);
+                            let heartClass = userHasLiked ? "action-btn like-btn liked" : "action-btn like-btn";
 
-                    document.querySelectorAll('.like-btn').forEach(btn => {
-                        btn.addEventListener('click', async function() {
-                            if(!currentUser) { alert("Please sign in to like posts!"); return; }
-                            let postId = this.getAttribute('data-post-id');
-                            let countSpan = this.querySelector('.like-count');
-                            let currentCount = parseInt(countSpan.innerText);
-
-                            if (this.classList.contains('liked')) {
-                                this.classList.remove('liked');
-                                countSpan.innerText = currentCount - 1;
-                                await supabaseApp.from('likes').delete().match({ post_id: postId, user_id: currentUser.id });
-                            } else {
-                                this.classList.add('liked');
-                                countSpan.innerText = currentCount + 1;
-                                await supabaseApp.from('likes').insert([{ post_id: postId, user_id: currentUser.id }]);
+                            let mediaHTML = '';
+                            if (mediaUrl && mediaUrl.trim() !== "") {
+                                if (mediaUrl.toLowerCase().includes('.mp4') || mediaUrl.toLowerCase().includes('.webm')) {
+                                    mediaHTML = `<video src="${mediaUrl.trim}" class="post-media" controls autoplay muted loop></video>`;
+                                } else {
+                                    mediaHTML = `<img src="${mediaUrl.trim()}" alt="Post Media" class="post-media">`;
+                                }
                             }
+
+                            let postCommentsHTML = '';
+                            let currentPostComments = dbComments.filter(c => c.post_id === uniquePostId);
+                            currentPostComments.forEach(c => {
+                                postCommentsHTML += `<div class="comment-item"><strong>${c.username}:</strong> ${c.comment_text}</div>`;
+                            });
+
+                            let postHTML = `
+                            <div class="queef-post" id="card_${uniquePostId}">
+                                <div class="post-header">
+                                    <a href="profile.html?artist=${encodeURIComponent(artistName)}" class="profile-click-wrapper">
+                                        <img src="${profile.image}" alt="${artistName}" class="post-avatar">
+                                        <div class="post-info">
+                                            <h4>${artistName} <span class="verified-badge"></span></h4>
+                                            <span>${profile.handle} • ${time}</span>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="post-content">${linkifyContent(content)}</div>
+                                ${mediaHTML}
+                                <div class="post-actions">
+                                    <div class="${heartClass}" data-post-id="${uniquePostId}">
+                                        <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                                        <span class="like-count">${postLikesCount}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="comments-section">
+                                    <div class="comment-list" id="comments_list_${uniquePostId}">
+                                        ${postCommentsHTML}
+                                    </div>
+                                    <div class="comment-input-box">
+                                        <input type="text" id="input_${uniquePostId}" placeholder="Write a comment...">
+                                        <button class="comment-submit-btn" onclick="submitComment('${uniquePostId}')">Post</button>
+                                    </div>
+                                </div>
+                            </div>`;
+                            
+                            feed.innerHTML += postHTML;
                         });
-                    });
-                }
-            });
+
+                        document.querySelectorAll('.like-btn').forEach(btn => {
+                            btn.addEventListener('click', async function() {
+                                let postId = this.getAttribute('data-post-id');
+                                let countSpan = this.querySelector('.like-count');
+                                let currentCount = parseInt(countSpan.innerText);
+                                let targetUserId = currentUser ? currentUser.id : userIpIdentifier;
+
+                                if (this.classList.contains('liked')) {
+                                    this.classList.remove('liked');
+                                    countSpan.innerText = currentCount - 1;
+                                    await supabaseApp.from('likes').delete().match({ post_id: postId, user_id: targetUserId });
+                                } else {
+                                    this.classList.add('liked');
+                                    countSpan.innerText = currentCount + 1;
+                                    await supabaseApp.from('likes').insert([{ post_id: postId, user_id: targetUserId }]);
+                                }
+                            });
+                        });
+                    }
+                });
+            }
         }
 
         async function submitComment(postId) {
@@ -556,6 +537,9 @@
             hamburger.classList.toggle('active');
             mobileMenu.classList.toggle('active');
         });
+
+        // Trigger loop execution on initialization window mount
+        initFeed();
     </script>
 </body>
 </html>
