@@ -203,10 +203,10 @@
         }
         .start-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #1b8dae; }
 
-        /* 📱 HORIZONTAL FIXED MOBILE ARCADEPAD LINK GRID */
+        /* 📱 MOBILE ARCADEPAD SINGLE-ROW HORIZONTAL DECK BUTTON GRAPHICS */
         .mobile-controls {
             display: none;
-            grid-template-columns: 1fr 1.5fr 1fr; /* Set column distributions cleanly in a single row */
+            grid-template-columns: 1fr 1.2fr 1fr; /* Lock all layout blocks side-by-side in a row */
             gap: 12px;
             margin-top: 20px;
             width: 100%;
@@ -218,7 +218,7 @@
             background: #090214; 
             border: 2px solid #30d5ff;
             color: #30d5ff; 
-            padding: 16px 8px; 
+            padding: 18px 4px; 
             border-radius: 50px; 
             font-weight: bold; 
             font-size: 1rem; 
@@ -240,8 +240,8 @@
             background: #140212;
             border-color: #ff3bb4; 
             color: #ff3bb4;
-            font-size: 1.2rem; 
-            padding: 18px 8px; 
+            font-size: 1.1rem; 
+            padding: 18px 4px; 
             text-shadow: 0 0 5px #ff3bb4;
             box-shadow: 0 0 10px rgba(255, 59, 180, 0.3);
         }
@@ -289,7 +289,7 @@
             <div class="screen-overlay" id="overlay">
                 <h2 id="overlay-title">CALISOGA WEB</h2>
                 <p id="overlay-desc">GUIDE SARAH YAMAGUCHI THROUGH THE GRID FIELDS! MANEUVER SECURELY PAST HAZARDS AS SPATIAL ANOMALIES SCALE OVER TIME.<br><br>PC: SPACE = FLY UP, A/D or ARROWS = STRAFE SIDEWAYS<br>MOBILE: USE MOVEMENT BUTTON CLUSTERS BELOW CABINET</p>
-                <button class="start-btn" id="action-btn" onpointerdown="startGame(event)">INSERT COIN</button>
+                <button class="start-btn" id="action-btn" onclick="startGame(event)">INSERT COIN</button>
             </div>
 
             <img src="sarahmid.png" id="player-sarah" alt="Sarah Yamaguchi" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23ff73ca\'><rect x=\'4\' y=\'4\' width=\'16\' height=\'16\'/></svg>'">
@@ -297,7 +297,7 @@
 
         <div class="mobile-controls">
             <div class="mob-btn" onpointerdown="handleMobileLeft(true, event)" onpointerup="handleMobileLeft(false, event)" onpointerleave="handleMobileLeft(false, event)">◀ LEFT</div>
-            <div class="mob-btn fly-cluster" onpointerdown="triggerFlyJump(event)">FLY</div>
+            <div class="mob-btn fly-cluster" onpointerdown="handleMobileFlyTrigger(event)">FLY ⚡</div>
             <div class="mob-btn" onpointerdown="handleMobileRight(true, event)" onpointerup="handleMobileRight(false, event)" onpointerleave="handleMobileRight(false, event)">RIGHT ▶</div>
         </div>
     </div>
@@ -357,14 +357,26 @@
         function handleMobileLeft(isActive, e) { if(e) e.preventDefault(); mobileLeftActive = isActive; }
         function handleMobileRight(isActive, e) { if(e) e.preventDefault(); mobileRightActive = isActive; }
 
-        function triggerFlyJump(e) {
+        function handleMobileFlyTrigger(e) {
             if(e) e.preventDefault();
+            // Dual actions configuration check: if game is currently idle, trigger game startup routine
+            if(!gameActive) {
+                startGame();
+            } else {
+                triggerFlyJump();
+            }
+        }
+
+        function triggerFlyJump() {
             if (!gameActive) return;
             player.vy = player.jumpStrength;
         }
 
         function startGame(e) {
-            if(e) e.preventDefault();
+            if(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
             score = 0;
             lives = 3;
             currentStage = 1;
@@ -563,7 +575,8 @@
 
         function triggerGameOverAnimation() {
             gameActive = false;
-            cancelAnimationFrame(loopRef);
+            clearTimeout(moleTimeout);
+            clearInterval(countdownTimer);
             
             let fallRotation = 0;
             let animateFallInterval = setInterval(() => {
