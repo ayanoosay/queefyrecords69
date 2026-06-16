@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="../favicon.ico?v=2">
+    
+    <title>FIST-A-GABRI | Arcade</title>
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="FIST-A-GABRI | Queefy Arcade">
+    <meta property="og:description" content="Test your speed and precision reflexes in this fast-paced electronic clicker trial.">
+    <meta property="og:image" content="https://ayanoosay.github.io/queefyrecords69/logo.jpeg">
+    <meta name="theme-color" content="#ff3bb4">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            background-color: #030008;
+            color: #ffffff;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -20%; left: -20%; width: 140%; height: 140%;
+            background: 
+                radial-gradient(circle at 15% 25%, rgba(255, 59, 180, 0.15) 0%, transparent 35%),
+                radial-gradient(circle at 85% 30%, rgba(0, 191, 255, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 50% 80%, rgba(255, 0, 128, 0.08) 0%, transparent 45%);
+            z-index: -1;
+            filter: blur(40px);
+        }
+
+        header {
+            position: fixed;
+            top: 24px; left: 50%; transform: translateX(-50%);
+            width: 92%; max-width: 1200px;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 28px; border-radius: 30px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+            backdrop-filter: blur(40px) saturate(240%);
+            -webkit-backdrop-filter: blur(40px) saturate(240%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .brand { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+        .brand-logo { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid rgba(255, 59, 180, 0.6); }
+        .logo-text {
+            font-size: 1.15rem; font-weight: 800; letter-spacing: -0.3px;
+            background: linear-gradient(135deg, #ffffff 0%, #ff73ca 50%, #30d5ff 100%);
+            background-size: 200% 200%;
+            animation: liquidText 4s ease infinite;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .desktop-nav a {
+            color: rgba(255, 255, 255, 0.75); text-decoration: none;
+            font-size: 0.9rem; font-weight: 600; transition: color 0.3s;
+        }
+        .desktop-nav a:hover { color: #ff73ca; }
+
+        @keyframes liquidText {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .arcade-cabinet {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 32px;
+            width: 92%; max-width: 700px;
+            padding: 24px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.2);
+            margin-top: 100px;
+            position: relative;
+        }
+
+        .game-hud {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 16px; padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.4); border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .hud-item { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.2px; }
+        .hud-item span { color: #00e5ff; text-shadow: 0 0 10px rgba(0, 229, 255, 0.4); }
+        #multiplier-val { color: #ff3bb4; text-shadow: 0 0 10px rgba(255, 59, 180, 0.4); }
+
+        .game-viewport {
+            width: 100%; height: 420px;
+            background: #06020c; border-radius: 20px;
+            position: relative; overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
+            cursor: pointer;
+        }
+
+        #target-gabri {
+            width: 90px; height: 90px;
+            border-radius: 50%;
+            border: 2.5px solid #ff3bb4;
+            box-shadow: 0 0 20px rgba(255, 59, 180, 0.6);
+            object-fit: cover;
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            display: none;
+            transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #target-gabri:active { transform: translate(-50%, -50%) scale(0.85); }
+
+        .screen-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(3, 0, 8, 0.85);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 10; border-radius: 20px; text-align: center; padding: 20px;
+        }
+
+        .screen-overlay h2 {
+            font-size: 2.5rem; font-weight: 900; margin-bottom: 10px;
+            background: linear-gradient(135deg, #ffffff 0%, #ff73ca 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .screen-overlay p { color: rgba(255, 255, 255, 0.6); margin-bottom: 24px; font-size: 1rem; max-width: 400px; }
+
+        .start-btn {
+            background: linear-gradient(135deg, #ff3bb4 0%, #00bfff 100%);
+            color: white; border: none; padding: 14px 40px;
+            border-radius: 50px; font-size: 1rem; font-weight: 700;
+            cursor: pointer; box-shadow: 0 10px 25px rgba(255, 59, 180, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .start-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(255, 59, 180, 0.4); }
+
+        .hit-effect {
+            position: absolute; pointer-events: none;
+            font-size: 1.5rem; font-weight: 900; color: #00e5ff;
+            text-shadow: 0 0 10px #00e5ff; animation: effectFloat 0.4s ease-out forwards;
+            z-index: 5;
+        }
+
+        @keyframes effectFloat {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(0.6); }
+            100% { opacity: 0; transform: translate(-50%, -100%) scale(1.2); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="brand">
+            <img src="../logo.jpeg" alt="Logo" class="brand-logo">
+            <div class="logo-text">Queefy Arcade</div>
+        </a>
+        <nav class="desktop-nav">
+            <a href="index.html">← Back to Arcade</a>
+        </nav>
+    </header>
+
+    <div class="arcade-cabinet">
+        <div class="game-hud">
+            <div class="hud-item">Score: <span id="score-val">0</span></div>
+            <div class="hud-item">Streak: <span id="multiplier-val">1x</span></div>
+            <div class="hud-item">Time: <span id="time-val">30</span>s</div>
+        </div>
+
+        <div class="game-viewport" id="viewport">
+            <div class="screen-overlay" id="overlay">
+                <h2 id="overlay-title">FIST-A-GABRI</h2>
+                <p id="overlay-desc">Speed trial reflection module. Land consecutive fast punches on Gabri as she warps across the matrix grid. Miss, and your streak falls.</p>
+                <button class="start-btn" id="action-btn" onclick="startGame()">Initiate Trial</button>
+            </div>
+
+            <img src="../gabrihannah.png" id="target-gabri" alt="Target Gabri" onpointerdown="handleTargetHit(event)">
+        </div>
+    </div>
+
+    <script>
+        let score = 0;
+        let streak = 0;
+        let multiplier = 1;
+        let timeLeft = 30;
+        let gameActive = false;
+        let moveInterval = null;
+        let countdownTimer = null;
+        let baseSpeed = 900; // Milliseconds before target warps somewhere else automatically
+
+        const viewport = document.getElementById('viewport');
+        const target = document.getElementById('target-gabri');
+        const overlay = document.getElementById('overlay');
+        const overlayTitle = document.getElementById('overlay-title');
+        const overlayDesc = document.getElementById('overlay-desc');
+        const actionBtn = document.getElementById('action-btn');
+        
+        const scoreVal = document.getElementById('score-val');
+        const multVal = document.getElementById('multiplier-val');
+        const timeVal = document.getElementById('time-val');
+
+        // Check if full target sprite exists, otherwise fall back to base layout thumbnail image smoothly
+        const imgCheck = new Image();
+        imgCheck.src = 'gabrifull.jpg';
+        imgCheck.onload = () => { target.src = 'gabrifull.jpg'; };
+
+        // Handle misses inside viewport workspace layout container boundaries
+        viewport.addEventListener('pointerdown', (e) => {
+            if (!gameActive || e.target === target) return;
+            resetStreak();
+        });
+
+        function startGame() {
+            score = 0;
+            streak = 0;
+            multiplier = 1;
+            timeLeft = 30;
+            gameActive = true;
+
+            scoreVal.innerText = score;
+            multVal.innerText = "1x";
+            timeVal.innerText = timeLeft;
+
+            overlay.style.display = 'none';
+            target.style.display = 'block';
+
+            repositionTarget();
+            startLoops();
+        }
+
+        function startLoops() {
+            clearInterval(moveInterval);
+            clearInterval(countdownTimer);
+
+            // Time ticking down loop track
+            countdownTimer = setInterval(() => {
+                timeLeft--;
+                timeVal.innerText = timeLeft;
+                if (timeLeft <= 0) endGame();
+            }, 1000);
+
+            // Automatic reposition cycle track
+            triggerWarpLoop();
+        }
+
+        function triggerWarpLoop() {
+            clearInterval(moveInterval);
+            // Dynamic acceleration scaling based on user score thresholds
+            let adaptiveSpeed = Math.max(450, baseSpeed - Math.floor(score / 50) * 60);
+            
+            moveInterval = setInterval(() => {
+                resetStreak();
+                repositionTarget();
+            }, adaptiveSpeed);
+        }
+
+        function repositionTarget() {
+            const maxX = viewport.clientWidth - target.clientWidth;
+            const maxY = viewport.clientHeight - target.clientHeight;
+
+            const randomX = Math.floor(Math.random() * maxX);
+            const randomY = Math.floor(Math.random() * maxY);
+
+            target.style.left = `${randomX + target.clientWidth / 2}px`;
+            target.style.top = `${randomY + target.clientHeight / 2}px`;
+        }
+
+        function handleTargetHit(e) {
+            if (!gameActive) return;
+            e.stopPropagation(); // Halt bubbling sequence trigger preventing miss mechanics execution
+
+            streak++;
+            // Escalating combo levels processing multiplier thresholds
+            if (streak >= 15) multiplier = 4;
+            else if (streak >= 8) multiplier = 3;
+            else if (streak >= 3) multiplier = 2;
+            else multiplier = 1;
+
+            score += 10 * multiplier;
+            
+            scoreVal.innerText = score;
+            multVal.innerText = `${multiplier}x`;
+
+            spawnHitVisual(e.clientX, e.clientY);
+            repositionTarget();
+            triggerWarpLoop(); // Reset timeout threshold cycle window natively
+        }
+
+        function resetStreak() {
+            streak = 0;
+            multiplier = 1;
+            multVal.innerText = "1x";
+        }
+
+        function spawnHitVisual(clientX, clientY) {
+            const rect = viewport.getBoundingClientRect();
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+
+            const effect = document.createElement('div');
+            effect.className = 'hit-effect';
+            effect.style.left = `${x}px`;
+            effect.style.top = `${y}px`;
+            
+            // Random hit tracking labels array matrix
+            const textOptions = ['💥 FIST!', '⚡ HIT!', '🔥 CRIT!', '💢 HYPER!'];
+            effect.innerText = textOptions[Math.floor(Math.random() * textOptions.length)];
+
+            viewport.appendChild(effect);
+            setTimeout(() => effect.remove(), 400);
+        }
+
+        function endGame() {
+            gameActive = false;
+            target.style.display = 'none';
+            clearInterval(moveInterval);
+            clearInterval(countdownTimer);
+
+            overlayTitle.innerText = "TRIAL CONCLUDED";
+            overlayDesc.innerHTML = `Matrix score outcome evaluated.<br><br style='margin-bottom:8px;'>Final Punch Rating: <span style='color:#ff73ca; font-weight:900; font-size:1.4rem;'>${score} pts</span>`;
+            actionBtn.innerText = "Reboot Module";
+            overlay.style.display = 'flex';
+        }
+    </script>
+</body>
+</html>
