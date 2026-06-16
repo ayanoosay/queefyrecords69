@@ -86,7 +86,7 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* 🖥️ MASSIVE IMMERSIVE CABINET BOX FOR PC */
+        /* 🖥️ CABINET WRAPPER CONTAINER BOX */
         .arcade-cabinet {
             background: #110924;
             border: 4px solid #30d5ff;
@@ -96,6 +96,7 @@
             box-shadow: 0 0 40px rgba(48, 213, 255, 0.3), inset 0 0 15px rgba(0,0,0,0.8);
             margin-top: 100px;
             position: relative;
+            transition: transform 0.3s ease;
         }
 
         .game-hud {
@@ -203,10 +204,10 @@
         }
         .start-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #1b8dae; }
 
-        /* 📱 MOBILE ARCADEPAD SINGLE-ROW HORIZONTAL DECK BUTTON GRAPHICS */
+        /* 📱 HORIZONTAL FIXED MOBILE ARCADEPAD LINK GRID */
         .mobile-controls {
             display: none;
-            grid-template-columns: 1fr 1.2fr 1fr; /* Lock all layout blocks side-by-side in a row */
+            grid-template-columns: 1fr 1.2fr 1fr;
             gap: 12px;
             margin-top: 20px;
             width: 100%;
@@ -218,7 +219,7 @@
             background: #090214; 
             border: 2px solid #30d5ff;
             color: #30d5ff; 
-            padding: 18px 4px; 
+            padding: 16px 8px; 
             border-radius: 50px; 
             font-weight: bold; 
             font-size: 1rem; 
@@ -240,8 +241,8 @@
             background: #140212;
             border-color: #ff3bb4; 
             color: #ff3bb4;
-            font-size: 1.1rem; 
-            padding: 18px 4px; 
+            font-size: 1.2rem; 
+            padding: 18px 8px; 
             text-shadow: 0 0 5px #ff3bb4;
             box-shadow: 0 0 10px rgba(255, 59, 180, 0.3);
         }
@@ -251,16 +252,40 @@
             box-shadow: 0 0 25px #ff3bb4;
         }
 
-        @media (max-width: 768px) {
-            header { top: 12px; padding: 10px 20px; width: 95%; }
-            .arcade-cabinet { margin-top: 85px; padding: 12px; max-width: 580px; }
+        /* 📱 FORCE RESPONSIVE LANDSCAPE ROTATION MODIFIERS ON VERTICAL SCREENS */
+        @media (max-width: 768px) and (orientation: portrait) {
+            header { display: none; } /* Clear header space on portrait mobile */
+            
+            .arcade-cabinet {
+                position: absolute;
+                width: 90vh; /* Match horizontal width to phone height viewport rules */
+                max-width: 90vh;
+                padding: 12px;
+                /* Spin entire layout interface 90 degrees cleanly */
+                transform: rotate(90deg);
+                margin-top: 0;
+            }
+
             .mobile-controls { display: grid; }
-            .screen-overlay h2 { font-size: 1.8rem; }
-            .screen-overlay p { font-size: 0.9rem; margin-bottom: 16px; }
+            .game-viewport { width: 100%; aspect-ratio: 16 / 9; }
+            .screen-overlay h2 { font-size: 1.6rem; }
+            .screen-overlay p { font-size: 0.85rem; margin-bottom: 12px; }
             #player-sarah { width: 80px; height: 80px; } 
-            .obstacle { width: 50px; height: 45px; }
-            .hud-item { font-size: 1.1rem; }
-            .start-btn { padding: 10px 32px; font-size: 1rem; }
+            .obstacle { width: 50px; height: 50px; }
+            .hud-item { font-size: 1rem; }
+            .start-btn { padding: 8px 24px; font-size: 0.95rem; }
+        }
+
+        /* Normal landscape layout if they turn their phone sideways manually */
+        @media (max-width: 932px) and (orientation: landscape) {
+            header { display: none; }
+            .arcade-cabinet { margin-top: 20px; padding: 12px; max-width: 85vw; }
+            .mobile-controls { display: grid; }
+            #player-sarah { width: 75px; height: 75px; }
+            .obstacle { width: 45px; height: 45px; }
+            .hud-item { font-size: 1rem; }
+            .screen-overlay h2 { font-size: 1.6rem; }
+            .screen-overlay p { font-size: 0.85rem; margin-bottom: 12px; }
         }
     </style>
 </head>
@@ -359,7 +384,6 @@
 
         function handleMobileFlyTrigger(e) {
             if(e) e.preventDefault();
-            // Dual actions configuration check: if game is currently idle, trigger game startup routine
             if(!gameActive) {
                 startGame();
             } else {
@@ -545,11 +569,13 @@
         }
 
         function checkCollision(rect1, rect2) {
+            // Mobile screen boundaries check normalization
+            let pad = (window.innerWidth <= 768) ? 14 : 24;
             return (
-                rect1.x + 24 < rect2.x + rect2.width &&
-                rect1.x + rect1.width - 24 > rect2.x &&
-                rect1.y + 24 < rect2.y + rect2.height &&
-                rect1.y + rect1.height - 24 > rect2.y
+                rect1.x + pad < rect2.x + rect2.width &&
+                rect1.x + rect1.width - pad > rect2.x &&
+                rect1.y + pad < rect2.y + rect2.height &&
+                rect1.y + rect1.height - pad > rect2.y
             );
         }
 
@@ -575,8 +601,7 @@
 
         function triggerGameOverAnimation() {
             gameActive = false;
-            clearTimeout(moleTimeout);
-            clearInterval(countdownTimer);
+            cancelAnimationFrame(loopRef);
             
             let fallRotation = 0;
             let animateFallInterval = setInterval(() => {
