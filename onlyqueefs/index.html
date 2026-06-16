@@ -136,6 +136,48 @@
             transform: scale(1.05);
         }
 
+        /* Social Login Modal Container */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(3, 0, 8, 0.85);
+            backdrop-filter: blur(20px);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: #110c1a;
+            border: 1px solid rgba(255,255,255,0.15);
+            padding: 30px;
+            border-radius: 24px;
+            max-width: 360px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+        }
+        .modal-content h3 { margin-bottom: 20px; font-weight: 800; font-size: 1.4rem; }
+        .social-login-btn {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+        .btn-google { background: white; color: black; }
+        .btn-apple { background: black; color: white; border-color: rgba(255,255,255,0.2); }
+        .btn-email { background: rgba(255,255,255,0.05); color: white; }
+        .social-login-btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .close-modal { margin-top: 10px; color: rgba(255,255,255,0.4); font-size: 0.85rem; cursor: pointer; text-decoration: underline; }
+
         .hamburger {
             display: none;
             flex-direction: column;
@@ -155,60 +197,29 @@
             transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
-        .hamburger.active span:nth-child(1) {
-            transform: translateY(9px) rotate(45deg);
-            background-color: #ff3bb4;
-        }
-        .hamburger.active span:nth-child(2) {
-            opacity: 0;
-            transform: translateX(-20px);
-        }
-        .hamburger.active span:nth-child(3) {
-            transform: translateY(-9px) rotate(-45deg);
-            background-color: #00bfff;
-        }
+        .hamburger.active span:nth-child(1) { transform: translateY(9px) rotate(45deg); background-color: #ff3bb4; }
+        .hamburger.active span:nth-child(2) { opacity: 0; transform: translateX(-20px); }
+        .hamburger.active span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); background-color: #00bfff; }
 
         .mobile-menu {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
+            top: 0; left: 0; width: 100%; height: 100vh;
             background: linear-gradient(135deg, rgba(3, 0, 8, 0.7) 0%, rgba(17, 5, 28, 0.8) 100%);
             backdrop-filter: blur(40px) saturate(240%);
-            -webkit-backdrop-filter: blur(40px) saturate(240%);
             z-index: 999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 40px;
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px;
+            opacity: 0; pointer-events: none; transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
             transform: translateY(-5%);
         }
 
-        .mobile-menu.active {
-            opacity: 1;
-            pointer-events: all;
-            transform: translateY(0);
-        }
+        .mobile-menu.active { opacity: 1; pointer-events: all; transform: translateY(0); }
 
         .mobile-link {
             color: rgba(255, 255, 255, 0.6);
             text-decoration: none;
             font-size: 2.2rem;
             font-weight: 800;
-            letter-spacing: -1px;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            transform: translateY(20px);
-            opacity: 0;
-        }
-
-        .mobile-menu.active .mobile-link {
-            transform: translateY(0);
-            opacity: 1;
+            transition: all 0.4s;
         }
 
         .feed-container {
@@ -219,205 +230,55 @@
             overflow: hidden;
         }
 
-        .feed-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
+        .feed-header { text-align: center; margin-bottom: 40px; }
         .feed-header h1 {
             font-size: 3.5rem;
             font-weight: 900;
-            letter-spacing: -1px;
             background: linear-gradient(135deg, #ffffff 15%, #ff46bd 55%, #00e5ff 100%);
             background-size: 200% 200%;
             animation: liquidText 6s ease infinite;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
-        .feed-header p {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 1.1rem;
-            margin-top: 10px;
-        }
+        .feed-header p { color: rgba(255, 255, 255, 0.6); font-size: 1.1rem; margin-top: 10px; }
 
         .queef-post {
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
             backdrop-filter: blur(30px) saturate(180%);
-            -webkit-backdrop-filter: blur(30px) saturate(180%);
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 28px;
             padding: 25px;
             margin-bottom: 30px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.2);
-            transition: transform 0.3s ease, border-color 0.3s ease;
-            position: relative;
-            min-width: 0;
-            overflow: hidden;
-        }
-
-        .queef-post:hover {
-            transform: translateY(-5px);
-            border-color: rgba(255, 59, 180, 0.4);
-        }
-
-        .post-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-            position: relative;
-            z-index: 6; 
-        }
-
-        .profile-click-wrapper {
-            text-decoration: none;
-            color: inherit;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            min-width: 0;
-        }
-
-        .post-avatar {
-            width: 50px;
-            height: 50px;
-            min-width: 50px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .post-info h4 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .post-info span {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.5);
-            font-weight: 500;
-            display: block;
-        }
-
-        .verified-badge {
-            display: inline-block;
-            width: 14px;
-            height: 14px;
-            min-width: 14px;
-            background: #00e5ff;
-            border-radius: 50%;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
             position: relative;
         }
-        .verified-badge::after {
-            content: '✓';
-            color: #030008;
-            font-size: 10px;
-            font-weight: 900;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
 
-        .post-content {
-            font-size: 1.15rem;
-            line-height: 1.5;
-            color: rgba(255, 255, 255, 0.9);
-            margin-bottom: 20px;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
+        .post-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .profile-click-wrapper { text-decoration: none; color: inherit; display: flex; align-items: center; gap: 15px; }
+        .post-avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; }
+        .post-info h4 { font-size: 1.1rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 5px; }
+        .post-info span { font-size: 0.9rem; color: rgba(255, 255, 255, 0.5); display: block; }
+        .verified-badge { display: inline-block; width: 14px; height: 14px; background: #00e5ff; border-radius: 50%; position: relative; }
+        .verified-badge::after { content: '✓'; color: #030008; font-size: 10px; font-weight: 900; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 
-        .post-content a {
-            color: #30d5ff;
-            text-decoration: none;
-        }
+        .post-content { font-size: 1.15rem; line-height: 1.5; color: rgba(255, 255, 255, 0.9); margin-bottom: 20px; white-space: pre-wrap; word-break: break-word; }
+        .post-content a { color: #30d5ff; text-decoration: none; }
+        .post-media { width: 100%; max-height: 500px; object-fit: cover; border-radius: 16px; margin-bottom: 20px; }
 
-        .post-media {
-            width: 100%;
-            max-height: 500px;
-            object-fit: cover;
-            border-radius: 16px;
-            margin-bottom: 20px;
-        }
-
-        .post-actions {
-            display: flex;
-            gap: 25px;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            padding-top: 15px;
-        }
-
-        .action-btn {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .action-btn svg {
-            width: 20px;
-            height: 20px;
-            fill: currentColor;
-        }
-
+        .post-actions { display: flex; gap: 25px; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 15px; }
+        .action-btn { display: flex; align-items: center; gap: 8px; color: rgba(255, 255, 255, 0.5); font-size: 0.95rem; font-weight: 600; cursor: pointer; }
+        .action-btn svg { width: 20px; height: 20px; fill: currentColor; }
         .action-btn.liked { color: #ff3bb4; }
 
-        .comments-section {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px dashed rgba(255,255,255,0.1);
-        }
-        .comment-list {
-            max-height: 200px;
-            overflow-y: auto;
-            margin-bottom: 10px;
-        }
-        .comment-item {
-            font-size: 0.9rem;
-            padding: 6px 10px;
-            background: rgba(255,255,255,0.03);
-            border-radius: 8px;
-            margin-bottom: 6px;
-        }
+        .comments-section { margin-top: 15px; padding-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); }
+        .comment-list { max-height: 200px; overflow-y: auto; margin-bottom: 10px; }
+        .comment-item { font-size: 0.9rem; padding: 6px 10px; background: rgba(255,255,255,0.03); border-radius: 8px; margin-bottom: 6px; }
         .comment-item strong { color: #ff73ca; }
-        .comment-input-box {
-            display: flex;
-            gap: 10px;
-        }
-        .comment-input-box input {
-            flex: 1;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 8px 12px;
-            border-radius: 20px;
-            color: white;
-            outline: none;
-        }
-        .comment-submit-btn {
-            background: #30d5ff;
-            color: #000;
-            border: none;
-            padding: 0 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            cursor: pointer;
-        }
+        .comment-input-box { display: flex; gap: 10px; }
+        .comment-input-box input { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); padding: 8px 12px; border-radius: 20px; color: white; outline: none; }
+        .comment-submit-btn { background: #30d5ff; color: #000; border: none; padding: 0 15px; border-radius: 20px; font-weight: bold; cursor: pointer; }
 
-        .loading-text {
-            text-align: center;
-            color: rgba(255,255,255,0.5);
-            margin-top: 40px;
-        }
+        .loading-text { text-align: center; color: rgba(255,255,255,0.5); margin-top: 40px; }
 
         @media (max-width: 768px) {
             header { top: 12px; padding: 10px 20px; width: 95%; }
@@ -439,7 +300,7 @@
             <a href="../index.html#roster">Roster</a>
             <a href="../events/">Events</a>
             <a href="#" class="active">OnlyQueefs</a>
-            <button class="auth-btn" id="login-btn" onclick="toggleAuth()">Sign In / Up</button>
+            <button class="auth-btn" id="login-btn" onclick="openAuthModal()">Sign In</button>
         </nav>
 
         <div class="hamburger" id="hamburger">
@@ -448,6 +309,22 @@
             <span></span>
         </div>
     </header>
+
+    <div class="modal" id="authModal">
+        <div class="modal-content">
+            <h3>Join OnlyQueefs</h3>
+            <button class="social-login-btn btn-google" onclick="loginWithProvider('google')">
+                <img src="https://www.google.com/favicon.ico" width="16" alt="Google"> Continue with Google
+            </button>
+            <button class="social-login-btn btn-apple" onclick="loginWithProvider('apple')">
+                 Continue with Apple
+            </button>
+            <button class="social-login-btn btn-email" onclick="handleEmailAuthFallback()">
+                 Use Email / Password
+            </button>
+            <div class="close-modal" onclick="closeAuthModal()">Cancel</div>
+        </div>
+    </div>
 
     <div class="mobile-menu" id="mobile-menu">
         <a href="../index.html" class="mobile-link">Home</a>
@@ -458,7 +335,7 @@
     <div class="feed-container">
         <div class="feed-header">
             <h1>OnlyQueefs</h1>
-            <p>The exclusive timeline. Authenticated user actions.</p>
+            <p>The official timeline timeline feed.</p>
         </div>
 
         <div id="dynamic-feed">
@@ -470,7 +347,6 @@
         const SUPABASE_URL = "https://ybrlwkrqgsdfwwkjvtsv.supabase.co"; 
         const SUPABASE_ANON_KEY = "sb_publishable_HKZYaWXO2UgTjRUomm7M1w_tB1d47ET";
         
-        // RENAMED variable to avoid global window object library naming collision
         const supabaseApp = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let currentUser = null;
 
@@ -481,24 +357,37 @@
                 loginBtn.innerText = "Log Out";
                 loginBtn.onclick = () => supabaseApp.auth.signOut();
             } else {
-                loginBtn.innerText = "Sign In / Up";
-                loginBtn.onclick = () => toggleAuth();
+                loginBtn.innerText = "Sign In";
+                loginBtn.onclick = () => openAuthModal();
             }
         });
 
-        async function toggleAuth() {
+        function openAuthModal() { document.getElementById('authModal').style.display = 'flex'; }
+        function closeAuthModal() { document.getElementById('authModal').style.display = 'none'; }
+
+        // Core Social Identity Handler (Requires configuration setup in Supabase Auth Panel)
+        async function loginWithProvider(providerName) {
+            closeAuthModal();
+            const { data, error } = await supabaseApp.auth.signInWithOAuth({
+                provider: providerName,
+                options: { redirectTo: window.location.origin + window.location.pathname }
+            });
+            if(error) alert("Authentication error: " + error.message);
+        }
+
+        async function handleEmailAuthFallback() {
+            closeAuthModal();
             const email = prompt("Enter your Email:");
             if(!email) return;
             const password = prompt("Enter your Password (min 6 characters):");
             if(!password) return;
 
             let { data, error } = await supabaseApp.auth.signInWithPassword({ email, password });
-            
             if (error) {
-                let signUp = confirm("Account not found. Would you like to Sign Up with these credentials?");
+                let signUp = confirm("Account not found. Sign Up with these credentials?");
                 if(signUp) {
-                    let { data: upData, error: upErr } = await supabaseApp.auth.signUp({ email, password });
-                    if(upErr) alert("Error creating account: " + upErr.message);
+                    let { error: upErr } = await supabaseApp.auth.signUp({ email, password });
+                    if(upErr) alert("Error: " + upErr.message);
                     else alert("Registration successful!");
                 }
             }
@@ -552,9 +441,7 @@
                         if (likesRes) dbLikes = likesRes;
                         const { data: commsRes } = await supabaseApp.from('comments').select('*').order('created_at', { ascending: true });
                         if (commsRes) dbComments = commsRes;
-                    } catch (err) {
-                        console.log("Database fallback triggered:", err);
-                    }
+                    } catch (err) { console.log("Database fetch bypassed:", err); }
 
                     posts.forEach(post => {
                         if (!post["Artist Name"]) return;
@@ -611,7 +498,7 @@
                                     ${postCommentsHTML}
                                 </div>
                                 <div class="comment-input-box">
-                                    <input type="text" id="input_${uniquePostId}" placeholder="Write an authenticated comment...">
+                                    <input type="text" id="input_${uniquePostId}" placeholder="Write a comment...">
                                     <button class="comment-submit-btn" onclick="submitComment('${uniquePostId}')">Post</button>
                                 </div>
                             </div>
@@ -622,7 +509,7 @@
 
                     document.querySelectorAll('.like-btn').forEach(btn => {
                         btn.addEventListener('click', async function() {
-                            if(!currentUser) { alert("Please log in to leave a like!"); return; }
+                            if(!currentUser) { alert("Please sign in to like posts!"); return; }
                             let postId = this.getAttribute('data-post-id');
                             let countSpan = this.querySelector('.like-count');
                             let currentCount = parseInt(countSpan.innerText);
@@ -643,7 +530,7 @@
         }
 
         async function submitComment(postId) {
-            if(!currentUser) { alert("You must sign in to post comments!"); return; }
+            if(!currentUser) { alert("Please sign in to comment!"); return; }
             const inputField = document.getElementById(`input_${postId}`);
             const commentText = inputField.value.trim();
             if(!commentText) return;
