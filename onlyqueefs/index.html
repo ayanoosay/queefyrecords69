@@ -136,6 +136,26 @@
             transform: scale(1.05);
         }
 
+        /* Seamless custom navigation action link buttons */
+        .portal-link-btn {
+            background: transparent;
+            border: 1px solid #30d5ff;
+            color: #30d5ff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-left: 15px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            text-decoration: none;
+            display: none;
+            transition: all 0.2s ease;
+        }
+        .portal-link-btn:hover {
+            background: rgba(48, 213, 255, 0.1);
+            box-shadow: 0 0 10px rgba(48, 213, 255, 0.3);
+        }
+
         .hamburger {
             display: none;
             flex-direction: column;
@@ -190,6 +210,20 @@
             cursor: pointer;
             font-size: 1.1rem;
             margin-top: 15px;
+        }
+
+        .mobile-portal-btn {
+            background: transparent;
+            border: 1px solid #30d5ff;
+            color: #30d5ff;
+            padding: 12px 32px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1.1rem;
+            text-decoration: none;
+            display: none;
+            margin-top: 5px;
         }
 
         .cute-modal-overlay {
@@ -425,6 +459,7 @@
             <a href="../index.html#roster">Roster</a>
             <a href="../events/">Events</a>
             <a href="#" class="active">OnlyQueefs</a>
+            <a href="4artists.html" class="portal-link-btn" id="header-portal-link">Artist Portal ↗</a>
             <button class="auth-btn" id="login-btn" onclick="openAuthModal()">Sign In</button>
         </nav>
 
@@ -439,6 +474,7 @@
         <a href="../index.html" class="mobile-link">Home</a>
         <a href="../index.html#roster" class="mobile-link">Roster</a>
         <a href="../events/" class="mobile-link">Events</a>
+        <a href="4artists.html" class="mobile-portal-btn" id="mobile-portal-link">Artist Portal ↗</a>
         <button class="mobile-auth-btn" id="mobile-login-btn" onclick="openAuthModal()">Sign In</button>
     </div>
 
@@ -487,6 +523,14 @@
         let isSignUpMode = false;
         const ADMIN_EMAIL = "kuraihanaofficial@gmail.com";
 
+        // Verified label artist email directory parameters matrix whitelist array mapping
+        const ARTIST_EMAILS_WHITELIST = [
+            "kuraihanaofficial@gmail.com",
+            "sarahyamaguchi@queefyrecords.com",
+            "gabrihannah@queefyrecords.com",
+            "stellasukehiro@queefyrecords.com"
+        ];
+
         async function fetchUserIP() {
             try {
                 let response = await fetch("https://api.ipify.org?format=json");
@@ -501,6 +545,8 @@
             currentUser = session?.user || null;
             const loginBtn = document.getElementById('login-btn');
             const mobileLoginBtn = document.getElementById('mobile-login-btn');
+            const headerPortalLink = document.getElementById('header-portal-link');
+            const mobilePortalLink = document.getElementById('mobile-portal-link');
             
             const updateBtnText = (text) => {
                 if(loginBtn) loginBtn.innerText = text;
@@ -512,11 +558,19 @@
                 const logoutAction = () => { supabaseApp.auth.signOut(); window.location.reload(); };
                 if(loginBtn) loginBtn.onclick = logoutAction;
                 if(mobileLoginBtn) mobileLoginBtn.onclick = logoutAction;
+
+                // Handle dynamic display parameters mapping on dashboard links for authorized whitelisted members
+                if (ARTIST_EMAILS_WHITELIST.includes(currentUser.email.toLowerCase())) {
+                    if(headerPortalLink) headerPortalLink.style.display = "inline-block";
+                    if(mobilePortalLink) mobilePortalLink.style.display = "block";
+                }
             } else {
                 updateBtnText("Sign In");
                 const loginAction = () => { openAuthModal(); };
                 if(loginBtn) loginBtn.onclick = loginAction;
                 if(mobileLoginBtn) mobileLoginBtn.onclick = loginAction;
+                if(headerPortalLink) headerPortalLink.style.display = "none";
+                if(mobilePortalLink) mobilePortalLink.style.display = "none";
             }
         });
 
