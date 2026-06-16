@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="../favicon.ico?v=2">
     
-    <title>FIST-A-GABRI | Arcade</title>
+    <title>FIST-A-GABRI | Arcade Grid</title>
 
     <meta property="og:type" content="website">
     <meta property="og:title" content="FIST-A-GABRI | Queefy Arcade">
-    <meta property="og:description" content="Test your speed and precision reflexes in this fast-paced electronic clicker trial.">
+    <meta property="og:description" content="Whack-a-Gabri! Grab your wet fist controller and beat the pixel grid.">
     <meta property="og:image" content="https://ayanoosay.github.io/queefyrecords69/logo.jpeg">
     <meta name="theme-color" content="#ff3bb4">
 
@@ -18,9 +18,12 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Courier New', Courier, monospace, -apple-system, sans-serif;
             user-select: none;
             -webkit-user-select: none;
+            /* Hard pixel graphics rendering layout toggle */
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
         }
 
         body {
@@ -33,6 +36,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            cursor: none !important;
         }
 
         body::before {
@@ -45,6 +49,44 @@
                 radial-gradient(circle at 50% 80%, rgba(255, 0, 128, 0.08) 0%, transparent 45%);
             z-index: -1;
             filter: blur(40px);
+        }
+
+        /* 💦 Wet Pixel Follower Controller Handle Cursor */
+        #custom-fist-cursor {
+            position: fixed;
+            width: 90px;
+            height: 90px;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+        }
+
+        #custom-fist-cursor img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transform-origin: bottom center;
+        }
+
+        body:active #custom-fist-cursor img {
+            transform: scale(0.8) rotate(-15deg);
+        }
+
+        /* Fluid Dripping Particle Drop Tracer */
+        .drip-particle {
+            position: fixed;
+            width: 8px;
+            height: 14px;
+            background: #30d5ff;
+            box-shadow: 0 0 4px #30d5ff;
+            pointer-events: none;
+            z-index: 9998;
+            animation: dropDown 0.5s steps(6, end) forwards;
+        }
+
+        @keyframes dropDown {
+            0% { transform: translateY(0) scaleY(1); opacity: 1; }
+            100% { transform: translateY(50px) scaleY(0.4); opacity: 0; }
         }
 
         header {
@@ -73,103 +115,131 @@
 
         .desktop-nav a {
             color: rgba(255, 255, 255, 0.75); text-decoration: none;
-            font-size: 0.9rem; font-weight: 600; transition: color 0.3s;
+            font-size: 0.9rem; font-weight: 600; cursor: none;
         }
         .desktop-nav a:hover { color: #ff73ca; }
 
-        @keyframes liquidText {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
         .arcade-cabinet {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
-            backdrop-filter: blur(30px) saturate(180%);
-            -webkit-backdrop-filter: blur(30px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 32px;
-            width: 92%; max-width: 700px;
-            padding: 24px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.2);
-            margin-top: 100px;
+            background: #140727;
+            border: 4px solid #ff3bb4;
+            border-radius: 12px;
+            width: 92%; max-width: 580px;
+            padding: 20px;
+            box-shadow: 0 0 30px rgba(255, 59, 180, 0.3), inset 0 0 15px rgba(0,0,0,0.8);
+            margin-top: 110px;
             position: relative;
         }
 
         .game-hud {
             display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 16px; padding: 10px 20px;
-            background: rgba(0, 0, 0, 0.4); border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 20px; padding: 12px 20px;
+            background: #000000; border: 2px solid #30d5ff; border-radius: 4px;
+            box-shadow: 0 0 10px rgba(48, 213, 255, 0.3);
         }
 
-        .hud-item { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.2px; }
-        .hud-item span { color: #00e5ff; text-shadow: 0 0 10px rgba(0, 229, 255, 0.4); }
-        #multiplier-val { color: #ff3bb4; text-shadow: 0 0 10px rgba(255, 59, 180, 0.4); }
+        .hud-item { font-size: 1.2rem; font-weight: bold; color: #fff; text-shadow: 0 0 4px #fff; }
+        .hud-item span { color: #30d5ff; text-shadow: 0 0 8px #30d5ff; }
+        #score-val { color: #ff73ca; text-shadow: 0 0 8px #ff73ca; }
 
-        .game-viewport {
-            width: 100%; height: 420px;
-            background: #06020c; border-radius: 20px;
-            position: relative; overflow: hidden;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
-            cursor: pointer;
+        /* 🟩 Retro Whack-A-Mole Green Arena Field */
+        .mole-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            width: 100%;
+            height: 400px;
+            background-color: #1a7a2a; /* Rich arcade field green background */
+            background-image: 
+                radial-gradient(#249436 20%, transparent 20%),
+                radial-gradient(#1e852f 20%, transparent 20%);
+            background-size: 16px 16px;
+            background-position: 0 0, 8px 8px;
+            border-radius: 8px;
+            padding: 24px;
+            border: 4px solid #0b3a0f;
+            position: relative;
+            overflow: hidden;
         }
 
-        #target-gabri {
-            width: 90px; height: 90px;
+        /* Scanline CRT glass overlay look */
+        .mole-grid::after {
+            content: " ";
+            display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 0, 0.06));
+            z-index: 8; background-size: 100% 4px, 6px 100%; pointer-events: none;
+        }
+
+        .grid-hole {
+            background: #091a0c;
             border-radius: 50%;
-            border: 2.5px solid #ff3bb4;
-            box-shadow: 0 0 20px rgba(255, 59, 180, 0.6);
-            object-fit: cover;
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            cursor: pointer;
-            display: none;
-            transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 4px solid #050d06;
+            box-shadow: inset 0 10px 10px rgba(0,0,0,0.85);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        #target-gabri:active { transform: translate(-50%, -50%) scale(0.85); }
+
+        /* 👤 Gabri target head image element */
+        .mole-target {
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
+            position: absolute;
+            bottom: -100%; /* Placed deep below the dirt threshold */
+            transition: bottom 0.1s steps(4); /* Chonky arcade step translation transition */
+            cursor: none;
+            z-index: 5;
+        }
+
+        .mole-target.up {
+            bottom: 5%; /* Pops out out of the soil zone */
+        }
 
         .screen-overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(3, 0, 8, 0.85);
+            background: rgba(3, 0, 8, 0.95);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 10; border-radius: 20px; text-align: center; padding: 20px;
+            z-index: 10; border-radius: 4px; text-align: center; padding: 20px;
         }
 
         .screen-overlay h2 {
-            font-size: 2.5rem; font-weight: 900; margin-bottom: 10px;
-            background: linear-gradient(135deg, #ffffff 0%, #ff73ca 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-size: 2.2rem; font-weight: bold; margin-bottom: 12px;
+            color: #ff3bb4; text-shadow: 0 0 8px #ff3bb4;
         }
 
-        .screen-overlay p { color: rgba(255, 255, 255, 0.6); margin-bottom: 24px; font-size: 1rem; max-width: 400px; }
+        .screen-overlay p { color: #30d5ff; margin-bottom: 24px; font-size: 0.95rem; max-width: 400px; line-height: 1.4; }
 
         .start-btn {
-            background: linear-gradient(135deg, #ff3bb4 0%, #00bfff 100%);
-            color: white; border: none; padding: 14px 40px;
-            border-radius: 50px; font-size: 1rem; font-weight: 700;
-            cursor: pointer; box-shadow: 0 10px 25px rgba(255, 59, 180, 0.3);
-            transition: transform 0.2s, box-shadow 0.2s;
+            background: #ff3bb4;
+            color: white; border: 2px solid #fff; padding: 12px 36px;
+            font-size: 1rem; font-weight: bold;
+            box-shadow: 0 6px 0 #b31d77, 0 10px 15px rgba(0,0,0,0.4);
+            transition: all 0.1s steps(2);
+            cursor: none;
         }
-        .start-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(255, 59, 180, 0.4); }
+        .start-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #b31d77; }
 
         .hit-effect {
             position: absolute; pointer-events: none;
-            font-size: 1.5rem; font-weight: 900; color: #00e5ff;
-            text-shadow: 0 0 10px #00e5ff; animation: effectFloat 0.4s ease-out forwards;
-            z-index: 5;
+            font-size: 1.2rem; font-weight: bold; color: #30d5ff;
+            text-shadow: 0 0 6px #30d5ff; animation: pixelFloat 0.3s steps(4) forwards;
+            z-index: 6;
         }
 
-        @keyframes effectFloat {
-            0% { opacity: 1; transform: translate(-50%, -50%) scale(0.6); }
-            100% { opacity: 0; transform: translate(-50%, -100%) scale(1.2); }
+        @keyframes pixelFloat {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
         }
     </style>
 </head>
 <body>
+
+    <div id="custom-fist-cursor">
+        <img src="fist.png" alt="Wet Fist" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23ff3bb4\'><rect x=\'6\' y=\'6\' width=\'12\' height=\'12\'/></svg>'">
+    </div>
 
     <header>
         <a href="index.html" class="brand">
@@ -177,144 +247,133 @@
             <div class="logo-text">Queefy Arcade</div>
         </a>
         <nav class="desktop-nav">
-            <a href="index.html">← Back to Arcade</a>
+            <a href="index.html">← EXIT</a>
         </nav>
     </header>
 
     <div class="arcade-cabinet">
         <div class="game-hud">
-            <div class="hud-item">Score: <span id="score-val">0</span></div>
-            <div class="hud-item">Streak: <span id="multiplier-val">1x</span></div>
-            <div class="hud-item">Time: <span id="time-val">30</span>s</div>
+            <div class="hud-item">SCORE: <span id="score-val">000</span></div>
+            <div class="hud-item">TIME: <span id="time-val">30</span>S</div>
         </div>
 
-        <div class="game-viewport" id="viewport">
+        <div class="mole-grid" id="game-grid">
             <div class="screen-overlay" id="overlay">
                 <h2 id="overlay-title">FIST-A-GABRI</h2>
-                <p id="overlay-desc">Speed trial reflection module. Land consecutive fast punches on Gabri as she warps across the matrix grid. Miss, and your streak falls.</p>
-                <button class="start-btn" id="action-btn" onclick="startGame()">Initiate Trial</button>
+                <p id="overlay-desc">ANOMALY DETECTED IN THE SOIL FIELDS! SMASH THE GABRI HEADSHOTS WITH YOUR WET FIST BEFORE THEY SLIDE UNDERGROUND.</p>
+                <button class="start-btn" id="action-btn" onclick="startGame()">INSERT COIN</button>
             </div>
 
-            <img src="../gabrihannah.png" id="target-gabri" alt="Target Gabri" onpointerdown="handleTargetHit(event)">
+            <div class="grid-hole"><img src="gabrihead.png" class="mole-target" data-index="0" onpointerdown="whackMole(this, event)"></div>
+            <div class="grid-hole"><img src="gabrihead.png" class="mole-target" data-index="1" onpointerdown="whackMole(this, event)"></div>
+            <div class="grid-hole"><img src="gabrihead.png" class="mole-target" data-index="2" onpointerdown="whackMole(this, event)"></div>
+            <div class="grid-hole"><img src="gabrihead.png" class="mole-target" data-index="3" onpointerdown="whackMole(this, event)"></div>
+            <div class="grid-hole"><img src="gabrihead.png" class="mole-target" data-index="4" onpointerdown="whackMole(this, event)"></div>
+            <div class="grid-hole"><img src="gabrihead.png" class="mole-target" data-index="5" onpointerdown="whackMole(this, event)"></div>
+            <div class="grid-hole"><img src="gabrihead.png" class="mole-target" data-index="6" onpointerdown="whackMole(this, event)"></div>
+            <div class="grid-hole"><img src="gabrihead.png" class="mole-target" data-index="7" onpointerdown="whackMole(this, event)"></div>
+            <div class="grid-hole"><img src="gabrihead.png" class="mole-target" data-index="8" onpointerdown="whackMole(this, event)"></div>
         </div>
     </div>
 
     <script>
         let score = 0;
-        let streak = 0;
-        let multiplier = 1;
         let timeLeft = 30;
         let gameActive = false;
-        let moveInterval = null;
+        let currentActiveMole = null;
+        let moleTimeout = null;
         let countdownTimer = null;
-        let baseSpeed = 900; // Milliseconds before target warps somewhere else automatically
+        let spawnDelay = 800; 
 
-        const viewport = document.getElementById('viewport');
-        const target = document.getElementById('target-gabri');
+        const cursor = document.getElementById('custom-fist-cursor');
+        const gridHoles = document.querySelectorAll('.mole-target');
         const overlay = document.getElementById('overlay');
         const overlayTitle = document.getElementById('overlay-title');
         const overlayDesc = document.getElementById('overlay-desc');
         const actionBtn = document.getElementById('action-btn');
         
         const scoreVal = document.getElementById('score-val');
-        const multVal = document.getElementById('multiplier-val');
         const timeVal = document.getElementById('time-val');
 
-        // Check if full target sprite exists, otherwise fall back to base layout thumbnail image smoothly
-        const imgCheck = new Image();
-        imgCheck.src = 'gabrifull.jpg';
-        imgCheck.onload = () => { target.src = 'gabrifull.jpg'; };
-
-        // Handle misses inside viewport workspace layout container boundaries
-        viewport.addEventListener('pointerdown', (e) => {
-            if (!gameActive || e.target === target) return;
-            resetStreak();
+        // Capture mouse movement coordinates
+        window.addEventListener('mousemove', (e) => {
+            cursor.style.left = `${e.clientX}px`;
+            cursor.style.top = `${e.clientY}px`;
+            
+            // Generate fluid wet trails dripping down
+            if (Math.random() < 0.15) {
+                spawnPixelDrip(e.clientX, e.clientY);
+            }
         });
+
+        function spawnPixelDrip(x, y) {
+            const particle = document.createElement('div');
+            particle.className = 'drip-particle';
+            particle.style.left = `${x + (Math.floor(Math.random() * 24) - 12)}px`;
+            particle.style.top = `${y + 30}px`;
+            document.body.appendChild(particle);
+            setTimeout(() => particle.remove(), 500);
+        }
 
         function startGame() {
             score = 0;
-            streak = 0;
-            multiplier = 1;
             timeLeft = 30;
             gameActive = true;
-
-            scoreVal.innerText = score;
-            multVal.innerText = "1x";
+            scoreVal.innerText = '000';
             timeVal.innerText = timeLeft;
-
             overlay.style.display = 'none';
-            target.style.display = 'block';
 
-            repositionTarget();
-            startLoops();
+            startCountdown();
+            nextMoleCycle();
         }
 
-        function startLoops() {
-            clearInterval(moveInterval);
+        function startCountdown() {
             clearInterval(countdownTimer);
-
-            // Time ticking down loop track
             countdownTimer = setInterval(() => {
                 timeLeft--;
                 timeVal.innerText = timeLeft;
                 if (timeLeft <= 0) endGame();
             }, 1000);
-
-            // Automatic reposition cycle track
-            triggerWarpLoop();
         }
 
-        function triggerWarpLoop() {
-            clearInterval(moveInterval);
-            // Dynamic acceleration scaling based on user score thresholds
-            let adaptiveSpeed = Math.max(450, baseSpeed - Math.floor(score / 50) * 60);
-            
-            moveInterval = setInterval(() => {
-                resetStreak();
-                repositionTarget();
-            }, adaptiveSpeed);
-        }
-
-        function repositionTarget() {
-            const maxX = viewport.clientWidth - target.clientWidth;
-            const maxY = viewport.clientHeight - target.clientHeight;
-
-            const randomX = Math.floor(Math.random() * maxX);
-            const randomY = Math.floor(Math.random() * maxY);
-
-            target.style.left = `${randomX + target.clientWidth / 2}px`;
-            target.style.top = `${randomY + target.clientHeight / 2}px`;
-        }
-
-        function handleTargetHit(e) {
+        function nextMoleCycle() {
             if (!gameActive) return;
-            e.stopPropagation(); // Halt bubbling sequence trigger preventing miss mechanics execution
 
-            streak++;
-            // Escalating combo levels processing multiplier thresholds
-            if (streak >= 15) multiplier = 4;
-            else if (streak >= 8) multiplier = 3;
-            else if (streak >= 3) multiplier = 2;
-            else multiplier = 1;
+            if (currentActiveMole) {
+                currentActiveMole.classList.remove('up');
+            }
 
-            score += 10 * multiplier;
+            // Select random soil location
+            const randomIndex = Math.floor(Math.random() * gridHoles.length);
+            currentActiveMole = gridHoles[randomIndex];
+            currentActiveMole.classList.add('up');
+
+            // Accelerate popup frequency based on points acquired
+            let dynamicSpeed = Math.max(450, spawnDelay - Math.floor(score / 30) * 40);
+
+            clearTimeout(moleTimeout);
+            moleTimeout = setTimeout(() => {
+                nextMoleCycle();
+            }, dynamicSpeed);
+        }
+
+        function whackMole(element, event) {
+            if (!gameActive || !element.classList.contains('up')) return;
             
-            scoreVal.innerText = score;
-            multVal.innerText = `${multiplier}x`;
-
-            spawnHitVisual(e.clientX, e.clientY);
-            repositionTarget();
-            triggerWarpLoop(); // Reset timeout threshold cycle window natively
+            score += 10;
+            // Pad out numerical string score format text output fields to match arcade style (e.g. 020)
+            scoreVal.innerText = String(score).padStart(3, '0');
+            
+            element.classList.remove('up');
+            
+            spawnHitVisual(element.parentElement, event.clientX, event.clientY);
+            
+            clearTimeout(moleTimeout);
+            nextMoleCycle();
         }
 
-        function resetStreak() {
-            streak = 0;
-            multiplier = 1;
-            multVal.innerText = "1x";
-        }
-
-        function spawnHitVisual(clientX, clientY) {
-            const rect = viewport.getBoundingClientRect();
+        function spawnHitVisual(parentSlot, clientX, clientY) {
+            const rect = parentSlot.getBoundingClientRect();
             const x = clientX - rect.left;
             const y = clientY - rect.top;
 
@@ -323,23 +382,23 @@
             effect.style.left = `${x}px`;
             effect.style.top = `${y}px`;
             
-            // Random hit tracking labels array matrix
-            const textOptions = ['💥 FIST!', '⚡ HIT!', '🔥 CRIT!', '💢 HYPER!'];
+            const textOptions = ['💦 SPLAT!', '💦 WACK!', '💦 FIST!', '💦 SMASH!'];
             effect.innerText = textOptions[Math.floor(Math.random() * textOptions.length)];
 
-            viewport.appendChild(effect);
-            setTimeout(() => effect.remove(), 400);
+            parentSlot.appendChild(effect);
+            setTimeout(() => effect.remove(), 300);
         }
 
         function endGame() {
             gameActive = false;
-            target.style.display = 'none';
-            clearInterval(moveInterval);
+            clearTimeout(moleTimeout);
             clearInterval(countdownTimer);
+            
+            gridHoles.forEach(h => h.classList.remove('up'));
 
-            overlayTitle.innerText = "TRIAL CONCLUDED";
-            overlayDesc.innerHTML = `Matrix score outcome evaluated.<br><br style='margin-bottom:8px;'>Final Punch Rating: <span style='color:#ff73ca; font-weight:900; font-size:1.4rem;'>${score} pts</span>`;
-            actionBtn.innerText = "Reboot Module";
+            overlayTitle.innerText = "GAME OVER";
+            overlayDesc.innerHTML = `ANOMALY TIMEOUT CLEAR.<br><br>TOTAL SCORE RATINGS: <span style='color:#ff73ca; font-weight:bold;'>${String(score).padStart(3, '0')} PTS</span>`;
+            actionBtn.innerText = "CONTINUE?";
             overlay.style.display = 'flex';
         }
     </script>
