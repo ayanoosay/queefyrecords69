@@ -468,14 +468,12 @@
     </div>
 
     <script>
-        // 1. Initialise Supabase Client with your real project parameters
         const SUPABASE_URL = "https://ybrlwkrqgsdfwwkjvtsv.supabase.co"; 
         const SUPABASE_ANON_KEY = "sb_publishable_HKZYaWXO2UgTjRUomm7M1w_tB1d47ET";
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let currentUser = null;
 
-        // Track Auth state changes
         supabase.auth.onAuthStateChange((event, session) => {
             currentUser = session?.user || null;
             const loginBtn = document.getElementById('login-btn');
@@ -488,14 +486,12 @@
             }
         });
 
-        // Trigger dynamic login pop-up
         async function toggleAuth() {
             const email = prompt("Enter your Email:");
             if(!email) return;
             const password = prompt("Enter your Password (min 6 characters):");
             if(!password) return;
 
-            // Try to log in, if it fails, try to sign them up seamlessly!
             let { data, error } = await supabase.auth.signInWithPassword({ email, password });
             
             if (error) {
@@ -503,14 +499,9 @@
                 if(signUp) {
                     let { data: upData, error: upErr } = await supabase.auth.signUp({ email, password });
                     if(upErr) alert("Error creating account: " + upErr.message);
-                    else alert("Registration successful! Check your email for a verification link if required.");
+                    else alert("Registration successful!");
                 }
             }
-        }
-
-        // Alternative modern Auth integration (Uncomment inside your Supabase settings to use Google/Apple)
-        async function loginWithGoogle() {
-            await supabase.auth.signInWithOAuth({ provider: 'google' });
         }
 
         const csvLink = "https://docs.google.com/spreadsheets/d/1pYMnzTwBwkopjhsTPxVgu_vAxg39o9uxmRb3e2oaMZo/export?format=csv";
@@ -528,9 +519,21 @@
         };
 
         function linkifyContent(text) {
+            if(!text) return "";
             const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
             const urlRegex = /(https?:\/\/[^\s]+)/g;
             return escaped.replace(urlRegex, (url) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`);
+        }
+
+        // Clean identifier generator function to make sure IDs never cause an indexing crash
+        function generatePostId(artist, content) {
+            let combined = (artist || "") + (content || "");
+            let hash = 0;
+            for (let i = 0; i < combined.length; i++) {
+                hash = (hash << 5) - hash + combined.charCodeAt(i);
+                hash |= 0;
+            }
+            return "qf_" + Math.abs(hash);
         }
 
         if (csvLink) {
@@ -542,9 +545,18 @@
                     feed.innerHTML = ""; 
                     let posts = results.data.reverse();
 
-                    // Pre-fetch all likes and comments global status from DB
-                    const { data: dbLikes } = await supabase.from('likes').select('*');
-                    const { data: dbComments } = await supabase.from('comments').select('*').order('created_at', { ascending: true });
+                    let dbLikes = [];
+                    let dbComments = [];
+
+                    // Safe DB wrapper so network errors or empty tables never crash your main post timeline rendering
+                    try {
+                        const { data: likesRes } = await supabase.from('likes').select('*');
+                        if (likesRes) dbLikes = likesRes;
+                        const { data: commsRes } = await supabase.from('comments').select('*').order('created_at', { ascending: true });
+                        if (commsRes) dbComments = commsRes;
+                    } catch (err) {
+                        console.log("Database fetch bypassed or empty:", err);
+                    }
 
                     posts.forEach(post => {
                         if (!post["Artist Name"]) return;
@@ -555,12 +567,10 @@
                         let time = post["Timestamp"] ? post["Timestamp"].split(" ")[0] : "Just now";
                         let profile = artistData[artistName] || { handle: "@artist", image: "../logo.jpeg" };
 
-                        let uniquePostId = (artistName + content).replace(/[^a-zA-Z0-9]/g, "").slice(0, 30);
+                        let uniquePostId = generatePostId(artistName, content);
                         
-                        // Database verification for Likes
-                        let postLikesCount = dbLikes?.filter(l => l.post_id === uniquePostId).length || 0;
-                        let userHasLiked = dbLikes?.some(l => l.post_id === uniquePostId && l.user_id === currentUser?.id) || false;
-                        
+                        let postLikesCount = dbLikes.filter(l => l.post_id === uniquePostId).length;
+                        let userHasLiked = dbLikes.some(l => l.post_id === uniquePostId && l.user_id === currentUser?.id);
                         let heartClass = userHasLiked ? "action-btn like-btn liked" : "action-btn like-btn";
 
                         let mediaHTML = '';
@@ -572,9 +582,8 @@
                             }
                         }
 
-                        // Filter comments for this exact post
                         let postCommentsHTML = '';
-                        let currentPostComments = dbComments?.filter(c => c.post_id === uniquePostId) || [];
+                        let currentPostComments = dbComments.filter(c => c.post_id === uniquePostId);
                         currentPostComments.forEach(c => {
                             postCommentsHTML += `<div class="comment-item"><strong>${c.username}:</strong> ${c.comment_text}</div>`;
                         });
@@ -613,7 +622,6 @@
                         feed.innerHTML += postHTML;
                     });
 
-                    // Event listeners for production backend dynamic Likes toggle
                     document.querySelectorAll('.like-btn').forEach(btn => {
                         btn.addEventListener('click', async function() {
                             if(!currentUser) { alert("Please log in to leave a like!"); return; }
@@ -636,14 +644,13 @@
             });
         }
 
-        // Post fresh inputs straight to your DB schema instantly
         async function submitComment(postId) {
             if(!currentUser) { alert("You must sign in to post comments!"); return; }
             const inputField = document.getElementById(`input_${postId}`);
             const commentText = inputField.value.trim();
             if(!commentText) return;
 
-            const username = currentUser.email.split('@')[0]; // Simple, secure clean username fallback from token metadata
+            const username = currentUser.email.split('@')[0];
 
             const { data, error } = await supabase.from('comments').insert([
                 { post_id: postId, user_id: currentUser.id, username: username, comment_text: commentText }
@@ -658,7 +665,6 @@
             }
         }
 
-        // Mobile Responsive Toggle Hook
         const hamburger = document.getElementById('hamburger');
         const mobileMenu = document.getElementById('mobile-menu');
         hamburger.addEventListener('click', () => {
@@ -668,7 +674,3 @@
     </script>
 </body>
 </html>
-
-
-
-
