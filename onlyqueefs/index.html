@@ -192,6 +192,121 @@
             margin-top: 15px;
         }
 
+        /* Cute Custom Modal Interface */
+        .cute-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(3, 0, 8, 0.6);
+            backdrop-filter: blur(15px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .cute-modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .cute-modal-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+            padding: 35px;
+            border-radius: 28px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .cute-modal-overlay.active .cute-modal-card {
+            transform: scale(1);
+        }
+        .cute-modal-card h2 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #ffffff 0%, #ff73ca 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .cute-modal-card p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.95rem;
+            margin-bottom: 24px;
+        }
+        .cute-form-group {
+            margin-bottom: 16px;
+            text-align: left;
+        }
+        .cute-form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 6px;
+            padding-left: 4px;
+        }
+        .cute-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 16px;
+            border-radius: 14px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .cute-input:focus {
+            border-color: #ff73ca;
+        }
+        .cute-submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #ff3bb4 0%, #00bfff 100%);
+            border: none;
+            color: white;
+            padding: 14px;
+            border-radius: 16px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+            box-shadow: 0 8px 20px rgba(255, 59, 180, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .cute-submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(255, 59, 180, 0.4);
+        }
+        .cute-toggle-link {
+            display: inline-block;
+            margin-top: 18px;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .cute-toggle-link span {
+            color: #30d5ff;
+            font-weight: 600;
+        }
+        .cute-toggle-link:hover {
+            color: white;
+        }
+        .cute-close-btn {
+            position: absolute;
+            top: 16px; right: 20px;
+            font-size: 1.5rem;
+            color: rgba(255,255,255,0.3);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .cute-close-btn:hover { color: white; }
+
         .feed-container {
             max-width: 650px;
             margin: 140px auto 100px;
@@ -236,7 +351,7 @@
         .post-media { width: 100%; max-height: 500px; object-fit: cover; border-radius: 16px; margin-bottom: 20px; }
 
         .post-actions { display: flex; gap: 25px; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 15px; }
-        .action-btn { display: flex; align-items: center; gap: 8px; color: rgba(255, 255, 255, 0.5); font-size: 0.95rem; font-weight: 600; cursor: pointer; }
+        .action-btn { display: flex; align-items: center; gap: 8px; color: rgba(255, 255, 255, 0.5); font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
         .action-btn svg { width: 20px; height: 20px; fill: currentColor; }
         .action-btn.liked { color: #ff3bb4; }
 
@@ -244,9 +359,25 @@
         .comment-list { max-height: 200px; overflow-y: auto; margin-bottom: 10px; }
         .comment-item { font-size: 0.9rem; padding: 6px 10px; background: rgba(255,255,255,0.03); border-radius: 8px; margin-bottom: 6px; }
         .comment-item strong { color: #ff73ca; }
-        .comment-input-box { display: flex; gap: 10px; }
+        
+        .comment-input-box { display: flex; gap: 10px; position: relative; }
         .comment-input-box input { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); padding: 8px 12px; border-radius: 20px; color: white; outline: none; }
         .comment-submit-btn { background: #30d5ff; color: #000; border: none; padding: 0 15px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+
+        .comment-error-msg {
+            display: none;
+            color: #ff4772;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 6px;
+            padding-left: 10px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-3px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
         .loading-text { text-align: center; color: rgba(255,255,255,0.5); margin-top: 40px; }
 
@@ -270,7 +401,7 @@
             <a href="../index.html#roster">Roster</a>
             <a href="../events/">Events</a>
             <a href="#" class="active">OnlyQueefs</a>
-            <button class="auth-btn" id="login-btn" onclick="toggleAuth()">Sign In / Up</button>
+            <button class="auth-btn" id="login-btn" onclick="openAuthModal()">Sign In</button>
         </nav>
 
         <div class="hamburger" id="hamburger">
@@ -284,7 +415,31 @@
         <a href="../index.html" class="mobile-link">Home</a>
         <a href="../index.html#roster" class="mobile-link">Roster</a>
         <a href="../events/" class="mobile-link">Events</a>
-        <button class="mobile-auth-btn" id="mobile-login-btn" onclick="toggleAuth()">Sign In / Up</button>
+        <button class="mobile-auth-btn" id="mobile-login-btn" onclick="openAuthModal()">Sign In</button>
+    </div>
+
+    <div class="cute-modal-overlay" id="authModal" onclick="closeAuthModalViaOverlay(event)">
+        <div class="cute-modal-card" style="position: relative;">
+            <div class="cute-close-btn" onclick="closeAuthModal()">&times;</div>
+            <h2 id="modalTitle">Welcome Back</h2>
+            <p id="modalSubtitle">Log into your profile to start commenting</p>
+            
+            <form onsubmit="handleAuthSubmit(event)">
+                <div class="cute-form-group">
+                    <label for="authEmail">Email Address</label>
+                    <input type="email" id="authEmail" class="cute-input" placeholder="you@example.com" required>
+                </div>
+                <div class="cute-form-group">
+                    <label for="authPassword">Password</label>
+                    <input type="password" id="authPassword" class="cute-input" placeholder="••••••••" minlength="6" required>
+                </div>
+                <button type="submit" id="modalSubmitBtn" class="cute-submit-btn">Sign In</button>
+            </form>
+            
+            <div class="cute-toggle-link" id="modalToggleLink" onclick="toggleAuthMode()">
+                Don't have an account? <span>Sign Up</span>
+            </div>
+        </div>
     </div>
 
     <div class="feed-container">
@@ -304,20 +459,17 @@
         
         const supabaseApp = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let currentUser = null;
-        let userIpIdentifier = "anon_guest"; // Default anonymous tracking fallback string
+        let userIpIdentifier = "anon_guest";
+        let isSignUpMode = false;
 
-        // Asynchronously request public IP footprint right away when loading
         async function fetchUserIP() {
             try {
                 let response = await fetch("https://api.ipify.org?format=json");
                 let data = await response.json();
                 if(data && data.ip) {
-                    // Turn the string IP value into a unique format structure to match UUID variables safely
                     userIpIdentifier = "00000000-0000-0000-0000-" + data.ip.replace(/\./g, "").slice(0, 12).padStart(12, '0');
                 }
-            } catch(err) {
-                console.log("IP fallback fetch issue:", err);
-            }
+            } catch(err) { console.log("IP fetch fallback:", err); }
         }
 
         supabaseApp.auth.onAuthStateChange((event, session) => {
@@ -332,37 +484,79 @@
 
             if (currentUser) {
                 updateBtnText("Log Out");
-                const logoutAction = () => { supabaseApp.auth.signOut(); closeMobileMenu(); };
+                const logoutAction = () => { supabaseApp.auth.signOut(); window.location.reload(); };
                 if(loginBtn) loginBtn.onclick = logoutAction;
                 if(mobileLoginBtn) mobileLoginBtn.onclick = logoutAction;
             } else {
-                updateBtnText("Sign In / Up");
-                const loginAction = () => { toggleAuth(); };
+                updateBtnText("Sign In");
+                const loginAction = () => { openAuthModal(); };
                 if(loginBtn) loginBtn.onclick = loginAction;
                 if(mobileLoginBtn) mobileLoginBtn.onclick = loginAction;
             }
         });
 
+        function openAuthModal() {
+            closeMobileMenu();
+            document.getElementById('authModal').classList.add('active');
+        }
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.remove('active');
+        }
+        function closeAuthModalViaOverlay(e) {
+            if(e.target.id === "authModal") closeAuthModal();
+        }
         function closeMobileMenu() {
             hamburger.classList.remove('active');
             mobileMenu.classList.remove('active');
         }
 
-        async function toggleAuth() {
-            closeMobileMenu();
-            const email = prompt("Enter your Email:");
-            if(!email) return;
-            const password = prompt("Enter your Password (min 6 characters):");
-            if(!password) return;
+        function toggleAuthMode() {
+            isSignUpMode = !isSignUpMode;
+            const title = document.getElementById('modalTitle');
+            const subtitle = document.getElementById('modalSubtitle');
+            const btn = document.getElementById('modalSubmitBtn');
+            const toggle = document.getElementById('modalToggleLink');
 
-            let { data, error } = await supabaseApp.auth.signInWithPassword({ email, password });
+            if(isSignUpMode) {
+                title.innerText = "Create Account";
+                subtitle.innerText = "Sign up to join the conversation";
+                btn.innerText = "Sign Up";
+                toggle.innerHTML = "Already have an account? <span>Sign In</span>";
+            } else {
+                title.innerText = "Welcome Back";
+                subtitle.innerText = "Log into your profile to start commenting";
+                btn.innerText = "Sign In";
+                toggle.innerHTML = "Don't have an account? <span>Sign Up</span>";
+            }
+        }
+
+        async function handleAuthSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+            const btn = document.getElementById('modalSubmitBtn');
             
-            if (error) {
-                let signUp = confirm("Account not found. Sign Up with these credentials?");
-                if(signUp) {
-                    let { data: upData, error: upErr } = await supabaseApp.auth.signUp({ email, password });
-                    if(upErr) alert("Error creating account: " + upErr.message);
-                    else alert("Registration successful!");
+            btn.innerText = "Processing...";
+            btn.disabled = true;
+
+            if(isSignUpMode) {
+                let { data, error } = await supabaseApp.auth.signUp({ email, password });
+                if(error) {
+                    alert("Registration failed: " + error.message);
+                    btn.innerText = "Sign Up";
+                    btn.disabled = false;
+                } else {
+                    alert("Account registered successfully! Logging you in...");
+                    window.location.reload();
+                }
+            } else {
+                let { data, error } = await supabaseApp.auth.signInWithPassword({ email, password });
+                if(error) {
+                    alert("Login failed: " + error.message);
+                    btn.innerText = "Sign In";
+                    btn.disabled = false;
+                } else {
+                    window.location.reload();
                 }
             }
         }
@@ -399,7 +593,7 @@
         }
 
         async function initFeed() {
-            await fetchUserIP(); // Run IP extractor step before rendering layout
+            await fetchUserIP(); 
 
             if (csvLink) {
                 Papa.parse(csvLink, {
@@ -430,18 +624,16 @@
                             let profile = artistData[artistName] || { handle: "@artist", image: "../logo.jpeg" };
 
                             let uniquePostId = generatePostId(artistName, content);
-                            
                             let postLikesCount = dbLikes.filter(l => l.post_id === uniquePostId).length;
                             
-                            // Check likeness using authenticated user ID OR fallback IP address identifier layout string
                             let currentViewerId = currentUser ? currentUser.id : userIpIdentifier;
-                            let userHasLiked = dbLikes.some(l => l.post_id === uniquePostId && l.user_id === currentViewerId);
+                            let userHasLiked = dbLikes.some(l => l.post_id === uniquePostId && l.user_id === currentViewerId) || localStorage.getItem("liked_" + uniquePostId) === "true";
                             let heartClass = userHasLiked ? "action-btn like-btn liked" : "action-btn like-btn";
 
                             let mediaHTML = '';
                             if (mediaUrl && mediaUrl.trim() !== "") {
                                 if (mediaUrl.toLowerCase().includes('.mp4') || mediaUrl.toLowerCase().includes('.webm')) {
-                                    mediaHTML = `<video src="${mediaUrl.trim}" class="post-media" controls autoplay muted loop></video>`;
+                                    mediaHTML = `<video src="${mediaUrl.trim()}" class="post-media" controls autoplay muted loop></video>`;
                                 } else {
                                     mediaHTML = `<img src="${mediaUrl.trim()}" alt="Post Media" class="post-media">`;
                                 }
@@ -478,9 +670,10 @@
                                         ${postCommentsHTML}
                                     </div>
                                     <div class="comment-input-box">
-                                        <input type="text" id="input_${uniquePostId}" placeholder="Write a comment...">
+                                        <input type="text" id="input_${uniquePostId}" placeholder="Write a comment..." oninput="clearCommentError('${uniquePostId}')">
                                         <button class="comment-submit-btn" onclick="submitComment('${uniquePostId}')">Post</button>
                                     </div>
+                                    <div class="comment-error-msg" id="error_${uniquePostId}">You must be signed in to post comments!</div>
                                 </div>
                             </div>`;
                             
@@ -497,10 +690,12 @@
                                 if (this.classList.contains('liked')) {
                                     this.classList.remove('liked');
                                     countSpan.innerText = currentCount - 1;
+                                    localStorage.removeItem("liked_" + postId);
                                     await supabaseApp.from('likes').delete().match({ post_id: postId, user_id: targetUserId });
                                 } else {
                                     this.classList.add('liked');
                                     countSpan.innerText = currentCount + 1;
+                                    localStorage.setItem("liked_" + postId, "true");
                                     await supabaseApp.from('likes').insert([{ post_id: postId, user_id: targetUserId }]);
                                 }
                             });
@@ -511,7 +706,13 @@
         }
 
         async function submitComment(postId) {
-            if(!currentUser) { alert("Please sign in to comment!"); return; }
+            const errorLabel = document.getElementById(`error_${postId}`);
+            
+            if(!currentUser) { 
+                if(errorLabel) errorLabel.style.display = "block";
+                return; 
+            }
+            
             const inputField = document.getElementById(`input_${postId}`);
             const commentText = inputField.value.trim();
             if(!commentText) return;
@@ -526,9 +727,15 @@
                 alert("Error submitting comment: " + error.message);
             } else {
                 const list = document.getElementById(`comments_list_${postId}`);
-                list.innerHTML += `<div class="comment-item"><strong>${username}:</strong> ${commentText}</div>`;
-                inputField.value = "";
+                if(list) list.innerHTML += `<div class="comment-item"><strong>${username}:</strong> ${commentText}</div>`;
+                if(inputField) inputField.value = "";
+                if(errorLabel) errorLabel.style.display = "none";
             }
+        }
+
+        function clearCommentError(postId) {
+            const errorLabel = document.getElementById(`error_${postId}`);
+            if(errorLabel) errorLabel.style.display = "none";
         }
 
         const hamburger = document.getElementById('hamburger');
@@ -538,7 +745,6 @@
             mobileMenu.classList.toggle('active');
         });
 
-        // Trigger loop execution on initialization window mount
         initFeed();
     </script>
 </body>
