@@ -181,20 +181,20 @@
             justify-content: center;
         }
 
-        /* 👤 Gabri target head image element */
+        /* 👤 Gabri target head image element - MADE BIGGER HERE */
         .mole-target {
-            width: 80%;
-            height: 80%;
+            width: 115%;
+            height: 115%;
             object-fit: contain;
             position: absolute;
-            bottom: -100%; /* Placed deep below the dirt threshold */
+            bottom: -130%; /* Kept hidden below the frame edge vector */
             transition: bottom 0.1s steps(4); /* Chonky arcade step translation transition */
             cursor: none;
             z-index: 5;
         }
 
         .mole-target.up {
-            bottom: 5%; /* Pops out out of the soil zone */
+            bottom: -15%; /* Pops up perfectly inside the hole field box zone */
         }
 
         .screen-overlay {
