@@ -372,7 +372,6 @@
 
         .action-btn.liked { color: #ff3bb4; }
 
-        /* Dynamic Comments Section */
         .comments-section {
             margin-top: 15px;
             padding-top: 15px;
@@ -470,16 +469,17 @@
     <script>
         const SUPABASE_URL = "https://ybrlwkrqgsdfwwkjvtsv.supabase.co"; 
         const SUPABASE_ANON_KEY = "sb_publishable_HKZYaWXO2UgTjRUomm7M1w_tB1d47ET";
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
+        
+        // RENAMED variable to avoid global window object library naming collision
+        const supabaseApp = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let currentUser = null;
 
-        supabase.auth.onAuthStateChange((event, session) => {
+        supabaseApp.auth.onAuthStateChange((event, session) => {
             currentUser = session?.user || null;
             const loginBtn = document.getElementById('login-btn');
             if (currentUser) {
                 loginBtn.innerText = "Log Out";
-                loginBtn.onclick = () => supabase.auth.signOut();
+                loginBtn.onclick = () => supabaseApp.auth.signOut();
             } else {
                 loginBtn.innerText = "Sign In / Up";
                 loginBtn.onclick = () => toggleAuth();
@@ -492,12 +492,12 @@
             const password = prompt("Enter your Password (min 6 characters):");
             if(!password) return;
 
-            let { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            let { data, error } = await supabaseApp.auth.signInWithPassword({ email, password });
             
             if (error) {
                 let signUp = confirm("Account not found. Would you like to Sign Up with these credentials?");
                 if(signUp) {
-                    let { data: upData, error: upErr } = await supabase.auth.signUp({ email, password });
+                    let { data: upData, error: upErr } = await supabaseApp.auth.signUp({ email, password });
                     if(upErr) alert("Error creating account: " + upErr.message);
                     else alert("Registration successful!");
                 }
@@ -525,7 +525,6 @@
             return escaped.replace(urlRegex, (url) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`);
         }
 
-        // Clean identifier generator function to make sure IDs never cause an indexing crash
         function generatePostId(artist, content) {
             let combined = (artist || "") + (content || "");
             let hash = 0;
@@ -548,14 +547,13 @@
                     let dbLikes = [];
                     let dbComments = [];
 
-                    // Safe DB wrapper so network errors or empty tables never crash your main post timeline rendering
                     try {
-                        const { data: likesRes } = await supabase.from('likes').select('*');
+                        const { data: likesRes } = await supabaseApp.from('likes').select('*');
                         if (likesRes) dbLikes = likesRes;
-                        const { data: commsRes } = await supabase.from('comments').select('*').order('created_at', { ascending: true });
+                        const { data: commsRes } = await supabaseApp.from('comments').select('*').order('created_at', { ascending: true });
                         if (commsRes) dbComments = commsRes;
                     } catch (err) {
-                        console.log("Database fetch bypassed or empty:", err);
+                        console.log("Database fallback triggered:", err);
                     }
 
                     posts.forEach(post => {
@@ -632,11 +630,11 @@
                             if (this.classList.contains('liked')) {
                                 this.classList.remove('liked');
                                 countSpan.innerText = currentCount - 1;
-                                await supabase.from('likes').delete().match({ post_id: postId, user_id: currentUser.id });
+                                await supabaseApp.from('likes').delete().match({ post_id: postId, user_id: currentUser.id });
                             } else {
                                 this.classList.add('liked');
                                 countSpan.innerText = currentCount + 1;
-                                await supabase.from('likes').insert([{ post_id: postId, user_id: currentUser.id }]);
+                                await supabaseApp.from('likes').insert([{ post_id: postId, user_id: currentUser.id }]);
                             }
                         });
                     });
@@ -652,7 +650,7 @@
 
             const username = currentUser.email.split('@')[0];
 
-            const { data, error } = await supabase.from('comments').insert([
+            const { data, error } = await supabaseApp.from('comments').insert([
                 { post_id: postId, user_id: currentUser.id, username: username, comment_text: commentText }
             ]);
 
