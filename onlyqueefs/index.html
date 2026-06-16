@@ -617,125 +617,142 @@
             return "qf_" + Math.abs(hash);
         }
 
-        async function initFeed() {
-            await fetchUserIP(); 
+        if (csvLink) {
+            Papa.parse(csvLink, {
+                download: true,
+                header: true,
+                complete: async function(results) {
+                    const feed = document.getElementById('dynamic-feed');
+                    feed.innerHTML = ""; 
+                    let csvPosts = results.data.reverse();
+                    let combinedPostsList = [];
 
-            if (csvLink) {
-                Papa.parse(csvLink, {
-                    download: true,
-                    header: true,
-                    complete: async function(results) {
-                        const feed = document.getElementById('dynamic-feed');
-                        feed.innerHTML = ""; 
-                        let posts = results.data.reverse();
+                    csvPosts.forEach(p => {
+                        if (p["Artist Name"]) {
+                            combinedPostsList.push({
+                                artistName: p["Artist Name"],
+                                content: p["Post Content"] || "",
+                                mediaUrl: p["Media URL"] || "",
+                                time: p["Timestamp"] ? p["Timestamp"].split(" ")[0] : "Just now"
+                            });
+                        }
+                    });
 
-                        let dbLikes = [];
-                        let dbComments = [];
+                    let dbLikes = [];
+                    let dbComments = [];
 
-                        try {
-                            const { data: likesRes } = await supabaseApp.from('likes').select('*');
-                            if (likesRes) dbLikes = likesRes;
-                            const { data: commsRes } = await supabaseApp.from('comments').select('*').order('created_at', { ascending: true });
-                            if (commsRes) dbComments = commsRes;
-                        } catch (err) { console.log("Database fetch bypassed:", err); }
+                    try {
+                        const { data: directLivePosts } = await supabaseApp.from('posts').select('*').order('timestamp', { ascending: false });
+                        if (directLivePosts) {
+                            directLivePosts.forEach(p => {
+                                combinedPostsList.unshift({
+                                    artistName: p.artist_name,
+                                    content: p.post_content || "",
+                                    mediaUrl: p.media_url || "",
+                                    time: new Date(p.timestamp).toLocaleDateString()
+                                });
+                            });
+                        }
 
-                        const isAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
+                        const { data: likesRes } = await supabaseApp.from('likes').select('*');
+                        if (likesRes) dbLikes = likesRes;
+                        const { data: commsRes } = await supabaseApp.from('comments').select('*').order('created_at', { ascending: true });
+                        if (commsRes) dbComments = commsRes;
+                    } catch (err) { console.log("Database fetch bypassed:", err); }
 
-                        posts.forEach(post => {
-                            if (!post["Artist Name"]) return;
+                    const isAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
 
-                            let artistName = post["Artist Name"];
-                            let content = post["Post Content"] || "";
-                            let mediaUrl = post["Media URL"]; 
-                            let time = post["Timestamp"] ? post["Timestamp"].split(" ")[0] : "Just now";
-                            let profile = artistData[artistName] || { handle: "@artist", image: "../logo.jpeg" };
+                    combinedPostsList.forEach(post => {
+                        let artistName = post.artistName;
+                        let content = post.content;
+                        let mediaUrl = post.mediaUrl; 
+                        let time = post.time;
+                        let profile = artistData[artistName] || { handle: "@artist", image: "../logo.jpeg" };
 
-                            let uniquePostId = generatePostId(artistName, content);
-                            let postLikesCount = dbLikes.filter(l => l.post_id === uniquePostId).length;
-                            
-                            let currentViewerId = currentUser ? currentUser.id : userIpIdentifier;
-                            let userHasLiked = dbLikes.some(l => l.post_id === uniquePostId && l.user_id === currentViewerId) || localStorage.getItem("liked_" + uniquePostId) === "true";
-                            let heartClass = userHasLiked ? "action-btn like-btn liked" : "action-btn like-btn";
+                        let uniquePostId = generatePostId(artistName, content);
+                        let postLikesCount = dbLikes.filter(l => l.post_id === uniquePostId).length;
+                        
+                        let currentViewerId = currentUser ? currentUser.id : userIpIdentifier;
+                        let userHasLiked = dbLikes.some(l => l.post_id === uniquePostId && l.user_id === currentViewerId) || localStorage.getItem("liked_" + uniquePostId) === "true";
+                        let heartClass = userHasLiked ? "action-btn like-btn liked" : "action-btn like-btn";
 
-                            let mediaHTML = '';
-                            if (mediaUrl && mediaUrl.trim() !== "") {
-                                if (mediaUrl.toLowerCase().includes('.mp4') || mediaUrl.toLowerCase().includes('.webm')) {
-                                    mediaHTML = `<video src="${mediaUrl.trim()}" class="post-media" controls autoplay muted loop></video>`;
-                                } else {
-                                    mediaHTML = `<img src="${mediaUrl.trim()}" alt="Post Media" class="post-media">`;
-                                }
+                        let mediaHTML = '';
+                        if (mediaUrl && mediaUrl.trim() !== "") {
+                            if (mediaUrl.toLowerCase().includes('.mp4') || mediaUrl.toLowerCase().includes('.webm')) {
+                                mediaHTML = `<video src="${mediaUrl.trim()}" class="post-media" controls autoplay muted loop></video>`;
+                            } else {
+                                mediaHTML = `<img src="${mediaUrl.trim()}" alt="Post Media" class="post-media">`;
                             }
+                        }
 
-                            let postCommentsHTML = '';
-                            let currentPostComments = dbComments.filter(c => c.post_id === uniquePostId);
-                            currentPostComments.forEach(c => {
-                                let deleteButtonHTML = isAdmin ? `<button class="comment-delete-btn" onclick="deleteComment('${c.id}', this)">🗑️</button>` : '';
-                                    postCommentsHTML += `
-                                <div class="comment-item" id="comment_item_${c.id}">
-                                    <span><strong>${c.username}:</strong> ${c.comment_text}</span>
-                                    ${deleteButtonHTML}
-                                </div>`;
-                            });
-
-                            // Added autocomplete="off" cleanly to comment node input matrices below
-                            let postHTML = `
-                            <div class="queef-post" id="card_${uniquePostId}">
-                                <div class="post-header">
-                                    <a href="profile.html?artist=${encodeURIComponent(artistName)}" class="profile-click-wrapper">
-                                        <img src="${profile.image}" alt="${artistName}" class="post-avatar">
-                                        <div class="post-info">
-                                            <h4>${artistName} <span class="verified-badge"></span></h4>
-                                            <span>${profile.handle} • ${time}</span>
-                                        </div>
-                                    </a>
-                                </div>
-                                <div class="post-content">${linkifyContent(content)}</div>
-                                ${mediaHTML}
-                                <div class="post-actions">
-                                    <div class="${heartClass}" data-post-id="${uniquePostId}">
-                                        <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                                        <span class="like-count">${postLikesCount}</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="comments-section">
-                                    <div class="comment-list" id="comments_list_${uniquePostId}">
-                                        ${postCommentsHTML}
-                                    </div>
-                                    <div class="comment-input-box">
-                                        <input type="text" id="input_${uniquePostId}" placeholder="Write a comment..." oninput="clearCommentError('${uniquePostId}')" autocomplete="off">
-                                        <button class="comment-submit-btn" onclick="submitComment('${uniquePostId}')">Post</button>
-                                    </div>
-                                    <div class="comment-error-msg" id="error_${uniquePostId}">You must be signed in to post comments!</div>
-                                </div>
+                        let postCommentsHTML = '';
+                        let currentPostComments = dbComments.filter(c => c.post_id === uniquePostId);
+                        currentPostComments.forEach(c => {
+                            let deleteButtonHTML = isAdmin ? `<button class="comment-delete-btn" onclick="deleteComment('${c.id}', this)">🗑️</button>` : '';
+                            postCommentsHTML += `
+                            <div class="comment-item" id="comment_item_${c.id}">
+                                <span><strong>${c.username}:</strong> ${c.comment_text}</span>
+                                ${deleteButtonHTML}
                             </div>`;
+                        });
+
+                        let postHTML = `
+                        <div class="queef-post" id="card_${uniquePostId}">
+                            <div class="post-header">
+                                <a href="profile.html?artist=${encodeURIComponent(artistName)}" class="profile-click-wrapper">
+                                    <img src="${profile.image}" alt="${artistName}" class="post-avatar">
+                                    <div class="post-info">
+                                        <h4>${artistName} <span class="verified-badge"></span></h4>
+                                        <span>${profile.handle} • ${time}</span>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="post-content">${linkifyContent(content)}</div>
+                            ${mediaHTML}
+                            <div class="post-actions">
+                                <div class="${heartClass}" data-post-id="${uniquePostId}">
+                                    <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                                    <span class="like-count">${postLikesCount}</span>
+                                </div>
+                            </div>
                             
-                            feed.innerHTML += postHTML;
-                        });
+                            <div class="comments-section">
+                                <div class="comment-list" id="comments_list_${uniquePostId}">
+                                    ${postCommentsHTML}
+                                </div>
+                                <div class="comment-input-box">
+                                    <input type="text" id="input_${uniquePostId}" placeholder="Write a comment..." oninput="clearCommentError('${uniquePostId}')" autocomplete="off">
+                                    <button class="comment-submit-btn" onclick="submitComment('${uniquePostId}')">Post</button>
+                                </div>
+                                <div class="comment-error-msg" id="error_${uniquePostId}">You must be signed in to post comments!</div>
+                            </div>
+                        </div>`;
+                        
+                        feed.innerHTML += postHTML;
+                    });
 
-                        document.querySelectorAll('.like-btn').forEach(btn => {
-                            btn.addEventListener('click', async function() {
-                                let postId = this.getAttribute('data-post-id');
-                                let countSpan = this.querySelector('.like-count');
-                                let currentCount = parseInt(countSpan.innerText);
-                                let targetUserId = currentUser ? currentUser.id : userIpIdentifier;
+                    document.querySelectorAll('.like-btn').forEach(btn => {
+                        btn.addEventListener('click', async function() {
+                            let postId = this.getAttribute('data-post-id');
+                            let countSpan = this.querySelector('.like-count');
+                            let currentCount = parseInt(countSpan.innerText);
+                            let targetUserId = currentUser ? currentUser.id : userIpIdentifier;
 
-                                if (this.classList.contains('liked')) {
-                                    this.classList.remove('liked');
-                                    countSpan.innerText = currentCount - 1;
-                                    localStorage.removeItem("liked_" + postId);
-                                    await supabaseApp.from('likes').delete().match({ post_id: postId, user_id: targetUserId });
-                                } else {
-                                    this.classList.add('liked');
-                                    countSpan.innerText = currentCount + 1;
-                                    localStorage.setItem("liked_" + postId, "true");
-                                    await supabaseApp.from('likes').insert([{ post_id: postId, user_id: targetUserId }]);
-                                }
-                            });
+                            if (this.classList.contains('liked')) {
+                                this.classList.remove('liked');
+                                countSpan.innerText = currentCount - 1;
+                                localStorage.removeItem("liked_" + postId);
+                                await supabaseApp.from('likes').delete().match({ post_id: postId, user_id: targetUserId });
+                            } else {
+                                this.classList.add('liked');
+                                countSpan.innerText = currentCount + 1;
+                                localStorage.setItem("liked_" + postId, "true");
+                                await supabaseApp.from('likes').insert([{ post_id: postId, user_id: targetUserId }]);
+                            }
                         });
-                    }
-                });
-            }
+                    });
+                }
+            });
         }
 
         async function submitComment(postId) {
