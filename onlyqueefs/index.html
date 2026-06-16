@@ -71,7 +71,7 @@
             align-items: center;
             gap: 14px;
             position: relative;
-            z-index: 1001; /* Keeps logo above mobile menu */
+            z-index: 1001;
         }
 
         .brand-logo {
@@ -93,7 +93,6 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* Desktop Nav */
         .desktop-nav a {
             color: rgba(255, 255, 255, 0.75);
             text-decoration: none;
@@ -114,7 +113,6 @@
             color: #ffffff;
         }
 
-        /* --- MOBILE MENU STYLES --- */
         .hamburger {
             display: none;
             flex-direction: column;
@@ -122,7 +120,7 @@
             width: 30px;
             height: 20px;
             cursor: pointer;
-            z-index: 1001; /* Keeps icon above the glass overlay */
+            z-index: 1001;
         }
 
         .hamburger span {
@@ -134,7 +132,6 @@
             transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
-        /* Hamburger Morph Animation */
         .hamburger.active span:nth-child(1) {
             transform: translateY(9px) rotate(45deg);
             background-color: #ff3bb4;
@@ -148,7 +145,6 @@
             background-color: #00bfff;
         }
 
-        /* Liquid Glass Full Screen Overlay */
         .mobile-menu {
             position: fixed;
             top: 0;
@@ -192,7 +188,6 @@
             opacity: 1;
         }
 
-        /* Staggered spring animations for the links */
         .mobile-menu.active .mobile-link:nth-child(1) { transition-delay: 0.1s; }
         .mobile-menu.active .mobile-link:nth-child(2) { transition-delay: 0.15s; }
         .mobile-menu.active .mobile-link:nth-child(3) { transition-delay: 0.2s; }
@@ -203,12 +198,14 @@
             transform: scale(1.1);
             text-shadow: 0 0 20px rgba(255, 59, 180, 0.6);
         }
-        /* --- END MOBILE MENU STYLES --- */
 
         .feed-container {
             max-width: 650px;
             margin: 140px auto 100px;
             padding: 0 20px;
+            /* Prevent any child from blowing out the container width */
+            min-width: 0;
+            overflow: hidden;
         }
 
         .feed-header {
@@ -264,6 +261,9 @@
             box-shadow: 0 15px 35px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.2);
             transition: transform 0.3s ease, border-color 0.3s ease;
             position: relative;
+            /* Critical: prevent children from blowing out card width */
+            min-width: 0;
+            overflow: hidden;
         }
 
         .queef-post:hover {
@@ -286,6 +286,7 @@
             display: flex;
             align-items: center;
             gap: 15px;
+            min-width: 0;
         }
 
         .profile-click-wrapper:hover h4 {
@@ -295,9 +296,14 @@
         .post-avatar {
             width: 50px;
             height: 50px;
+            min-width: 50px; /* prevent shrinking */
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .post-info {
+            min-width: 0; /* allow text truncation inside flex */
         }
 
         .post-info h4 {
@@ -308,12 +314,26 @@
             align-items: center;
             gap: 5px;
             transition: color 0.2s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .post-info span {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
         }
 
         .verified-badge {
             display: inline-block;
             width: 14px;
             height: 14px;
+            min-width: 14px;
             background: #00e5ff;
             border-radius: 50%;
             position: relative;
@@ -329,19 +349,39 @@
             transform: translate(-50%, -50%);
         }
 
-        .post-info span {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.5);
-            font-weight: 500;
-        }
-
+        /* ---- KEY FIX: post content link handling ---- */
         .post-content {
             font-size: 1.15rem;
             line-height: 1.5;
             color: rgba(255, 255, 255, 0.9);
             margin-bottom: 20px;
             white-space: pre-wrap;
+            /* Break long URLs/words so they don't overflow on mobile */
+            word-break: break-word;
+            overflow-wrap: break-word;
+            /* Ensure content stays within card */
+            min-width: 0;
+            max-width: 100%;
         }
+
+        /* Links inside post content: truncate visually with ellipsis on small screens */
+        .post-content a {
+            color: #30d5ff;
+            text-decoration: none;
+            /* On mobile, long URLs get truncated with "..." */
+            display: inline-block;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            vertical-align: bottom;
+        }
+
+        .post-content a:hover {
+            text-decoration: underline;
+            color: #ff73ca;
+        }
+        /* ---- END KEY FIX ---- */
 
         .post-media {
             width: 100%;
@@ -351,6 +391,7 @@
             margin-bottom: 20px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            display: block; /* prevent inline gap */
         }
 
         .post-actions {
@@ -395,9 +436,14 @@
 
         @media (max-width: 768px) {
             header { top: 12px; padding: 10px 20px; width: 95%; }
-            .desktop-nav { display: none; } /* Hide desktop links on mobile */
-            .hamburger { display: flex; } /* Show hamburger on mobile */
+            .desktop-nav { display: none; }
+            .hamburger { display: flex; }
             .feed-header h1 { font-size: 2.4rem; }
+
+            /* On mobile, link text is truncated — full URL still clickable */
+            .post-content a {
+                max-width: min(100%, 220px);
+            }
         }
     </style>
 </head>
@@ -456,7 +502,6 @@
             hamburger.classList.toggle('active');
             mobileMenu.classList.toggle('active');
             
-            // Prevent background scrolling when menu is open
             if(mobileMenu.classList.contains('active')) {
                 document.body.style.overflow = 'hidden';
             } else {
@@ -464,7 +509,6 @@
             }
         });
 
-        // Close menu and restore scroll when clicking a link
         mobileLinks.forEach(link => {
             link.addEventListener('click', () => {
                 hamburger.classList.remove('active');
@@ -497,6 +541,31 @@
                 hash = hash & hash;
             }
             return Math.abs(hash);
+        }
+
+        /**
+         * Converts plain-text URLs in a string into clickable <a> tags.
+         * The visible label is truncated with "..." if it's too long,
+         * but the href always holds the full URL so it's clickable.
+         */
+        function linkifyContent(text) {
+            // Escape HTML first to prevent injection
+            const escaped = text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            return escaped.replace(urlRegex, (url) => {
+                // Decode for display, truncate if needed
+                let display = url;
+                try { display = decodeURIComponent(url); } catch(e) {}
+                const MAX = 40;
+                if (display.length > MAX) {
+                    display = display.slice(0, MAX) + '…';
+                }
+                return `<a href="${url}" target="_blank" rel="noopener noreferrer">${display}</a>`;
+            });
         }
 
         if (csvLink) {
@@ -535,6 +604,9 @@
                             }
                         }
 
+                        // Use linkifyContent so URLs become clickable and truncated
+                        let contentHTML = linkifyContent(content);
+
                         let postHTML = `
                         <div class="queef-post">
                             <div class="post-header">
@@ -546,7 +618,7 @@
                                     </div>
                                 </a>
                             </div>
-                            <div class="post-content">${content}</div>
+                            <div class="post-content">${contentHTML}</div>
                             ${mediaHTML}
                             <div class="post-actions">
                                 <div class="${heartClass}" data-post-id="${uniquePostId}" data-base-likes="${baseLikes}">
