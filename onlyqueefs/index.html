@@ -132,31 +132,32 @@
             font-size: 0.9rem;
             transition: transform 0.2s ease;
             white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .auth-btn:hover {
             transform: scale(1.05);
         }
 
-        /* Fixed & Beautifully Contained Artist Portal Button Style */
         .portal-link-btn {
             display: none;
             align-items: center;
             justify-content: center;
+            gap: 6px;
             background: linear-gradient(135deg, rgba(48, 213, 255, 0.15) 0%, rgba(255, 115, 202, 0.05) 100%);
             border: 1px solid rgba(48, 213, 255, 0.4);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             color: #30d5ff;
-            padding: 10px 24px; /* Widened padding container bounds */
+            padding: 10px 24px !important;
             border-radius: 20px;
             font-weight: bold;
             margin-left: 25px;
             cursor: pointer;
             font-size: 0.85rem;
             text-decoration: none;
-            white-space: nowrap; /* Forces text to never break or wrap downward */
-            flex-shrink: 0; /* Prevents layout container from compressing the button */
+            white-space: nowrap !important;
+            flex-shrink: 0 !important;
             box-shadow: 0 0 15px rgba(48, 213, 255, 0.1), inset 0 1px 0px rgba(255,255,255,0.1);
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -432,7 +433,7 @@
         }
 
         .comment-input-box { display: flex; gap: 10px; position: relative; }
-        .comment-input-box input { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); padding: 8px 12px; border-radius: 20px; color: white; outline: none; }
+        .comment-input-box input { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255, 255, 255, 0.1); padding: 8px 12px; border-radius: 20px; color: white; outline: none; }
         .comment-submit-btn { background: #30d5ff; color: #000; border: none; padding: 0 15px; border-radius: 20px; font-weight: bold; cursor: pointer; }
 
         .comment-error-msg {
@@ -539,8 +540,9 @@
         const ARTIST_EMAILS_WHITELIST = [
             "kuraihanaofficial@gmail.com",
             "sarahyamaguchi@queefyrecords.com",
-            "gabrisrevenge@gmail.com",
-            "stellasukehiro@queefyrecords.com"
+            "gabrihannah@queefyrecords.com",
+            "stellasukehiro@queefyrecords.com",
+            "gabrisrevenge@gmail.com"
         ];
 
         async function fetchUserIP() {
@@ -689,16 +691,19 @@
                 complete: async function(results) {
                     const feed = document.getElementById('dynamic-feed');
                     feed.innerHTML = ""; 
-                    let csvPosts = results.data.reverse();
+                    let csvPosts = results.data;
                     let combinedPostsList = [];
 
+                    // Parse legacy spreadsheet date formats out into real javascript objects
                     csvPosts.forEach(p => {
                         if (p["Artist Name"]) {
+                            let csvDate = p["Timestamp"] ? new Date(p["Timestamp"]) : new Date();
                             combinedPostsList.push({
                                 artistName: p["Artist Name"],
                                 content: p["Post Content"] || "",
                                 mediaUrl: p["Media URL"] || "",
-                                time: p["Timestamp"] ? p["Timestamp"].split(" ")[0] : "Just now"
+                                displayTime: p["Timestamp"] ? p["Timestamp"].split(" ")[0] : "Just now",
+                                dateObj: isNaN(csvDate.getTime()) ? new Date(0) : csvDate
                             });
                         }
                     });
@@ -707,14 +712,16 @@
                     let dbComments = [];
 
                     try {
-                        const { data: directLivePosts } = await supabaseApp.from('posts').select('*').order('timestamp', { ascending: false });
+                        const { data: directLivePosts } = await supabaseApp.from('posts').select('*');
                         if (directLivePosts) {
                             directLivePosts.forEach(p => {
-                                combinedPostsList.unshift({
+                                let dbDate = new Date(p.timestamp);
+                                combinedPostsList.push({
                                     artistName: p.artist_name,
                                     content: p.post_content || "",
                                     mediaUrl: p.media_url || "",
-                                    time: new Date(p.timestamp).toLocaleDateString()
+                                    displayTime: dbDate.toLocaleDateString(),
+                                    dateObj: dbDate
                                 });
                             });
                         }
@@ -725,13 +732,16 @@
                         if (commsRes) dbComments = commsRes;
                     } catch (err) { console.log("Database fetch bypassed:", err); }
 
+                    // Sort chronologically (Newest items strictly forced on top)
+                    combinedPostsList.sort((a, b) => b.dateObj - a.dateObj);
+
                     const isAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
 
                     combinedPostsList.forEach(post => {
                         let artistName = post.artistName;
                         let content = post.content;
                         let mediaUrl = post.mediaUrl; 
-                        let time = post.time;
+                        let time = post.displayTime;
                         let profile = artistData[artistName] || { handle: "@artist", image: "../logo.jpeg" };
 
                         let uniquePostId = generatePostId(artistName, content);
