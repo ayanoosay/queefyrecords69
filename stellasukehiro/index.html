@@ -14,7 +14,7 @@
         }
 
         body {
-            background-color: #07030a;
+            background-color: #030814;
             color: #ffffff;
             min-height: 100vh;
             overflow-x: hidden;
@@ -29,9 +29,9 @@
             width: 140%;
             height: 140%;
             background: 
-                radial-gradient(circle at 15% 25%, rgba(216, 167, 255, 0.2) 0%, transparent 40%),
-                radial-gradient(circle at 85% 30%, rgba(157, 78, 221, 0.18) 0%, transparent 45%),
-                radial-gradient(circle at 50% 80%, rgba(216, 167, 255, 0.12) 0%, transparent 50%);
+                radial-gradient(circle at 15% 25%, rgba(167, 230, 255, 0.2) 0%, transparent 40%),
+                radial-gradient(circle at 85% 30%, rgba(0, 119, 182, 0.18) 0%, transparent 45%),
+                radial-gradient(circle at 50% 80%, rgba(167, 216, 255, 0.12) 0%, transparent 50%);
             z-index: -1;
             filter: blur(50px);
         }
@@ -57,10 +57,10 @@
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
             backdrop-filter: blur(40px) saturate(240%);
             -webkit-backdrop-filter: blur(40px) saturate(240%);
-            border: 1px solid rgba(216, 167, 255, 0.25);
+            border: 1px solid rgba(167, 230, 255, 0.25);
             box-shadow: 
-                -0.6px 0 1px rgba(216, 167, 255, 0.5), 
-                0.6px 0 1px rgba(157, 78, 221, 0.5),  
+                -0.6px 0 1px rgba(167, 230, 255, 0.5), 
+                0.6px 0 1px rgba(0, 119, 182, 0.5),  
                 0 10px 40px rgba(0, 0, 0, 0.6), 
                 inset 0 1px 1px rgba(255, 255, 255, 0.2);
             z-index: 1000;
@@ -80,17 +80,17 @@
             width: 42px;
             height: 42px;
             border-radius: 50%;
-            border: 1.5px solid rgba(216, 167, 255, 0.6);
+            border: 1.5px solid rgba(167, 230, 255, 0.6);
             object-fit: cover;
-            box-shadow: 0 0 15px rgba(216, 167, 255, 0.3);
-            background: linear-gradient(135deg, #d8a7ff, #9d4edd);
+            box-shadow: 0 0 15px rgba(167, 230, 255, 0.3);
+            background: linear-gradient(135deg, #a7e6ff, #0077b6);
         }
 
         .logo-text {
             font-size: 1.25rem;
             font-weight: 800;
             letter-spacing: -0.3px;
-            background: linear-gradient(135deg, #ffffff 0%, #d8a7ff 30%, #9d4edd 70%, #ffffff 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #a7e6ff 30%, #0077b6 70%, #ffffff 100%);
             background-size: 200% 200%;
             -webkit-background-clip: text;
             background-clip: text;
@@ -114,7 +114,7 @@
 
         .desktop-nav a:hover {
             color: #ffffff;
-            text-shadow: 0 0 10px rgba(216, 167, 255, 0.6);
+            text-shadow: 0 0 10px rgba(167, 230, 255, 0.6);
         }
 
         .desktop-nav a::after {
@@ -124,7 +124,7 @@
             left: 50%;
             width: 0;
             height: 3px;
-            background: linear-gradient(90deg, #d8a7ff, #9d4edd);
+            background: linear-gradient(90deg, #a7e6ff, #0077b6);
             border-radius: 10px;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             transform: translateX(-50%);
@@ -153,9 +153,9 @@
             transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
-        .hamburger.active span:nth-child(1) { transform: translateY(9px) rotate(45deg); background-color: #d8a7ff; }
+        .hamburger.active span:nth-child(1) { transform: translateY(9px) rotate(45deg); background-color: #a7e6ff; }
         .hamburger.active span:nth-child(2) { opacity: 0; transform: translateX(-20px); }
-        .hamburger.active span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); background-color: #9d4edd; }
+        .hamburger.active span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); background-color: #0077b6; }
 
         .mobile-menu {
             position: fixed;
@@ -163,7 +163,7 @@
             left: 0;
             width: 100%;
             height: 100vh;
-            background: linear-gradient(135deg, rgba(7, 3, 10, 0.8) 0%, rgba(20, 10, 28, 0.9) 100%);
+            background: linear-gradient(135deg, rgba(3, 8, 20, 0.8) 0%, rgba(10, 20, 28, 0.9) 100%);
             backdrop-filter: blur(40px) saturate(240%);
             -webkit-backdrop-filter: blur(40px) saturate(240%);
             z-index: 999;
@@ -204,7 +204,7 @@
         .mobile-link:hover, .mobile-link:active {
             color: #ffffff;
             transform: scale(1.1);
-            text-shadow: 0 0 20px rgba(216, 167, 255, 0.6);
+            text-shadow: 0 0 20px rgba(167, 230, 255, 0.6);
         }
 
         .hero {
@@ -222,13 +222,13 @@
             height: 260px;
             border-radius: 50%;
             box-shadow: 
-                0 0 60px rgba(216, 167, 255, 0.4), 
-                0 0 120px rgba(157, 78, 221, 0.25),
+                0 0 60px rgba(167, 230, 255, 0.4), 
+                0 0 120px rgba(0, 119, 182, 0.25),
                 inset 0 0 20px rgba(255, 255, 255, 0.2);
             margin-bottom: 35px;
             border: 2px solid rgba(255, 255, 255, 0.2);
             object-fit: cover;
-            background: linear-gradient(135deg, rgba(216, 167, 255, 0.3), rgba(157, 78, 221, 0.1));
+            background: linear-gradient(135deg, rgba(167, 230, 255, 0.3), rgba(0, 119, 182, 0.1));
             backdrop-filter: blur(10px);
             transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -243,7 +243,7 @@
             letter-spacing: -1.5px;
             margin-bottom: 10px;
             line-height: 1.1;
-            background: linear-gradient(135deg, #ffffff 0%, #d8a7ff 40%, #9d4edd 60%, #ffffff 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #a7e6ff 40%, #0077b6 60%, #ffffff 100%);
             background-size: 200% 200%;
             -webkit-background-clip: text;
             background-clip: text; 
@@ -257,10 +257,10 @@
             font-size: 1.1rem;
             text-transform: uppercase;
             letter-spacing: 3px;
-            color: #d8a7ff;
+            color: #a7e6ff;
             font-weight: 700;
             margin-bottom: 25px;
-            text-shadow: 0 0 15px rgba(216, 167, 255, 0.4);
+            text-shadow: 0 0 15px rgba(167, 230, 255, 0.4);
         }
 
         .hero p {
@@ -292,16 +292,16 @@
             letter-spacing: -0.1px;
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(216, 167, 255, 0.3);
+            border: 1px solid rgba(167, 230, 255, 0.3);
             box-shadow: 0 15px 35px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.2);
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .platform-btn:hover {
             transform: translateY(-4px);
-            border-color: #d8a7ff;
-            background: linear-gradient(135deg, #d8a7ff 0%, #9d4edd 100%);
-            box-shadow: 0 20px 40px rgba(157, 78, 221, 0.35), 0 0 20px rgba(216, 167, 255, 0.2);
+            border-color: #a7e6ff;
+            background: linear-gradient(135deg, #a7e6ff 0%, #0077b6 100%);
+            box-shadow: 0 20px 40px rgba(0, 119, 182, 0.35), 0 0 20px rgba(167, 230, 255, 0.2);
         }
 
         .section {
@@ -316,7 +316,7 @@
             letter-spacing: -0.8px;
             margin-bottom: 50px;
             text-align: center;
-            background: linear-gradient(135deg, #ffffff 0%, rgba(216, 167, 255, 0.8) 50%, #ffffff 100%);
+            background: linear-gradient(135deg, #ffffff 0%, rgba(167, 230, 255, 0.8) 50%, #ffffff 100%);
             background-size: 200% 200%;
             -webkit-background-clip: text;
             background-clip: text; 
@@ -345,8 +345,8 @@
 
         .release-card:hover {
             transform: translateY(-8px);
-            border-color: rgba(216, 167, 255, 0.4);
-            box-shadow: 0 30px 50px rgba(157, 78, 221, 0.15);
+            border-color: rgba(167, 230, 255, 0.4);
+            box-shadow: 0 30px 50px rgba(0, 119, 182, 0.15);
         }
 
         .album-art-wrapper {
@@ -356,7 +356,7 @@
             overflow: hidden;
             margin-bottom: 20px;
             position: relative;
-            background: linear-gradient(135deg, #1b0f19, #0f080e);
+            background: linear-gradient(135deg, #091424, #050d1a);
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
@@ -380,7 +380,7 @@
         }
 
         .release-info p {
-            color: #d8a7ff;
+            color: #a7e6ff;
             font-size: 0.9rem;
             font-weight: 600;
             letter-spacing: 0.5px;
@@ -395,7 +395,7 @@
             font-weight: 500;
             letter-spacing: -0.1px;
             border-top: 1px solid rgba(255, 255, 255, 0.05);
-            background: linear-gradient(to top, rgba(7, 3, 10, 0.8), transparent);
+            background: linear-gradient(to top, rgba(3, 8, 20, 0.8), transparent);
         }
 
         @media (max-width: 768px) {
@@ -440,7 +440,7 @@
     </div>
 
     <section id="profile" class="hero">
-        <img src="stellasukehiro.jpeg" alt="Stella Sukehiro" class="artist-avatar-large" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100%\' height=\'100%\' fill=\'%23d8a7ff\'/></svg>'">
+        <img src="stellasukehiro.jpeg" alt="Stella Sukehiro" class="artist-avatar-large" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100%\' height=\'100%\' fill=\'%23a7e6ff\'/></svg>'">
         
         <h1>Stella Sukehiro</h1>
         <div class="genre-tag">Hyperpop</div>
@@ -460,7 +460,7 @@
             
             <div class="release-card">
                 <div class="album-art-wrapper">
-                    <img src="album1.png" alt="" class="album-art" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100%\' height=\'100%\' fill=\'%23d8a7ff\'/></svg>'">
+                    <img src="album1.png" alt="" class="album-art" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100%\' height=\'100%\' fill=\'%23a7e6ff\'/></svg>'">
                 </div>
                 <div class="release-info">
                     <h3>HYPERSLUT</h3>
@@ -470,7 +470,7 @@
 
             <div class="release-card">
                 <div class="album-art-wrapper">
-                    <img src="album2.jpeg" alt="" class="album-art" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100%\' height=\'100%\' fill=\'%239d4edd\'/></svg>'">
+                    <img src="album2.jpeg" alt="" class="album-art" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100%\' height=\'100%\' fill=\'%230077b6\'/></svg>'">
                 </div>
                 <div class="release-info">
                     <h3>TARTARUS</h3>
@@ -480,7 +480,7 @@
 
             <div class="release-card">
                 <div class="album-art-wrapper">
-                    <img src="album3.jpeg" alt="" class="album-art" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100%\' height=\'100%\' fill=\'%23d8a7ff\'/></svg>'">
+                    <img src="album3.jpeg" alt="" class="album-art" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100%\' height=\'100%\' fill=\'%23a7e6ff\'/></svg>'">
                 </div>
                 <div class="release-info">
                     <h3>POINTER UP</h3>
