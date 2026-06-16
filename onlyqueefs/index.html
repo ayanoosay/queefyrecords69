@@ -192,7 +192,6 @@
             margin-top: 15px;
         }
 
-        /* Cute Custom Modal Interface */
         .cute-modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -370,7 +369,6 @@
         }
         .comment-item strong { color: #ff73ca; }
         
-        /* Slick custom trash icon button */
         .comment-delete-btn {
             background: transparent;
             border: none;
@@ -453,11 +451,11 @@
             <form onsubmit="handleAuthSubmit(event)">
                 <div class="cute-form-group">
                     <label for="authEmail">Email Address</label>
-                    <input type="email" id="authEmail" class="cute-input" placeholder="you@example.com" required>
+                    <input type="email" id="authEmail" class="cute-input" placeholder="you@example.com" autocomplete="username" required>
                 </div>
                 <div class="cute-form-group">
                     <label for="authPassword">Password</label>
-                    <input type="password" id="authPassword" class="cute-input" placeholder="••••••••" minlength="6" required>
+                    <input type="password" id="authPassword" class="cute-input" placeholder="••••••••" minlength="6" autocomplete="current-password" required>
                 </div>
                 <button type="submit" id="modalSubmitBtn" class="cute-submit-btn">Sign In</button>
             </form>
@@ -641,7 +639,6 @@
                             if (commsRes) dbComments = commsRes;
                         } catch (err) { console.log("Database fetch bypassed:", err); }
 
-                        // Check if current logged-in session belongs to your admin email address
                         const isAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
 
                         posts.forEach(post => {
@@ -672,15 +669,15 @@
                             let postCommentsHTML = '';
                             let currentPostComments = dbComments.filter(c => c.post_id === uniquePostId);
                             currentPostComments.forEach(c => {
-                                // Add a dynamic moderation button if viewer matches admin profile parameters
                                 let deleteButtonHTML = isAdmin ? `<button class="comment-delete-btn" onclick="deleteComment('${c.id}', this)">🗑️</button>` : '';
-                                postCommentsHTML += `
+                                    postCommentsHTML += `
                                 <div class="comment-item" id="comment_item_${c.id}">
                                     <span><strong>${c.username}:</strong> ${c.comment_text}</span>
                                     ${deleteButtonHTML}
                                 </div>`;
                             });
 
+                            // Added autocomplete="off" cleanly to comment node input matrices below
                             let postHTML = `
                             <div class="queef-post" id="card_${uniquePostId}">
                                 <div class="post-header">
@@ -706,7 +703,7 @@
                                         ${postCommentsHTML}
                                     </div>
                                     <div class="comment-input-box">
-                                        <input type="text" id="input_${uniquePostId}" placeholder="Write a comment..." oninput="clearCommentError('${uniquePostId}')">
+                                        <input type="text" id="input_${uniquePostId}" placeholder="Write a comment..." oninput="clearCommentError('${uniquePostId}')" autocomplete="off">
                                         <button class="comment-submit-btn" onclick="submitComment('${uniquePostId}')">Post</button>
                                     </div>
                                     <div class="comment-error-msg" id="error_${uniquePostId}">You must be signed in to post comments!</div>
@@ -757,7 +754,7 @@
 
             const { data, error } = await supabaseApp.from('comments').insert([
                 { post_id: postId, user_id: currentUser.id, username: username, comment_text: commentText }
-            ]).select(); // Fetch returns rows to easily hook up database generated column sequential indexes on structural nodes
+            ]).select();
 
             if(error) {
                 alert("Error submitting comment: " + error.message);
@@ -779,7 +776,6 @@
             }
         }
 
-        // Target moderation hook function executed across global scope contexts natively
         async function deleteComment(commentId, buttonElement) {
             if(!confirm("Are you sure you want to delete this comment?")) return;
             
