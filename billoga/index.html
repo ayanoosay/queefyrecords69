@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Billoga | Queefy Records69</title>
+    <meta name="title" content="Billoga | Queefy Records69">
+    <meta name="description" content="Bringing explosive energy, sugary melodies, and bubblegum textures into high-definition Pop space. Explore the official discography and latest releases.">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ayanoosay.github.io/queefyrecords69/artists/billoga.html">
+    <meta property="og:title" content="Billoga | Queefy Records69">
+    <meta property="og:description" content="Bringing explosive energy, sugary melodies, and bubblegum textures into high-definition Pop space.">
+    <meta property="og:image" content="https://ayanoosay.github.io/queefyrecords69/artists/billoga.jpg">
+
+    <meta name="theme-color" content="#ff007f">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #0d0006;
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -20%;
+            left: -20%;
+            width: 140%;
+            height: 140%;
+            background: 
+                radial-gradient(circle at 15% 25%, rgba(255, 0, 127, 0.22) 0%, transparent 40%),
+                radial-gradient(circle at 85% 30%, rgba(141, 0, 71, 0.18) 0%, transparent 45%),
+                radial-gradient(circle at 50% 80%, rgba(255, 133, 192, 0.1) 0%, transparent 50%);
+            z-index: -1;
+            filter: blur(50px);
+        }
+
+        @keyframes textGradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        header {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 92%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 28px;
+            border-radius: 30px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+            backdrop-filter: blur(40px) saturate(240%);
+            -webkit-backdrop-filter: blur(40px) saturate(240%);
+            border: 1px solid rgba(255, 0, 127, 0.25);
+            box-shadow: 
+                -0.6px 0 1px rgba(255, 0, 127, 0.5), 
+                0.6px 0 1px rgba(141, 0, 71, 0.5),  
+                0 10px 40px rgba(0, 0, 0, 0.6), 
+                inset 0 1px 1px rgba(255, 255, 255, 0.2);
+            z-index: 1000;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+            position: relative;
+            z-index: 1001;
+        }
+
+        .brand-logo {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(255, 0, 127, 0.6);
+            object-fit: cover;
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.3);
+            background: linear-gradient(135deg, #ff007f, #8d0047);
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            background: linear-gradient(135deg, #ffffff 0%, #ff52af 30%, #8d0047 70%, #ffffff 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            display: inline-block;
+            animation: textGradientFlow 6s ease infinite;
+        }
+
+        .desktop-nav a {
+            color: rgba(255, 255, 255, 0.75);
+            text-decoration: none;
+            margin-left: 30px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: -0.1px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            padding: 6px 0;
+        }
+
+        .desktop-nav a:hover {
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(255, 0, 127, 0.6);
+        }
+
+        .desktop-nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #ff52af, #8d0047);
+            border-radius: 10px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateX(-50%);
+        }
+
+        .desktop-nav a:hover::after { width: 80%; }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 30px;
+            height: 20px;
+            cursor: pointer;
+            z-index: 1001; 
+        }
+
+        .hamburger span {
+            display: block;
+            height: 2px;
+            width: 100%;
+            background-color: #ffffff;
+            border-radius: 2px;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .hamburger.active span:nth-child(1) { transform: translateY(9px) rotate(45deg); background-color: #ff52af; }
+        .hamburger.active span:nth-child(2) { opacity: 0; transform: translateX(-20px); }
+        .hamburger.active span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); background-color: #8d0047; }
+
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, rgba(13, 0, 6, 0.8) 0%, rgba(38, 0, 18, 0.9) 100%);
+            backdrop-filter: blur(40px) saturate(240%);
+            -webkit-backdrop-filter: blur(40px) saturate(240%);
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(-5%);
+        }
+
+        .mobile-menu.active { opacity: 1; pointer-events: all; transform: translateY(0); }
+
+        .mobile-link {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(20px);
+            opacity: 0;
+        }
+
+        .mobile-menu.active .mobile-link { transform: translateY(0); opacity: 1; }
+        .mobile-menu.active .mobile-link:nth-child(1) { transition-delay: 0.1s; }
+        .mobile-menu.active .mobile-link:nth-child(2) { transition-delay: 0.15s; }
+        .mobile-menu.active .mobile-link:nth-child(3) { transition-delay: 0.2s; }
+        .mobile-menu.active .mobile-link:nth-child(4) { transition-delay: 0.25s; }
+
+        .mobile-link:hover, .mobile-link:active {
+            color: #ffffff;
+            transform: scale(1.1);
+            text-shadow: 0 0 20px rgba(255, 0, 127, 0.6);
+        }
+
+        .hero {
+            min-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 180px 20px 60px;
+        }
+
+        .artist-avatar-large {
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            box-shadow: 
+                0 0 60px rgba(255, 0, 127, 0.45), 
+                0 0 120px rgba(141, 0, 71, 0.25),
+                inset 0 0 20px rgba(255, 255, 255, 0.2);
+            margin-bottom: 35px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            object-fit: cover;
+            background: linear-gradient(135deg, rgba(255, 0, 127, 0.3), rgba(141, 0, 71, 0.1));
+            backdrop-filter: blur(10px);
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .artist-avatar-large:hover { transform: scale(1.04) rotate(-2deg); }
+
+        .hero h1 {
+            font-size: 4.8rem;
+            font-weight: 900;
+            letter-spacing: -1.5px;
+            margin-bottom: 10px;
+            line-height: 1.1;
+            background: linear-gradient(135deg, #ffffff 0%, #ff52af 40%, #8d0047 60%, #ffffff 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            display: inline-block;
+            animation: textGradientFlow 5s ease-in-out infinite;
+        }
+
+        .genre-tag {
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #ff52af;
+            font-weight: 700;
+            margin-bottom: 25px;
+            text-shadow: 0 0 15px rgba(255, 0, 127, 0.4);
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 620px;
+            margin-bottom: 40px;
+            font-weight: 400;
+            line-height: 1.6;
+            letter-spacing: -0.2px;
+        }
+
+        .platforms-container {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 700px;
+        }
+
+        .platform-btn {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+            color: #ffffff;
+            padding: 14px 32px;
+            text-decoration: none;
+            font-weight: 700;
+            border-radius: 50px;
+            font-size: 0.95rem;
+            letter-spacing: -0.1px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 0, 127, 0.3);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.2);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .platform-btn:hover {
+            transform: translateY(-4px);
+            border-color: #ff52af;
+            background: linear-gradient(135deg, #ff007f 0%, #8d0047 100%);
+            box-shadow: 0 20px 40px rgba(141, 0, 71, 0.35), 0 0 20px rgba(255, 0, 127, 0.2);
+        }
+
+        .section {
+            padding: 80px 6% 120px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 2.6rem;
+            font-weight: 800;
+            letter-spacing: -0.8px;
+            margin-bottom: 50px;
+            text-align: center;
+            background: linear-gradient(135deg, #ffffff 0%, rgba(255, 0, 127, 0.8) 50%, #ffffff 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            display: inline-block;
+            animation: textGradientFlow 7s ease-in-out infinite;
+        }
+
+        .discography-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 35px;
+        }
+
+        .release-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.2);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .release-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(255, 0, 127, 0.4);
+            box-shadow: 0 30px 50px rgba(141, 0, 71, 0.15);
+        }
+
+        .album-art-wrapper {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            position: relative;
+            background: linear-gradient(135deg, #240012, #0d0006);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .album-art {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .release-card:hover .album-art { transform: scale(1.04); }
+
+        .release-info h3 { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 4px; color: #ffffff; }
+        .release-info p { color: #ff52af; font-size: 0.9rem; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+
+        footer {
+            text-align: center;
+            padding: 80px 0;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: -0.1px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            background: linear-gradient(to top, rgba(13, 0, 6, 0.8), transparent);
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 3.2rem; }
+            header { top: 12px; padding: 10px 20px; width: 95%; }
+            .desktop-nav { display: none; }
+            .hamburger { display: flex; }
+            .artist-avatar-large { width: 200px; height: 200px; }
+            .section { padding: 60px 4% 80px; }
+            .discography-grid { gap: 25px; }
+            .platform-btn { width: 100%; text-align: center; padding: 14px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="https://ayanoosay.github.io/queefyrecords69/" class="brand">
+            <img src="../logo.jpeg" alt="" class="brand-logo" onerror="this.style.display='none'">
+            <div class="logo-text">Queefy Records69</div>
+        </a>
+        
+        <nav class="desktop-nav">
+            <a href="https://ayanoosay.github.io/queefyrecords69/">Home</a>
+            <a href="https://ayanoosay.github.io/queefyrecords69/#roster">Roster</a>
+            <a href="https://ayanoosay.github.io/queefyrecords69/events">Events</a>
+            <a href="https://ayanoosay.github.io/queefyrecords69/onlyqueefs">OnlyQueefs</a>
+        </nav>
+
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </header>
+
+    <div class="mobile-menu" id="mobile-menu">
+        <a href="https://ayanoosay.github.io/queefyrecords69/" class="mobile-link">Home</a>
+        <a href="https://ayanoosay.github.io/queefyrecords69/#roster" class="mobile-link">Roster</a>
+        <a href="https://ayanoosay.github.io/queefyrecords69/events" class="mobile-link">Events</a>
+        <a href="https://ayanoosay.github.io/queefyrecords69/onlyqueefs" class="mobile-link">OnlyQueefs</a>
+    </div>
+
+    <section id="profile" class="hero">
+        <img src="billoga.jpg" alt="Billoga" class="artist-avatar-large" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100%\' height=\'100%\' fill=\'%23ff007f\'/></svg>'">
+        
+        <h1>Billoga</h1>
+        <div class="genre-tag">Pop</div>
+        <p>Bringing explosive energy, sugary melodies, and bubblegum textures into high-definition Pop space, establishing a bold footprint in the futuristic pop arena.</p>
+        
+        <div class="platforms-container">
+            <a href="https://open.spotify.com/" target="_blank" class="platform-btn">Listen on Spotify</a>
+            <a href="https://music.apple.com/" target="_blank" class="platform-btn">Apple Music</a>
+            <a href="https://youtube.com/" target="_blank" class="platform-btn">YouTube Music</a>
+            <a href="https://music.amazon.com/" target="_blank" class="platform-btn">Amazon Music</a>
+        </div>
+    </section>
+
+    <section id="discography" class="section">
+        <h2 class="section-title">Latest Releases</h2>
+        <div class="discography-grid">
+            
+            <div class="release-card">
+                <div class="album-art-wrapper">
+                    <img src="album1.png" alt="" class="album-art" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100%\' height=\'100%\' fill=\'%23ff52af\'/></svg>'">
+                </div>
+                <div class="release-info">
+                    <h3>HYPERSLUT</h3>
+                    <p>Album • 2026</p>
+                </div>
+            </div>
+
+            <div class="release-card">
+                <div class="album-art-wrapper">
+                    <img src="album2.jpeg" alt="" class="album-art" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100%\' height=\'100%\' fill=\'%238d0047\'/></svg>'">
+                </div>
+                <div class="release-info">
+                    <h3>TARTARUS</h3>
+                    <p>Album • 2026</p>
+                </div>
+            </div>
+
+            <div class="release-card">
+                <div class="album-art-wrapper">
+                    <img src="album3.jpeg" alt="" class="album-art" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><rect width=\'100%\' height=\'100%\' fill=\'%23ff52af\'/></svg>'">
+                </div>
+                <div class="release-info">
+                    <h3>POINTER UP</h3>
+                    <p>Single • 2026</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <footer>
+        © 2026 Queefy Records69. Curated for the core. Closed roster.
+    </footer>
+
+    <script>
+        const hamburger = document.getElementById('hamburger');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+            
+            if(mobileMenu.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                mobileMenu.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+        });
+    </script>
+
+    <script>
+        const csvLink = "https://docs.google.com/spreadsheets/d/1zDvlgSW9p2-fb2A7b95jtwTg8v-6blxDaAoOm-Y_kl0/export?format=csv";
+        const targetArtist = "Billoga";
+
+        Papa.parse(csvLink, {
+            download: true,
+            header: true,
+            complete: function(results) {
+                let data = results.data.filter(row => row["Artist Name"] && row["Artist Name"].trim() === targetArtist);
+                if (data.length === 0) return; 
+
+                data.reverse();
+                const cards = document.querySelectorAll('.discography-grid .release-card');
+                
+                data.forEach((release, index) => {
+                    if (index >= cards.length) return;
+
+                    let title = release["Release Title"] || "Unknown Title";
+                    let type = release["Release Type"] || "Single";
+                    let year = release["Release Year"] || "2026";
+                    let artUrl = release["Artwork Image URL (Direct Link)"] || "album1.png";
+
+                    const imgElement = cards[index].querySelector('.album-art');
+                    const titleElement = cards[index].querySelector('.release-info h3');
+                    const infoElement = cards[index].querySelector('.release-info p');
+
+                    if (imgElement) imgElement.src = artUrl.trim();
+                    if (titleElement) titleElement.textContent = title;
+                    if (infoElement) infoElement.innerHTML = `${type} • ${year}`;
+                });
+            },
+            error: function(err) {
+                console.error("Could not fetch the Google Sheet:", err);
+            }
+        });
+    </script>
+</body>
+</html>
