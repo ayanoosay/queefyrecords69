@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="icon" type="image/x-icon" href="../favicon.ico?v=2">
     
     <title>Calisoga Web | Arcade</title>
@@ -23,6 +23,8 @@
             -webkit-user-select: none;
             image-rendering: pixelated;
             image-rendering: crisp-edges;
+            /* 🚫 KILL MOBILE DOUBLE-TAP ZOOMING ENTIRELY */
+            touch-action: manipulation;
         }
 
         body {
@@ -84,63 +86,76 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* 🖥️ Expanded Arcade Cabinet Profile */
+        /* 🖥️ MASSIVE IMMERSIVE CABINET BOX FOR PC */
         .arcade-cabinet {
             background: #110924;
             border: 4px solid #30d5ff;
             border-radius: 12px;
-            width: 92%; max-width: 900px; /* Wider footprint on desktop */
+            width: 95%; max-width: 1100px;
             padding: 24px;
-            box-shadow: 0 0 30px rgba(48, 213, 255, 0.2), inset 0 0 15px rgba(0,0,0,0.8);
-            margin-top: 110px;
+            box-shadow: 0 0 40px rgba(48, 213, 255, 0.3), inset 0 0 15px rgba(0,0,0,0.8);
+            margin-top: 100px;
             position: relative;
         }
 
         .game-hud {
             display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 16px; padding: 12px 20px;
+            margin-bottom: 16px; padding: 14px 24px;
             background: #000000; border: 2px solid #ff3bb4; border-radius: 4px;
         }
 
-        .hud-item { font-size: 1.2rem; font-weight: bold; color: #fff; }
+        .hud-item { font-size: 1.4rem; font-weight: bold; color: #fff; }
         .hud-item span { color: #ff73ca; text-shadow: 0 0 8px #ff73ca; }
         #stage-name { color: #30d5ff; text-shadow: 0 0 8px #30d5ff; }
         
-        .hearts-container { display: flex; gap: 4px; font-size: 1.3rem; }
+        .hearts-container { display: flex; gap: 6px; font-size: 1.5rem; }
 
-        /* 🎮 True 16:9 Monitor Aspect Ratio Configuration Box */
+        /* 🎮 GIANT 16:9 SCREEN RATIO CONTAINER BOX */
         .game-viewport {
             width: 100%;
-            aspect-ratio: 16 / 9; /* Fluid widescreen constraints mapping */
+            aspect-ratio: 16 / 9;
             border-radius: 6px;
             border: 4px solid #070312;
             position: relative;
             overflow: hidden;
-            transition: background 1s ease;
+            background-color: #000;
+            background-repeat: repeat-x;
+            background-position: 0px 0px;
+            background-size: auto 100%;
+            z-index: 1;
         }
 
-        /* Scanline Filter Effect Overlay */
+        /* 🎞️ Pixelated Blending Transition Underlayer */
+        #bg-transition-layer {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-repeat: repeat-x;
+            background-position: 0px 0px;
+            background-size: auto 100%;
+            opacity: 0;
+            z-index: 2;
+            /* Incremental stepping function matching vintage visual styles */
+            transition: opacity 0.8s steps(8, end);
+            pointer-events: none;
+        }
+
+        #bg-transition-layer.fade-in {
+            opacity: 1;
+        }
+
+        /* CRT Raster Line Shading Filter */
         .game-viewport::after {
             content: " ";
             display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%);
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.22) 50%);
             z-index: 8; background-size: 100% 4px; pointer-events: none;
         }
 
-        /* Environment Stage Graphics Modifiers */
-        .bg-underground { background: linear-gradient(to bottom, #0f051d, #250936); }
-        .bg-forest { background: linear-gradient(to bottom, #051a11, #0f381d); }
-        .bg-space { background: linear-gradient(to bottom, #02020f, #070b24); }
-
-        .bg-particle {
-            position: absolute; background: rgba(255, 255, 255, 0.4); pointer-events: none;
-        }
-
-        /* 👤 Bigger Player Sprite Scale Layer */
+        /* 👤 MASSIVE PLAYER AVATAR BOUNDS */
         #player-sarah {
             position: absolute;
-            width: 90px; height: 90px; /* Made Sarah bigger */
-            left: 80px; top: 200px;
+            width: 110px; height: 110px;
+            left: 100px; top: 200px;
             z-index: 5;
             object-fit: contain;
             transform: rotate(0deg);
@@ -152,14 +167,14 @@
         }
 
         @keyframes flashFrames {
-            0% { opacity: 0.3; }
+            0% { opacity: 0.25; }
             100% { opacity: 1; }
         }
 
-        /* 👾 Game Obstacle Elements Class layout mapping variables */
+        /* 👾 SCALED HAZARD OBSTACLES PROFILE */
         .obstacle {
             position: absolute;
-            width: 54px; height: 54px; /* Proportionally expanded obstacles sizing */
+            width: 65px; height: 65px;
             object-fit: contain;
             z-index: 4;
         }
@@ -167,58 +182,65 @@
         .screen-overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(3, 0, 8, 0.95);
+            background: rgba(3, 0, 8, 0.96);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             z-index: 10; border-radius: 4px; text-align: center; padding: 20px;
         }
 
         .screen-overlay h2 {
-            font-size: 2.5rem; font-weight: bold; margin-bottom: 12px;
+            font-size: 3rem; font-weight: bold; margin-bottom: 12px;
             color: #30d5ff; text-shadow: 0 0 8px #30d5ff;
         }
 
-        .screen-overlay p { color: #ff73ca; margin-bottom: 24px; font-size: 0.95rem; max-width: 520px; line-height: 1.4; }
+        .screen-overlay p { color: #ff73ca; margin-bottom: 24px; font-size: 1.1rem; max-width: 600px; line-height: 1.5; }
 
         .start-btn {
             background: #30d5ff;
-            color: #000; border: 2px solid #fff; padding: 12px 36px;
-            font-size: 1rem; font-weight: bold;
+            color: #000; border: 2px solid #fff; padding: 14px 44px;
+            font-size: 1.1rem; font-weight: bold;
             box-shadow: 0 6px 0 #1b8dae, 0 10px 15px rgba(0,0,0,0.4);
             transition: all 0.1s steps(2);
             cursor: pointer;
         }
         .start-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #1b8dae; }
 
-        /* 📱 Mobile Input Framework Clusters Layout styling maps */
+        /* 📱 CLEAN NON-ZOOMABLE MOBILE BUTTON INTERFACE LAYOUTS */
         .mobile-controls {
             display: none;
             grid-template-columns: 1fr 1fr 1fr;
-            gap: 12px;
+            gap: 16px;
             margin-top: 16px;
             width: 100%;
         }
 
         .mob-btn {
             background: #1c0f38; border: 2px solid #30d5ff;
-            color: #fff; padding: 16px; border-radius: 8px;
-            font-weight: bold; font-size: 1.1rem; text-align: center;
-            box-shadow: 0 4px 0 #0f0724;
+            color: #fff; padding: 20px; border-radius: 12px;
+            font-weight: bold; font-size: 1.3rem; text-align: center;
+            box-shadow: 0 5px 0 #0f0724;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
-        .mob-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #0f0724; }
-        .fly-cluster { grid-column: span 3; background: linear-gradient(135deg, #ff3bb4, #00bfff); border: 2px solid #fff; font-size: 1.3rem; }
+        .mob-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #0f0724; }
+        .fly-cluster { grid-column: span 3; background: linear-gradient(135deg, #ff3bb4, #00bfff); border: 2px solid #fff; font-size: 1.5rem; padding: 24px; }
 
         @media (max-width: 768px) {
             header { top: 12px; padding: 10px 20px; width: 95%; }
-            .arcade-cabinet { margin-top: 85px; padding: 12px; }
+            .arcade-cabinet { margin-top: 85px; padding: 12px; max-width: 580px; }
             .mobile-controls { display: grid; }
-            .screen-overlay h2 { font-size: 1.6rem; }
-            .screen-overlay p { font-size: 0.85rem; }
-            #player-sarah { width: 65px; height: 65px; } /* Scales comfortably to avoid choking mobile grids */
-            .obstacle { width: 42px; height: 42px; }
+            .screen-overlay h2 { font-size: 1.8rem; }
+            .screen-overlay p { font-size: 0.9rem; }
+            #player-sarah { width: 70px; height: 75px; }
+            .obstacle { width: 45px; height: 45px; }
+            .hud-item { font-size: 1.1rem; }
         }
     </style>
 </head>
 <body>
+
+    <div id="custom-fist-cursor">
+        <img src="fist.png" alt="Wet Fist" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23ff3bb4\'><rect x=\'6\' y=\'6\' width=\'12\' height=\'12\'/></svg>'">
+    </div>
 
     <header>
         <a href="index.html" class="brand">
@@ -237,7 +259,9 @@
             <div class="hud-item hearts-container" id="hearts-box">❤️❤️❤️</div>
         </div>
 
-        <div class="game-viewport bg-underground" id="viewport">
+        <div class="game-viewport" id="viewport" style="background-image: url('underground.jpeg');">
+            <div id="bg-transition-layer"></div>
+
             <div class="screen-overlay" id="overlay">
                 <h2 id="overlay-title">CALISOGA WEB</h2>
                 <p id="overlay-desc">GUIDE SARAH YAMAGUCHI THROUGH THE GRID FIELDS! MANEUVER SECURELY PAST HAZARDS AS SPATIAL ANOMALIES SCALE OVER TIME.<br><br>PC: SPACE = FLY UP, A/D or ARROWS = STRAFE SIDEWAYS<br>MOBILE: USE MOVEMENT BUTTON CLUSTERS BELOW CABINET</p>
@@ -256,12 +280,12 @@
 
     <script>
         let player = {
-            x: 80, y: 160,
+            x: 100, y: 160,
             vy: 0, vx: 0,
-            width: 90, height: 90, 
-            speedX: 11,           // Snappy response movement tuning
-            jumpStrength: -7.8,   // Counteract wide aspect drop frames
-            gravity: 0.42         
+            width: 110, height: 110, 
+            speedX: 12.5,          
+            jumpStrength: -8.8,   
+            gravity: 0.46         
         };
 
         let score = 0;
@@ -269,18 +293,19 @@
         let gameActive = false;
         let invincibilityFrames = 0;
         let currentStage = 1; 
+        let bgScrollPosition = 0;
+        let isTransitioning = false;
 
         let obstaclesList = [];
-        let particlesList = [];
-        
         let loopRef = null;
         let obstacleSpawnTimer = 0;
-        let obstacleSpawnRate = 70; // Tight spawn intervals to keep threat high on broad screen spaces
+        let obstacleSpawnRate = 65; 
 
         let mobileLeftActive = false;
         let mobileRightActive = false;
 
         const viewport = document.getElementById('viewport');
+        const bgTransitionLayer = document.getElementById('bg-transition-layer');
         const sarahSprite = document.getElementById('player-sarah');
         const scoreVal = document.getElementById('score-val');
         const stageName = document.getElementById('stage-name');
@@ -319,28 +344,26 @@
             currentStage = 1;
             gameActive = true;
             invincibilityFrames = 0;
+            bgScrollPosition = 0;
+            isTransitioning = false;
             
             obstaclesList.forEach(obs => obs.el.remove());
             obstaclesList = [];
-            particlesList.forEach(p => p.el.remove());
-            particlesList = [];
             
             player.y = 160;
-            player.x = 80;
+            player.x = 100;
             player.vy = 0;
             player.vx = 0;
 
             sarahSprite.style.transform = "rotate(0deg)"; 
             scoreVal.innerText = '000';
             stageName.innerText = "THE UNDERGROUND";
-            viewport.className = "game-viewport bg-underground";
+            viewport.style.backgroundImage = "url('underground.png')";
+            bgTransitionLayer.className = "";
+            bgTransitionLayer.style.backgroundImage = "none";
             updateHeartsUI();
 
             overlay.style.display = 'none';
-            
-            for (let i = 0; i < 20; i++) {
-                spawnAmbientParticle(true);
-            }
 
             cancelAnimationFrame(loopRef);
             loopRef = requestAnimationFrame(gameTickLoop);
@@ -352,7 +375,7 @@
             processPhysicsVelocity();
             processStageProgression();
             processObstaclesEngine();
-            processAmbientParticles();
+            processParallaxScrolling();
 
             loopRef = requestAnimationFrame(gameTickLoop);
         }
@@ -396,20 +419,44 @@
         }
 
         function processStageProgression() {
-            score += 0.08; // Point scoring adjusted smoothly over longer runtime paths
+            score += 0.08; 
             let displayScore = Math.floor(score);
             scoreVal.innerText = String(displayScore).padStart(3, '0');
 
-            // Doubled milestone benchmarks for longer game duration loop sequences
             if (displayScore >= 510 && currentStage !== 3) {
-                currentStage = 3;
-                stageName.innerText = "SPACE DEEP";
-                viewport.className = "game-viewport bg-space";
+                triggerStageTransition(3, "SPACE DEEP", "space.jpeg");
             } else if (displayScore >= 210 && displayScore < 510 && currentStage !== 2) {
-                currentStage = 2;
-                stageName.innerText = "THE FOREST FIELDS";
-                viewport.className = "game-viewport bg-forest";
+                triggerStageTransition(2, "THE FOREST FIELDS", "forest.jpeg");
             }
+        }
+
+        // 🎞️ Active Parallax Blending Engine Module Handles
+        function triggerStageTransition(nextStage, nextStageName, nextBgImage) {
+            if (isTransitioning) return;
+            isTransitioning = true;
+            currentStage = nextStage;
+            stageName.innerText = nextStageName;
+
+            // Load incoming background onto tracking overlap layer node
+            bgTransitionLayer.style.backgroundImage = `url('${nextBgImage}')`;
+            bgTransitionLayer.classList.add('fade-in');
+
+            // Synchronize final canvas assets swap clearing layer states after CSS transition window settles
+            setTimeout(() => {
+                viewport.style.backgroundImage = `url('${nextBgImage}')`;
+                bgTransitionLayer.classList.remove('fade-in');
+                bgTransitionLayer.style.backgroundImage = "none";
+                isTransitioning = false;
+            }, 800); // Syncs directly with 0.8s CSS transitions config
+        }
+
+        function processParallaxScrolling() {
+            let scrollSpeed = 2.5 + Math.floor(Math.floor(score) / 100) * 0.5;
+            bgScrollPosition -= scrollSpeed;
+            
+            // Sync horizontal positions across both map layers during transition states
+            viewport.style.backgroundPosition = `${bgScrollPosition}px 0px`;
+            bgTransitionLayer.style.backgroundPosition = `${bgScrollPosition}px 0px`;
         }
 
         function processObstaclesEngine() {
@@ -419,8 +466,7 @@
                 spawnDynamicObstacle();
             }
 
-            // Balanced speed tracking formula to cover horizontal 16:9 monitor pixels
-            let movementSpeed = 6.2 + Math.floor(Math.floor(score) / 100) * 1.3;
+            let movementSpeed = 6.8 + Math.floor(Math.floor(score) / 100) * 1.4;
 
             for (let i = obstaclesList.length - 1; i >= 0; i--) {
                 let obs = obstaclesList[i];
@@ -431,7 +477,7 @@
                     triggerPlayerHit();
                 }
 
-                if (obs.x < -70) {
+                if (obs.x < -80) {
                     obs.el.remove();
                     obstaclesList.splice(i, 1);
                 }
@@ -451,7 +497,7 @@
             };
 
             const spawnX = viewport.clientWidth + 20;
-            const spawnY = Math.random() * (viewport.clientHeight - 60);
+            const spawnY = Math.random() * (viewport.clientHeight - 70);
 
             el.style.left = `${spawnX}px`;
             el.style.top = `${spawnY}px`;
@@ -460,17 +506,16 @@
             obstaclesList.push({
                 el: el,
                 x: spawnX, y: spawnY,
-                width: 46, height: 42
+                width: 52, height: 52
             });
         }
 
         function checkCollision(rect1, rect2) {
-            // Precise padding hitbox constraints tuning for larger sprite profiles
             return (
-                rect1.x + 16 < rect2.x + rect2.width &&
-                rect1.x + rect1.width - 16 > rect2.x &&
-                rect1.y + 16 < rect2.y + rect2.height &&
-                rect1.y + rect1.height - 16 > rect2.y
+                rect1.x + 24 < rect2.x + rect2.width &&
+                rect1.x + rect1.width - 24 > rect2.x &&
+                rect1.y + 24 < rect2.y + rect2.height &&
+                rect1.y + rect1.height - 24 > rect2.y
             );
         }
 
@@ -480,7 +525,7 @@
             lives--;
             updateHeartsUI();
             invincibilityFrames = 60; 
-            player.vy = -3; 
+            player.vy = -3.5; 
             sarahSprite.classList.add('invincible');
 
             if (lives <= 0) triggerGameOverAnimation();
@@ -494,57 +539,20 @@
             heartsBox.innerText = heartStr;
         }
 
-        function processAmbientParticles() {
-            if (Math.random() < 0.1) spawnAmbientParticle(false);
-
-            for (let i = particlesList.length - 1; i >= 0; i--) {
-                let p = particlesList[i];
-                p.x -= p.speed;
-                p.el.style.left = `${p.x}px`;
-
-                if (p.x < -10) {
-                    p.el.remove();
-                    particlesList.splice(i, 1);
-                }
-            }
-        }
-
-        function spawnAmbientParticle(randomizeX) {
-            const el = document.createElement('div');
-            el.className = 'bg-particle';
-            
-            const size = Math.floor(Math.random() * 4) + 2;
-            el.style.width = `${size}px`;
-            el.style.height = `${size}px`;
-
-            const spawnX = randomizeX ? Math.random() * viewport.clientWidth : viewport.clientWidth + 10;
-            const spawnY = Math.random() * viewport.clientHeight;
-
-            el.style.left = `${spawnX}px`;
-            el.style.top = `${spawnY}px`;
-            
-            if (currentStage === 2) el.style.background = 'rgba(74, 222, 128, 0.3)';
-            else if (currentStage === 3) el.style.background = 'rgba(147, 197, 253, 0.5)';
-            else el.style.background = 'rgba(232, 121, 249, 0.25)';
-
-            viewport.appendChild(el);
-            particlesList.push({ el: el, x: spawnX, speed: Math.random() * 2 + 0.6 });
-        }
-
         function triggerGameOverAnimation() {
             gameActive = false;
             cancelAnimationFrame(loopRef);
             
             let fallRotation = 0;
             let animateFallInterval = setInterval(() => {
-                player.vy += 0.5; 
+                player.vy += 0.55; 
                 player.y += player.vy;
-                fallRotation += 18; 
+                fallRotation += 20; 
                 
                 sarahSprite.style.top = `${player.y}px`;
                 sarahSprite.style.transform = `rotate(${fallRotation}deg)`;
 
-                if (player.y > viewport.clientHeight + 100) {
+                if (player.y > viewport.clientHeight + 120) {
                     clearInterval(animateFallInterval);
                     displayGameOverModal();
                 }
