@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artist Dashboard | Management Hub</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #030008; color: #ffffff;
+            min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; position: relative;
+        }
+
+        body::before {
+            content: ''; position: fixed; top: -20%; left: -20%; width: 140%; height: 140%;
+            background: radial-gradient(circle at 85% 25%, rgba(0, 191, 255, 0.18) 0%, transparent 35%), radial-gradient(circle at 15% 75%, rgba(255, 59, 180, 0.15) 0%, transparent 40%);
+            z-index: -1; filter: blur(40px);
+        }
+
+        .portal-container {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+            backdrop-filter: blur(30px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 32px; padding: 40px; width: 100%; max-width: 550px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .portal-header { text-align: center; margin-bottom: 30px; }
+        .portal-header h1 {
+            font-size: 2.2rem; font-weight: 900;
+            background: linear-gradient(135deg, #ffffff 0%, #30d5ff 50%, #ff73ca 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px;
+        }
+        .portal-header p { color: rgba(255, 255, 255, 0.5); font-size: 0.95rem; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 700; color: rgba(255, 255, 255, 0.7); margin-bottom: 8px; }
+        
+        .portal-input, .portal-textarea, .portal-select {
+            width: 100%; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 14px; border-radius: 14px; color: white; font-size: 1rem; outline: none;
+        }
+        .portal-textarea { resize: vertical; min-height: 100px; }
+        .portal-input:focus, .portal-textarea:focus, .portal-select:focus { border-color: #30d5ff; }
+
+        .portal-btn {
+            width: 100%; background: linear-gradient(135deg, #00bfff 0%, #ff3bb4 100%); border: none; color: white;
+            padding: 16px; border-radius: 16px; font-size: 1rem; font-weight: 700; cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0, 191, 255, 0.2); transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .portal-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(0, 191, 255, 0.3); }
+        .portal-btn:disabled { background: #555; cursor: not-allowed; box-shadow: none; }
+
+        .file-upload-wrapper { position: relative; width: 100%; }
+        .hidden-workflow { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="portal-container">
+        <div class="portal-header">
+            <h1>Artist Dashboard</h1>
+            <p id="portal-status">Verification Required</p>
+        </div>
+
+        <div id="auth-gate">
+            <form onsubmit="handleArtistLogin(event)">
+                <div class="form-group">
+                    <label>Label Account Email</label>
+                    <input type="email" id="artistEmail" class="portal-input" placeholder="name@queefyrecords.com" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="artistPassword" class="portal-input" placeholder="••••••••" required autocomplete="current-password">
+                </div>
+                <button type="submit" id="loginBtn" class="portal-btn">Access Dashboard</button>
+            </form>
+        </div>
+
+        <div id="workspace-area" class="hidden-workflow">
+            <form onsubmit="publishLivePost(event)">
+                <div class="form-group">
+                    <label>Publishing Identity</label>
+                    <select id="artistSelect" class="portal-select"></select>
+                </div>
+
+                <div class="form-group">
+                    <label>Post Content</label>
+                    <textarea id="postContent" class="portal-textarea" placeholder="Write a description... Links transform automatically."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Media Attachment (Image / Video File)</label>
+                    <input type="file" id="mediaFile" class="portal-input" accept="image/*,video/*">
+                </div>
+
+                <button type="submit" id="submitBtn" class="portal-btn">Publish to Feed</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://ybrlwkrqgsdfwwkjvtsv.supabase.co"; 
+        const SUPABASE_ANON_KEY = "sb_publishable_HKZYaWXO2UgTjRUomm7M1w_tB1d47ET";
+        const supabaseApp = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Your secure whitelisted identities map array settings
+        const WHITELIST_MAPPING = {
+            "kuraihanaofficial@gmail.com": ["Kurai Hana", "Queefy Records Official"],
+            "sarahyamaguchi@queefyrecords.com": ["Sarah Yamaguchi"],
+            "gabrihannah@queefyrecords.com": ["Gabri Hannah"],
+            "stellasukehiro@queefyrecords.com": ["Stella Sukehiro"]
+        };
+
+        window.onload = async () => {
+            const { data: { session } } = await supabaseApp.auth.getSession();
+            if (session) verifyAndLoad(session.user.email);
+        };
+
+        async function handleArtistLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('artistEmail').value.trim().toLowerCase();
+            const password = document.getElementById('artistPassword').value;
+            const btn = document.getElementById('loginBtn');
+
+            btn.innerText = "Verifying...";
+            btn.disabled = true;
+
+            let { data, error } = await supabaseApp.auth.signInWithPassword({ email, password });
+            
+            if (error) {
+                alert("Login Failed: " + error.message);
+                btn.innerText = "Access Dashboard";
+                btn.disabled = false;
+            } else {
+                verifyAndLoad(email);
+            }
+        }
+
+        function verifyAndLoad(email) {
+            const normalizedEmail = email.toLowerCase();
+            if (!WHITELIST_MAPPING[normalizedEmail]) {
+                alert("Access Denied: Your email address is not whitelisted as a label artist profile.");
+                supabaseApp.auth.signOut();
+                window.location.reload();
+                return;
+            }
+
+            document.getElementById('auth-gate').style.display = 'none';
+            document.getElementById('workspace-area').style.display = 'block';
+            document.getElementById('portal-status').innerText = "Verified Profile: " + email;
+
+            // Generate choices dropdown strictly containing identities this specific artist owns
+            const select = document.getElementById('artistSelect');
+            select.innerHTML = "";
+            WHITELIST_MAPPING[normalizedEmail].forEach(identity => {
+                select.innerHTML += `<option value="${identity}">${identity}</option>`;
+            });
+        }
+
+        async function publishLivePost(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const artist = document.getElementById('artistSelect').value;
+            const content = document.getElementById('postContent').value.trim();
+            const fileInput = document.getElementById('mediaFile');
+            const file = fileInput.files[0];
+
+            if (!content && !file) { alert("Cannot publish an empty post!"); return; }
+
+            btn.innerText = "Uploading & Publishing...";
+            btn.disabled = true;
+            let finalMediaUrl = "";
+
+            // Handle direct binary file stream transfers directly to your Storage Cloud Bucket
+            if (file) {
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+                const filePath = `uploads/${fileName}`;
+
+                let { error: uploadError } = await supabaseApp.storage
+                    .from('queef-media')
+                    .upload(filePath, file);
+
+                if (uploadError) {
+                    alert("Media upload breakdown: " + uploadError.message);
+                    btn.innerText = "Publish to Feed";
+                    btn.disabled = false;
+                    return;
+                }
+
+                const { data } = supabaseApp.storage.from('queef-media').getPublicUrl(filePath);
+                finalMediaUrl = data.publicUrl;
+            }
+
+            // Write record values directly to database rows securely
+            const { error } = await supabaseApp.from('posts').insert([
+                { artist_name: artist, post_content: content, media_url: finalMediaUrl }
+            ]);
+
+            if (error) {
+                alert("Error writing database records: " + error.message);
+                btn.innerText = "Publish to Feed";
+                btn.disabled = false;
+            } else {
+                alert("Boom! Post published live successfully.");
+                window.location.reload();
+            }
+        }
+    </script>
+</body>
+</html>
