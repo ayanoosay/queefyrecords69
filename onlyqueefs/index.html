@@ -357,9 +357,35 @@
 
         .comments-section { margin-top: 15px; padding-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); }
         .comment-list { max-height: 200px; overflow-y: auto; margin-bottom: 10px; }
-        .comment-item { font-size: 0.9rem; padding: 6px 10px; background: rgba(255,255,255,0.03); border-radius: 8px; margin-bottom: 6px; }
+        
+        .comment-item { 
+            font-size: 0.9rem; 
+            padding: 8px 12px; 
+            background: rgba(255,255,255,0.03); 
+            border-radius: 8px; 
+            margin-bottom: 6px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
         .comment-item strong { color: #ff73ca; }
         
+        /* Slick custom trash icon button */
+        .comment-delete-btn {
+            background: transparent;
+            border: none;
+            color: rgba(255, 71, 114, 0.6);
+            cursor: pointer;
+            padding: 2px 6px;
+            font-size: 0.85rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        .comment-delete-btn:hover {
+            color: #ff4772;
+            background: rgba(255, 71, 114, 0.1);
+        }
+
         .comment-input-box { display: flex; gap: 10px; position: relative; }
         .comment-input-box input { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); padding: 8px 12px; border-radius: 20px; color: white; outline: none; }
         .comment-submit-btn { background: #30d5ff; color: #000; border: none; padding: 0 15px; border-radius: 20px; font-weight: bold; cursor: pointer; }
@@ -461,6 +487,7 @@
         let currentUser = null;
         let userIpIdentifier = "anon_guest";
         let isSignUpMode = false;
+        const ADMIN_EMAIL = "kuraihanaofficial@gmail.com";
 
         async function fetchUserIP() {
             try {
@@ -614,6 +641,9 @@
                             if (commsRes) dbComments = commsRes;
                         } catch (err) { console.log("Database fetch bypassed:", err); }
 
+                        // Check if current logged-in session belongs to your admin email address
+                        const isAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
+
                         posts.forEach(post => {
                             if (!post["Artist Name"]) return;
 
@@ -642,7 +672,13 @@
                             let postCommentsHTML = '';
                             let currentPostComments = dbComments.filter(c => c.post_id === uniquePostId);
                             currentPostComments.forEach(c => {
-                                postCommentsHTML += `<div class="comment-item"><strong>${c.username}:</strong> ${c.comment_text}</div>`;
+                                // Add a dynamic moderation button if viewer matches admin profile parameters
+                                let deleteButtonHTML = isAdmin ? `<button class="comment-delete-btn" onclick="deleteComment('${c.id}', this)">🗑️</button>` : '';
+                                postCommentsHTML += `
+                                <div class="comment-item" id="comment_item_${c.id}">
+                                    <span><strong>${c.username}:</strong> ${c.comment_text}</span>
+                                    ${deleteButtonHTML}
+                                </div>`;
                             });
 
                             let postHTML = `
@@ -721,15 +757,42 @@
 
             const { data, error } = await supabaseApp.from('comments').insert([
                 { post_id: postId, user_id: currentUser.id, username: username, comment_text: commentText }
-            ]);
+            ]).select(); // Fetch returns rows to easily hook up database generated column sequential indexes on structural nodes
 
             if(error) {
                 alert("Error submitting comment: " + error.message);
             } else {
                 const list = document.getElementById(`comments_list_${postId}`);
-                if(list) list.innerHTML += `<div class="comment-item"><strong>${username}:</strong> ${commentText}</div>`;
+                if(list && data && data[0]) {
+                    let commentId = data[0].id;
+                    const isAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
+                    let deleteButtonHTML = isAdmin ? `<button class="comment-delete-btn" onclick="deleteComment('${commentId}', this)">🗑️</button>` : '';
+                    
+                    list.innerHTML += `
+                    <div class="comment-item" id="comment_item_${commentId}">
+                        <span><strong>${username}:</strong> ${commentText}</span>
+                        ${deleteButtonHTML}
+                    </div>`;
+                }
                 if(inputField) inputField.value = "";
                 if(errorLabel) errorLabel.style.display = "none";
+            }
+        }
+
+        // Target moderation hook function executed across global scope contexts natively
+        async function deleteComment(commentId, buttonElement) {
+            if(!confirm("Are you sure you want to delete this comment?")) return;
+            
+            const { error } = await supabaseApp
+                .from('comments')
+                .delete()
+                .eq('id', commentId);
+
+            if(error) {
+                alert("Could not remove record: " + error.message);
+            } else {
+                const targetNode = document.getElementById(`comment_item_${commentId}`);
+                if(targetNode) targetNode.remove();
             }
         }
 
