@@ -108,6 +108,7 @@
             transition: all 0.3s ease;
             position: relative;
             padding: 6px 0;
+            white-space: nowrap;
         }
 
         .desktop-nav a.active {
@@ -130,27 +131,32 @@
             cursor: pointer;
             font-size: 0.9rem;
             transition: transform 0.2s ease;
+            white-space: nowrap;
         }
 
         .auth-btn:hover {
             transform: scale(1.05);
         }
 
-        /* Upgraded Glowing Artist Portal Button Style */
+        /* Fixed & Beautifully Contained Artist Portal Button Style */
         .portal-link-btn {
+            display: none;
+            align-items: center;
+            justify-content: center;
             background: linear-gradient(135deg, rgba(48, 213, 255, 0.15) 0%, rgba(255, 115, 202, 0.05) 100%);
             border: 1px solid rgba(48, 213, 255, 0.4);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             color: #30d5ff;
-            padding: 8px 18px;
+            padding: 10px 24px; /* Widened padding container bounds */
             border-radius: 20px;
             font-weight: bold;
             margin-left: 25px;
             cursor: pointer;
             font-size: 0.85rem;
             text-decoration: none;
-            display: none;
+            white-space: nowrap; /* Forces text to never break or wrap downward */
+            flex-shrink: 0; /* Prevents layout container from compressing the button */
             box-shadow: 0 0 15px rgba(48, 213, 255, 0.1), inset 0 1px 0px rgba(255,255,255,0.1);
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -566,7 +572,7 @@
                 if(mobileLoginBtn) mobileLoginBtn.onclick = logoutAction;
 
                 if (ARTIST_EMAILS_WHITELIST.includes(currentUser.email.toLowerCase())) {
-                    if(headerPortalLink) headerPortalLink.style.display = "inline-block";
+                    if(headerPortalLink) headerPortalLink.style.display = "inline-flex";
                     if(mobilePortalLink) mobilePortalLink.style.display = "block";
                 }
             } else {
