@@ -285,7 +285,10 @@
         let currentActiveMole = null;
         let moleTimeout = null;
         let countdownTimer = null;
-        let spawnDelay = 800; 
+        
+        // Balanced speed tuning variables
+        const initialSpawnDelay = 1000; // Warmup delay: 1 full second
+        const minimumSpawnDelay = 420;  // Maximum speed cap for the final seconds
 
         const cursor = document.getElementById('custom-fist-cursor');
         const gridHoles = document.querySelectorAll('.mole-target');
@@ -334,8 +337,34 @@
             countdownTimer = setInterval(() => {
                 timeLeft--;
                 timeVal.innerText = timeLeft;
-                if (timeLeft <= 0) endGame();
+                
+                if (timeLeft <= 0) {
+                    endGame();
+                } else if (gameActive) {
+                    // Instantly recalculate target loop timing based on remaining time clock ticks
+                    adjustGameSpeed();
+                }
             }, 1000);
+        }
+
+        function getCurrentDelay() {
+            // First 15 seconds are kept at standard 1-second warmup speed
+            if (timeLeft > 15) {
+                return initialSpawnDelay;
+            }
+            
+            // Over the last 15 seconds, smoothly decrease time window down to minimum target cap
+            const finalPhaseProgress = (15 - timeLeft) / 15; // Normalized scale: 0 to 1
+            const delayRange = initialSpawnDelay - minimumSpawnDelay;
+            
+            return initialSpawnDelay - (delayRange * finalPhaseProgress);
+        }
+
+        function adjustGameSpeed() {
+            // Recalculates intervals live without interrupting popup states
+            if (!currentActiveMole || !currentActiveMole.classList.contains('up')) return;
+            
+            // Let the current mole live out its speed value calculated at spawn time
         }
 
         function nextMoleCycle() {
@@ -350,24 +379,22 @@
             currentActiveMole = gridHoles[randomIndex];
             currentActiveMole.classList.add('up');
 
-            // Accelerate popup frequency based on points acquired
-            let dynamicSpeed = Math.max(450, spawnDelay - Math.floor(score / 30) * 40);
+            // Calculate exact speed frame window based on timeline progress
+            let currentDelay = getCurrentDelay();
 
             clearTimeout(moleTimeout);
             moleTimeout = setTimeout(() => {
                 nextMoleCycle();
-            }, dynamicSpeed);
+            }, currentDelay);
         }
 
         function whackMole(element, event) {
             if (!gameActive || !element.classList.contains('up')) return;
             
             score += 10;
-            // Pad out numerical string score format text output fields to match arcade style (e.g. 020)
             scoreVal.innerText = String(score).padStart(3, '0');
             
             element.classList.remove('up');
-            
             spawnHitVisual(element.parentElement, event.clientX, event.clientY);
             
             clearTimeout(moleTimeout);
