@@ -119,7 +119,7 @@
             position: relative;
             overflow: hidden;
             background-color: #000;
-            background-repeat: repeat; /* Changed to full horizontal tile repeat loop */
+            background-repeat: repeat;
             background-position: 0px 0px;
             background-size: auto 100%;
             z-index: 1;
@@ -203,24 +203,25 @@
         }
         .start-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #1b8dae; }
 
-        /* 📱 NEON ARCADE HANDHELD MOB CONTROLLER ARRAY */
+        /* 📱 HORIZONTAL FIXED MOBILE ARCADEPAD LINK GRID */
         .mobile-controls {
             display: none;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
+            grid-template-columns: 1fr 1.5fr 1fr; /* Set column distributions cleanly in a single row */
+            gap: 12px;
             margin-top: 20px;
             width: 100%;
-            padding: 0 10px;
+            padding: 0;
+            align-items: center;
         }
 
         .mob-btn {
             background: #090214; 
             border: 2px solid #30d5ff;
             color: #30d5ff; 
-            padding: 18px; 
-            border-radius: 50px; /* Rounded pill shape look */
+            padding: 16px 8px; 
+            border-radius: 50px; 
             font-weight: bold; 
-            font-size: 1.1rem; 
+            font-size: 1rem; 
             text-align: center;
             box-shadow: 0 0 10px rgba(48, 213, 255, 0.3), inset 0 0 4px rgba(48, 213, 255, 0.2);
             touch-action: manipulation;
@@ -236,12 +237,11 @@
         }
         
         .fly-cluster { 
-            grid-column: span 3; 
             background: #140212;
             border-color: #ff3bb4; 
             color: #ff3bb4;
-            font-size: 1.4rem; 
-            padding: 22px; 
+            font-size: 1.2rem; 
+            padding: 18px 8px; 
             text-shadow: 0 0 5px #ff3bb4;
             box-shadow: 0 0 10px rgba(255, 59, 180, 0.3);
         }
@@ -256,10 +256,11 @@
             .arcade-cabinet { margin-top: 85px; padding: 12px; max-width: 580px; }
             .mobile-controls { display: grid; }
             .screen-overlay h2 { font-size: 1.8rem; }
-            .screen-overlay p { font-size: 0.9rem; }
+            .screen-overlay p { font-size: 0.9rem; margin-bottom: 16px; }
             #player-sarah { width: 80px; height: 80px; } 
             .obstacle { width: 50px; height: 45px; }
             .hud-item { font-size: 1.1rem; }
+            .start-btn { padding: 10px 32px; font-size: 1rem; }
         }
     </style>
 </head>
@@ -296,7 +297,7 @@
 
         <div class="mobile-controls">
             <div class="mob-btn" onpointerdown="handleMobileLeft(true, event)" onpointerup="handleMobileLeft(false, event)" onpointerleave="handleMobileLeft(false, event)">◀ LEFT</div>
-            <div class="mob-btn fly-cluster" onpointerdown="triggerFlyJump(event)">FLY ⚡</div>
+            <div class="mob-btn fly-cluster" onpointerdown="triggerFlyJump(event)">FLY</div>
             <div class="mob-btn" onpointerdown="handleMobileRight(true, event)" onpointerup="handleMobileRight(false, event)" onpointerleave="handleMobileRight(false, event)">RIGHT ▶</div>
         </div>
     </div>
