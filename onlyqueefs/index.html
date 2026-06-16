@@ -136,24 +136,29 @@
             transform: scale(1.05);
         }
 
-        /* Seamless custom navigation action link buttons */
+        /* Upgraded Glowing Artist Portal Button Style */
         .portal-link-btn {
-            background: transparent;
-            border: 1px solid #30d5ff;
+            background: linear-gradient(135deg, rgba(48, 213, 255, 0.15) 0%, rgba(255, 115, 202, 0.05) 100%);
+            border: 1px solid rgba(48, 213, 255, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             color: #30d5ff;
-            padding: 7px 16px;
+            padding: 8px 18px;
             border-radius: 20px;
             font-weight: bold;
-            margin-left: 15px;
+            margin-left: 25px;
             cursor: pointer;
             font-size: 0.85rem;
             text-decoration: none;
             display: none;
-            transition: all 0.2s ease;
+            box-shadow: 0 0 15px rgba(48, 213, 255, 0.1), inset 0 1px 0px rgba(255,255,255,0.1);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .portal-link-btn:hover {
-            background: rgba(48, 213, 255, 0.1);
-            box-shadow: 0 0 10px rgba(48, 213, 255, 0.3);
+            border-color: #30d5ff;
+            color: #ffffff;
+            transform: translateY(-1px) scale(1.03);
+            box-shadow: 0 0 20px rgba(48, 213, 255, 0.4), inset 0 1px 0px rgba(255,255,255,0.2);
         }
 
         .hamburger {
@@ -213,8 +218,8 @@
         }
 
         .mobile-portal-btn {
-            background: transparent;
-            border: 1px solid #30d5ff;
+            background: linear-gradient(135deg, rgba(48, 213, 255, 0.1) 0%, rgba(255, 115, 202, 0.05) 100%);
+            border: 1px solid rgba(48, 213, 255, 0.4);
             color: #30d5ff;
             padding: 12px 32px;
             border-radius: 25px;
@@ -224,6 +229,8 @@
             text-decoration: none;
             display: none;
             margin-top: 5px;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(48, 213, 255, 0.1);
         }
 
         .cute-modal-overlay {
@@ -523,7 +530,6 @@
         let isSignUpMode = false;
         const ADMIN_EMAIL = "kuraihanaofficial@gmail.com";
 
-        // Verified label artist email directory parameters matrix whitelist array mapping
         const ARTIST_EMAILS_WHITELIST = [
             "kuraihanaofficial@gmail.com",
             "sarahyamaguchi@queefyrecords.com",
@@ -559,7 +565,6 @@
                 if(loginBtn) loginBtn.onclick = logoutAction;
                 if(mobileLoginBtn) mobileLoginBtn.onclick = logoutAction;
 
-                // Handle dynamic display parameters mapping on dashboard links for authorized whitelisted members
                 if (ARTIST_EMAILS_WHITELIST.includes(currentUser.email.toLowerCase())) {
                     if(headerPortalLink) headerPortalLink.style.display = "inline-block";
                     if(mobilePortalLink) mobilePortalLink.style.display = "block";
