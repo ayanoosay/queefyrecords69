@@ -23,7 +23,6 @@
             -webkit-user-select: none;
             image-rendering: pixelated;
             image-rendering: crisp-edges;
-            /* 🚫 KILL MOBILE DOUBLE-TAP ZOOMING ENTIRELY */
             touch-action: manipulation;
         }
 
@@ -114,7 +113,7 @@
         
         .hearts-container { display: flex; gap: 6px; font-size: 1.5rem; }
 
-        /* 🎮 GIANT 16:9 VIEWPORT MONITOR CONTAINER */
+        /* 🎮 GIANT VIEWPORT MONITOR CONTAINER */
         .game-viewport {
             width: 100%;
             aspect-ratio: 16 / 9;
@@ -129,7 +128,6 @@
             z-index: 1;
         }
 
-        /* 🎞️ Pixelated Blending Transition Underlayer */
         #bg-transition-layer {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -145,7 +143,6 @@
             opacity: 1;
         }
 
-        /* CRT Raster Line Shading Filter */
         .game-viewport::after {
             content: " ";
             display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
@@ -153,7 +150,6 @@
             z-index: 8; background-size: 100% 4px; pointer-events: none;
         }
 
-        /* 👤 PLAYER AVATAR BOUNDS */
         #player-sarah {
             position: absolute;
             width: 120px; height: 120px;
@@ -173,7 +169,6 @@
             100% { opacity: 1; }
         }
 
-        /* 👾 SCALED HAZARD OBSTACLES PROFILE */
         .obstacle {
             position: absolute;
             width: 70px; height: 70px;
@@ -208,7 +203,6 @@
         .start-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #1b8dae; }
         .start-btn.disabled { opacity: 0.4; pointer-events: none; }
 
-        /* 📱 STYLIZED HUD ROW CONTROLLERS */
         .mobile-controls {
             display: none;
             grid-template-columns: 1fr 1.3fr 1fr;
@@ -259,17 +253,25 @@
             }
             .arcade-cabinet {
                 position: absolute;
-                width: 92vh !important;  /* Fits perfectly in screen height dimensions when rotated */
+                width: 90vh !important;  /* Strictly bounds to physical height */
+                height: 94vw !important; /* Strictly bounds to physical width (prevents cropping!) */
                 max-width: none;
                 transform: rotate(90deg);
                 transform-origin: center center;
                 margin-top: 0 !important;
                 padding: 10px !important;
+                display: flex;
+                flex-direction: column;
+            }
+            .game-viewport {
+                aspect-ratio: auto !important; /* Removes 16:9 so it doesn't overflow */
+                flex-grow: 1; /* Naturally fills the exact remaining safe space */
+                min-height: 0;
             }
             header { display: none; }
-            .mobile-controls { display: grid !important; gap: 8px !important; margin-top: 8px !important; }
-            .mob-btn { padding: 12px 6px !important; font-size: 1rem !important; border-radius: 10px !important; }
-            .game-hud { padding: 6px 12px !important; margin-bottom: 8px !important; }
+            .mobile-controls { display: grid !important; gap: 6px !important; margin-top: 6px !important; }
+            .mob-btn { padding: 10px 6px !important; font-size: 0.95rem !important; border-radius: 8px !important; }
+            .game-hud { padding: 6px 12px !important; margin-bottom: 6px !important; }
             .hud-item { font-size: 0.9rem !important; }
             .hearts-container { font-size: 1rem !important; }
             
@@ -284,9 +286,22 @@
         /* 📱 MOBILE RESPONSIVE (TRUE NATIVE LANDSCAPE VIEWPORTS) */
         @media screen and (max-width: 900px) and (orientation: landscape) {
             header { display: none; }
+            .arcade-cabinet { 
+                margin-top: 0; 
+                padding: 8px; 
+                width: 98vw; 
+                height: 96vh; 
+                max-width: none;
+                display: flex;
+                flex-direction: column;
+            }
+            .game-viewport {
+                aspect-ratio: auto;
+                flex-grow: 1;
+                min-height: 0;
+            }
             .mobile-controls { display: grid; gap: 8px; margin-top: 8px; }
             .mob-btn { padding: 10px 6px; font-size: 0.95rem; border-radius: 10px; }
-            .arcade-cabinet { margin-top: 0; padding: 10px; width: 100%; max-width: 640px; }
             .game-hud { padding: 6px 14px; margin-bottom: 8px; }
             .hud-item { font-size: 0.9rem; }
             .hearts-container { font-size: 1rem; }
@@ -299,15 +314,10 @@
             .start-btn { padding: 8px 24px; font-size: 0.9rem; }
         }
 
-        /* Legacy fallback check for small screens globally */
+        /* Legacy fallback check */
         @media (max-width: 768px) and (min-aspect-ratio: 13/9) {
             header { display: none; }
             .mobile-controls { display: grid; }
-            .arcade-cabinet { margin-top: 0px; padding: 12px; width: 100%; }
-            .hud-item { font-size: 1.1rem; }
-            .hearts-container { font-size: 1.2rem; }
-            #player-sarah { width: 80px; height: 80px; left: 40px; }
-            .obstacle { width: 48px; height: 48px; }
         }
     </style>
 </head>
@@ -365,7 +375,6 @@
 
         function syncHitboxDimensions() {
             if (isMobileSize()) {
-                // Highly compact dynamic configurations for mobile/rotated screens
                 player.width = window.matchMedia("(max-width: 768px) and (orientation: portrait)").matches ? 50 : 55;
                 player.height = player.width;
                 player.speedX = 7.5;
@@ -427,6 +436,7 @@
 
         function unlockArcadeInterface() {
             overlayTitle.innerText = "CALISOGA WEB";
+            overlayTitle.style.color = "#30d5ff";
             overlayDesc.innerHTML = "GUIDE SARAH YAMAGUCHI THROUGH THE GRID FIELDS! MANEUVER SECURELY PAST HAZARDS AS SPATIAL ANOMALIES SCALE OVER TIME.<br><br>PC: SPACE = FLY UP, A/D or ARROWS = STRAFE SIDEWAYS<br>MOBILE: USE MOVEMENT BUTTON CLUSTERS BELOW CABINET";
             actionBtn.innerText = "INSERT COIN";
             actionBtn.classList.remove('disabled');
@@ -550,13 +560,16 @@
         }
 
         function processStageProgression() {
-            score += 0.08; 
+            // Speed up score to shorten the total game time
+            score += 0.12; 
             let displayScore = Math.floor(score);
             scoreVal.innerText = String(displayScore).padStart(3, '0');
 
-            if (displayScore >= 510 && currentStage !== 3) {
+            if (displayScore >= 300) {
+                triggerGameWin();
+            } else if (displayScore >= 200 && currentStage !== 3) {
                 triggerStageTransition(3, "SPACE DEEP", "space.jpeg");
-            } else if (displayScore >= 210 && displayScore < 510 && currentStage !== 2) {
+            } else if (displayScore >= 100 && displayScore < 200 && currentStage !== 2) {
                 triggerStageTransition(2, "THE FOREST FIELDS", "forest.jpeg");
             }
         }
@@ -628,6 +641,7 @@
             let obsSize = window.matchMedia("(max-width: 768px) and (orientation: portrait)").matches ? 34 : (isMobileSize() ? 36 : 70);
 
             const spawnX = viewport.clientWidth + 20;
+            // Ensure spawns dynamically respect the flex-grown vertical height
             const spawnY = Math.random() * (viewport.clientHeight - obsSize);
 
             el.style.left = `${spawnX}px`;
@@ -696,8 +710,19 @@
 
         function displayGameOverModal() {
             overlayTitle.innerText = "DIALOUT LOSS";
+            overlayTitle.style.color = "#ff3bb4";
             overlayDesc.innerHTML = `Matrix integrity compromised across stages.<br><br>Final Flight Record score: <span style='color:#30d5ff; font-weight:bold;'>${String(Math.floor(score)).padStart(3, '0')} PTS</span>`;
             actionBtn.innerText = "INSERT COIN REBOOT";
+            overlay.style.display = 'flex';
+        }
+
+        function triggerGameWin() {
+            gameActive = false;
+            sarahSprite.classList.remove('invincible');
+            overlayTitle.innerText = "SYSTEM SECURED";
+            overlayTitle.style.color = "#30d5ff";
+            overlayDesc.innerHTML = `Matrix integrity fully restored. You have successfully navigated the grid.<br><br>Final Flight Record: <span style='color:#ff73ca; font-weight:bold;'>${String(Math.floor(score)).padStart(3, '0')} PTS</span>`;
+            actionBtn.innerText = "REPLAY MISSION";
             overlay.style.display = 'flex';
         }
 
@@ -705,7 +730,6 @@
             syncHitboxDimensions();
         });
         
-        // Initial programmatic execution link call setup 
         syncHitboxDimensions();
     </script>
 </body>
