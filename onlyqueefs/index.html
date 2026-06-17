@@ -578,7 +578,6 @@
         
         const supabaseApp = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let currentUser = null;
-        let userIpIdentifier = "anon_guest";
         let isSignUpMode = false;
         const ADMIN_EMAIL = "kuraihanaofficial@gmail.com";
         let globalDbLikes = [];
@@ -591,14 +590,32 @@
             "gabrisrevenge@gmail.com"
         ];
 
-        async function fetchUserIP() {
-            try {
-                let response = await fetch("https://api.ipify.org?format=json");
-                let data = await response.json();
-                if(data && data.ip) {
-                    userIpIdentifier = "00000000-0000-0000-0000-" + data.ip.replace(/\./g, "").slice(0, 12).padStart(12, '0');
-                }
-            } catch(err) { console.log("IP fetch fallback:", err); }
+        // ---------------------------------------------------------------
+        // FIX: Generate a stable anonymous UUID stored in localStorage.
+        // This replaces the old async IP-based approach which had a race
+        // condition and produced invalid UUID formats that Supabase rejects.
+        // ---------------------------------------------------------------
+        function getOrCreateAnonId() {
+            const key = 'qf_anon_uid';
+            let id = localStorage.getItem(key);
+            if (!id) {
+                // Generate a proper v4-style UUID
+                id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    const r = Math.random() * 16 | 0;
+                    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+                localStorage.setItem(key, id);
+            }
+            return id;
+        }
+
+        // Set once, synchronously, before anything else runs — no race condition
+        const userAnonId = getOrCreateAnonId();
+
+        // Always call this to get the right ID whether logged in or not
+        function getViewerId() {
+            return currentUser ? currentUser.id : userAnonId;
         }
 
         supabaseApp.auth.onAuthStateChange((event, session) => {
@@ -731,7 +748,6 @@
             btn.innerText = "Saving...";
             btn.disabled = true;
 
-            // Step 1: Update Auth metadata for future comments
             const { data, error } = await supabaseApp.auth.updateUser({
                 data: { display_name: newUsername }
             });
@@ -741,7 +757,6 @@
                 btn.innerText = "Save Changes";
                 btn.disabled = false;
             } else {
-                // Step 2: Actively update ALL legacy comments posted by this specific user
                 try {
                     await supabaseApp
                         .from('comments')
@@ -795,8 +810,8 @@
             const totalLikes = globalDbLikes.filter(l => l.post_id === postId).length;
             if(countSpan) countSpan.innerText = totalLikes;
 
-            let currentViewerId = currentUser ? currentUser.id : userIpIdentifier;
-            let userHasLiked = globalDbLikes.some(l => l.post_id === postId && l.user_id === currentViewerId);
+            const viewerId = getViewerId();
+            let userHasLiked = globalDbLikes.some(l => l.post_id === postId && l.user_id === viewerId);
             
             if(userHasLiked) btn.classList.add('liked');
             else btn.classList.remove('liked');
@@ -852,6 +867,7 @@
                     combinedPostsList.sort((a, b) => b.dateObj - a.dateObj);
 
                     const isAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
+                    const viewerId = getViewerId();
 
                     combinedPostsList.forEach(post => {
                         let artistName = post.artistName;
@@ -863,8 +879,8 @@
                         let uniquePostId = generatePostId(artistName, content);
                         let postLikesCount = globalDbLikes.filter(l => l.post_id === uniquePostId).length;
                         
-                        let currentViewerId = currentUser ? currentUser.id : userIpIdentifier;
-                        let userHasLiked = globalDbLikes.some(l => l.post_id === uniquePostId && l.user_id === currentViewerId);
+                        // Use stable viewerId — works for both logged-in users and anon guests
+                        let userHasLiked = globalDbLikes.some(l => l.post_id === uniquePostId && l.user_id === viewerId);
                         let heartClass = userHasLiked ? "action-btn like-btn liked" : "action-btn like-btn";
 
                         let mediaHTML = '';
@@ -927,7 +943,8 @@
                             let postId = this.getAttribute('data-post-id');
                             let countSpan = this.querySelector('.like-count');
                             let currentCount = parseInt(countSpan.innerText);
-                            let targetUserId = currentUser ? currentUser.id : userIpIdentifier;
+                            // Always use getViewerId() — stable for anon users across refreshes
+                            let targetUserId = getViewerId();
 
                             if (this.classList.contains('liked')) {
                                 this.classList.remove('liked');
@@ -968,7 +985,6 @@
                             }
                         })
                         .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'comments' }, payload => {
-                            // Catch updates so users see comment username changes update dynamically in real time
                             const legacyCommentStrongTags = document.querySelectorAll('.comment-item strong');
                             legacyCommentStrongTags.forEach(tag => {
                                 if (tag.innerText === `${payload.old.username}:`) {
@@ -1032,7 +1048,8 @@
             mobileMenu.classList.toggle('active');
         });
 
-        fetchUserIP().then(() => initFeed());
+        // Start the feed directly — no async IP fetch, no race condition
+        initFeed();
     </script>
 </body>
 </html>
