@@ -251,21 +251,63 @@
             color: #000;
         }
 
-        /* 📱 RESPONSIVE PORTRAIT ANTI-CROP VIEWPORT ADJUSTMENTS */
-        @media (max-width: 768px) {
+        /* 🔄 CSS FORCED ROTATION & SCALING ENGINE FOR PORTRAIT SMARTPHONES */
+        @media screen and (max-width: 768px) and (orientation: portrait) {
+            body {
+                justify-content: center;
+                align-items: center;
+            }
+            .arcade-cabinet {
+                position: absolute;
+                width: 92vh !important;  /* Fits perfectly in screen height dimensions when rotated */
+                max-width: none;
+                transform: rotate(90deg);
+                transform-origin: center center;
+                margin-top: 0 !important;
+                padding: 10px !important;
+            }
+            header { display: none; }
+            .mobile-controls { display: grid !important; gap: 8px !important; margin-top: 8px !important; }
+            .mob-btn { padding: 12px 6px !important; font-size: 1rem !important; border-radius: 10px !important; }
+            .game-hud { padding: 6px 12px !important; margin-bottom: 8px !important; }
+            .hud-item { font-size: 0.9rem !important; }
+            .hearts-container { font-size: 1rem !important; }
+            
+            #player-sarah { width: 50px !important; height: 50px !important; left: 30px !important; }
+            .obstacle { width: 34px !important; height: 34px !important; }
+            
+            .screen-overlay h2 { font-size: 1.5rem !important; margin-bottom: 6px !important; }
+            .screen-overlay p { font-size: 0.75rem !important; margin-bottom: 10px !important; line-height: 1.3 !important; }
+            .start-btn { padding: 8px 20px !important; font-size: 0.85rem !important; }
+        }
+
+        /* 📱 MOBILE RESPONSIVE (TRUE NATIVE LANDSCAPE VIEWPORTS) */
+        @media screen and (max-width: 900px) and (orientation: landscape) {
+            header { display: none; }
+            .mobile-controls { display: grid; gap: 8px; margin-top: 8px; }
+            .mob-btn { padding: 10px 6px; font-size: 0.95rem; border-radius: 10px; }
+            .arcade-cabinet { margin-top: 0; padding: 10px; width: 100%; max-width: 640px; }
+            .game-hud { padding: 6px 14px; margin-bottom: 8px; }
+            .hud-item { font-size: 0.9rem; }
+            .hearts-container { font-size: 1rem; }
+            
+            #player-sarah { width: 55px; height: 55px; left: 35px; }
+            .obstacle { width: 36px; height: 36px; }
+            
+            .screen-overlay h2 { font-size: 1.6rem; margin-bottom: 6px; }
+            .screen-overlay p { font-size: 0.8rem; margin-bottom: 12px; line-height: 1.3; }
+            .start-btn { padding: 8px 24px; font-size: 0.9rem; }
+        }
+
+        /* Legacy fallback check for small screens globally */
+        @media (max-width: 768px) and (min-aspect-ratio: 13/9) {
             header { display: none; }
             .mobile-controls { display: grid; }
-            .arcade-cabinet { margin-top: 10px; padding: 12px; width: 100%; }
+            .arcade-cabinet { margin-top: 0px; padding: 12px; width: 100%; }
             .hud-item { font-size: 1.1rem; }
             .hearts-container { font-size: 1.2rem; }
-            
-            /* 🚀 PROPORTIONAL RETRO BALANCING FOR PORTRAIT SMARTPHONES */
             #player-sarah { width: 80px; height: 80px; left: 40px; }
             .obstacle { width: 48px; height: 48px; }
-            
-            .screen-overlay h2 { font-size: 1.8rem; }
-            .screen-overlay p { font-size: 0.9rem; margin-bottom: 16px; }
-            .start-btn { padding: 10px 32px; font-size: 1rem; }
         }
     </style>
 </head>
@@ -317,13 +359,18 @@
             gravity: 0.46         
         };
 
+        function isMobileSize() {
+            return window.matchMedia("(max-width: 900px)").matches;
+        }
+
         function syncHitboxDimensions() {
-            if (window.matchMedia("(max-width: 768px)").matches) {
-                player.width = 80;
-                player.height = 80;
-                player.speedX = 9.5;
-                player.jumpStrength = -7.2;
-                player.gravity = 0.38;
+            if (isMobileSize()) {
+                // Highly compact dynamic configurations for mobile/rotated screens
+                player.width = window.matchMedia("(max-width: 768px) and (orientation: portrait)").matches ? 50 : 55;
+                player.height = player.width;
+                player.speedX = 7.5;
+                player.jumpStrength = -6.2;
+                player.gravity = 0.32;
             } else {
                 player.width = 120;
                 player.height = 120;
@@ -433,14 +480,13 @@
             obstaclesList.forEach(obs => obs.el.remove());
             obstaclesList = [];
             
-            // Fixed mobile positioning coordinates
             player.y = viewport.clientHeight / 3;
-            player.x = window.matchMedia("(max-width: 768px)").matches ? 40 : 100;
+            player.x = isMobileSize() ? 35 : 100;
             player.vy = 0;
             player.vx = 0;
 
             sarahSprite.style.transform = "rotate(0deg)"; 
-            sarahSprite.classList.remove('invincible'); // Anti-stuck flash cleanup loop fix
+            sarahSprite.classList.remove('invincible'); 
             scoreVal.innerText = '000';
             stageName.innerText = "THE UNDERGROUND";
             viewport.style.backgroundImage = "url('underground.jpeg')";
@@ -533,7 +579,8 @@
         }
 
         function processParallaxScrolling() {
-            let scrollSpeed = 2.5 + Math.floor(Math.floor(score) / 100) * 0.5;
+            let scrollSpeed = isMobileSize() ? 1.5 : 2.5;
+            scrollSpeed += Math.floor(Math.floor(score) / 100) * 0.5;
             bgScrollPosition -= scrollSpeed;
             
             viewport.style.backgroundPosition = `${bgScrollPosition}px 0px`;
@@ -547,7 +594,8 @@
                 spawnDynamicObstacle();
             }
 
-            let movementSpeed = 6.8 + Math.floor(Math.floor(score) / 100) * 1.4;
+            let baseSpeed = isMobileSize() ? 4.2 : 6.8;
+            let movementSpeed = baseSpeed + Math.floor(Math.floor(score) / 100) * 1.4;
 
             for (let i = obstaclesList.length - 1; i >= 0; i--) {
                 let obs = obstaclesList[i];
@@ -577,14 +625,14 @@
                 this.src = 'data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%2300bfff\'><rect x=\'4\' y=\'4\' width=\'16\' height=\'16\'/></svg>';
             };
 
+            let obsSize = window.matchMedia("(max-width: 768px) and (orientation: portrait)").matches ? 34 : (isMobileSize() ? 36 : 70);
+
             const spawnX = viewport.clientWidth + 20;
-            const spawnY = Math.random() * (viewport.clientHeight - (window.matchMedia("(max-width: 768px)").matches ? 50 : 70));
+            const spawnY = Math.random() * (viewport.clientHeight - obsSize);
 
             el.style.left = `${spawnX}px`;
             el.style.top = `${spawnY}px`;
             viewport.appendChild(el);
-
-            let obsSize = window.matchMedia("(max-width: 768px)").matches ? 48 : 70;
 
             obstaclesList.push({
                 el: el,
@@ -594,7 +642,7 @@
         }
 
         function checkCollision(rect1, rect2) {
-            let pad = window.matchMedia("(max-width: 768px)").matches ? 12 : 24;
+            let pad = isMobileSize() ? 6 : 24;
             return (
                 rect1.x + pad < rect2.x + rect2.width &&
                 rect1.x + rect1.width - pad > rect2.x &&
@@ -629,7 +677,7 @@
             let fallRotation = 0;
             let currentY = player.y;
             let currentVy = player.vy;
-            const absoluteFloorLimit = viewport.clientHeight + 40; // Unified absolute threshold target metric
+            const absoluteFloorLimit = viewport.clientHeight + 40; 
 
             let animateFallInterval = setInterval(() => {
                 currentVy += 0.55; 
@@ -656,6 +704,9 @@
         window.addEventListener('resize', () => {
             syncHitboxDimensions();
         });
+        
+        // Initial programmatic execution link call setup 
+        syncHitboxDimensions();
     </script>
 </body>
 </html>
