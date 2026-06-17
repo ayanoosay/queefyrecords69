@@ -9,7 +9,7 @@
 
     <meta property="og:type" content="website">
     <meta property="og:title" content="Calisoga Web | Queefy Arcade">
-    <meta property="og:description" content="Help Sarah Yamaguchi navigate through the Underground, Forest, and Space fields!">
+    <meta property="og:description" content="Help Sarah Yamaguchi safely fly away from the calisogas and their webs!">
     <meta property="og:image" content="https://ayanoosay.github.io/queefyrecords69/logo.jpeg">
     <meta name="theme-color" content="#ff3bb4">
 
@@ -437,7 +437,7 @@
         function unlockArcadeInterface() {
             overlayTitle.innerText = "CALISOGA WEB";
             overlayTitle.style.color = "#30d5ff";
-            overlayDesc.innerHTML = "GUIDE SARAH YAMAGUCHI THROUGH THE GRID FIELDS! MANEUVER SECURELY PAST HAZARDS AS SPATIAL ANOMALIES SCALE OVER TIME.<br><br>PC: SPACE = FLY UP, A/D or ARROWS = STRAFE SIDEWAYS<br>MOBILE: USE MOVEMENT BUTTON CLUSTERS BELOW CABINET";
+            overlayDesc.innerHTML = "HELP SARAH FLY AWAY FROM THE CALISOGAS AND THEIR WEBS!<br><br>PC: SPACE = FLY UP, A/D or ARROWS = STRAFE SIDEWAYS<br>MOBILE: USE MOVEMENT BUTTON CLUSTERS BELOW CABINET";
             actionBtn.innerText = "INSERT COIN";
             actionBtn.classList.remove('disabled');
         }
@@ -568,7 +568,7 @@
             if (displayScore >= 300) {
                 triggerGameWin();
             } else if (displayScore >= 200 && currentStage !== 3) {
-                triggerStageTransition(3, "SPACE DEEP", "space.jpeg");
+                triggerStageTransition(3, "DEEP SPACE", "space.jpeg");
             } else if (displayScore >= 100 && displayScore < 200 && currentStage !== 2) {
                 triggerStageTransition(2, "THE FOREST FIELDS", "forest.jpeg");
             }
@@ -709,9 +709,9 @@
         }
 
         function displayGameOverModal() {
-            overlayTitle.innerText = "DIALOUT LOSS";
+            overlayTitle.innerText = "BOO, LOSER!";
             overlayTitle.style.color = "#ff3bb4";
-            overlayDesc.innerHTML = `Matrix integrity compromised across stages.<br><br>Final Flight Record score: <span style='color:#30d5ff; font-weight:bold;'>${String(Math.floor(score)).padStart(3, '0')} PTS</span>`;
+            overlayDesc.innerHTML = `WTF IS WRONG WITH YOUR ASS YOU JUST KILLED SARAH YAMAGUCHI?? <br><br>Final Flight Record score: <span style='color:#30d5ff; font-weight:bold;'>${String(Math.floor(score)).padStart(3, '0')} PTS</span>`;
             actionBtn.innerText = "INSERT COIN REBOOT";
             overlay.style.display = 'flex';
         }
@@ -719,9 +719,9 @@
         function triggerGameWin() {
             gameActive = false;
             sarahSprite.classList.remove('invincible');
-            overlayTitle.innerText = "SYSTEM SECURED";
+            overlayTitle.innerText = "SARAH IS SAFE!";
             overlayTitle.style.color = "#30d5ff";
-            overlayDesc.innerHTML = `Matrix integrity fully restored. You have successfully navigated the grid.<br><br>Final Flight Record: <span style='color:#ff73ca; font-weight:bold;'>${String(Math.floor(score)).padStart(3, '0')} PTS</span>`;
+            overlayDesc.innerHTML = `YAY! SARAH IS NOW FREE!<br><br>Final Flight Record: <span style='color:#ff73ca; font-weight:bold;'>${String(Math.floor(score)).padStart(3, '0')} PTS</span>`;
             actionBtn.innerText = "REPLAY MISSION";
             overlay.style.display = 'flex';
         }
