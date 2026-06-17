@@ -203,7 +203,7 @@
         }
         .start-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #1b8dae; }
 
-        /* 📱 HORIZONTAL FIXED MOBILE ARCADEPAD LINK GRID */
+        /* 📱 MOBILE ARCADEPAD SINGLE-ROW HORIZONTAL DECK BUTTON GRAPHICS */
         .mobile-controls {
             display: none;
             grid-template-columns: 1fr 1.2fr 1fr;
@@ -251,17 +251,16 @@
             box-shadow: 0 0 25px #ff3bb4;
         }
 
-        /* 📱 FORCE RESPONSIVE SCALE-UP LANDSCAPE ROTATION MODIFIERS ON PORTRAIT PHONES */
+        /* 📱 RESPONSIVE PORTRAIT ROTATION SAFE VALUES FIX */
         @media (max-width: 768px) and (orientation: portrait) {
             header { display: none; } 
             
             .arcade-cabinet {
                 position: absolute;
-                width: 72vh; /* Decreased ratio parameters giving safe canvas breathing padding */
+                width: 72vh; 
                 height: 92vw;
                 max-width: 72vh;
                 padding: 12px;
-                /* 🔍 SPIN 90 DEGREES AND SCALE THE WINDOW BY 130% TO ENLARGE HUD/SCREEN SCREEN */
                 transform: rotate(90deg) scale(1.3);
                 margin-top: 0;
                 display: flex;
@@ -274,7 +273,6 @@
             .screen-overlay h2 { font-size: 1.4rem; }
             .screen-overlay p { font-size: 0.75rem; margin-bottom: 8px; }
             
-            /* ✂️ DOWNSIZE SPRITES SO THE SCALED CABINET FEELS PROPORTIONAL AND COMFORTABLE */
             #player-sarah { width: 62px; height: 62px; } 
             .obstacle { width: 38px; height: 38px; }
             
@@ -299,10 +297,6 @@
 </head>
 <body>
 
-    <div id="custom-fist-cursor">
-        <img src="fist.png" alt="Wet Fist" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23ff3bb4\'><rect x=\'6\' y=\'6\' width=\'12\' height=\'12\'/></svg>'">
-    </div>
-
     <header>
         <a href="index.html" class="brand">
             <img src="../logo.jpeg" alt="Logo" class="brand-logo">
@@ -325,334 +319,8 @@
 
             <div class="screen-overlay" id="overlay">
                 <h2 id="overlay-title">CALISOGA WEB</h2>
-                <p id="overlay-desc">HELP SARAH TO GET THROUGH THE STAGES AND FLY FREE!<br><br>PC: SPACE = FLY UP, A/D or ARROWS = STRAFE SIDEWAYS<br>MOBILE: USE MOVEMENT BUTTONS</p>
+                <p id="overlay-desc">GUIDE SARAH YAMAGUCHI THROUGH THE GRID FIELDS! MANEUVER SECURELY PAST HAZARDS AS SPATIAL ANOMALIES SCALE OVER TIME.<br><br>PC: SPACE = FLY UP, A/D or ARROWS = STRAFE SIDEWAYS<br>MOBILE: USE MOVEMENT BUTTON CLUSTERS BELOW CABINET</p>
                 <button class="start-btn" id="action-btn" onclick="startGame(event)">INSERT COIN</button>
             </div>
 
-            <img src="sarahmid.png" id="player-sarah" alt="Sarah Yamaguchi" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23ff73ca\'><rect x=\'4\' y=\'4\' width=\'16\' height=\'16\'/></svg>'">
-        </div>
-
-        <div class="mobile-controls">
-            <div class="mob-btn" onpointerdown="handleMobileLeft(true, event)" onpointerup="handleMobileLeft(false, event)" onpointerleave="handleMobileLeft(false, event)">◀ LEFT</div>
-            <div class="mob-btn fly-cluster" onpointerdown="handleMobileFlyTrigger(event)">FLY ⚡</div>
-            <div class="mob-btn" onpointerdown="handleMobileRight(true, event)" onpointerup="handleMobileRight(false, event)" onpointerleave="handleMobileRight(false, event)">RIGHT ▶</div>
-        </div>
-    </div>
-
-    <script>
-        let player = {
-            x: 100, y: 160,
-            vy: 0, vx: 0,
-            width: 120, height: 120, 
-            speedX: 12.5,          
-            jumpStrength: -8.8,   
-            gravity: 0.46         
-        };
-
-        // Dynamically shift runtime object hitboxes when running under smaller mobile layout values
-        function syncHitboxDimensions() {
-            if (window.innerWidth <= 768 && window.innerHeight > window.innerWidth) {
-                player.width = 62;
-                player.height = 62;
-            } else {
-                player.width = 120;
-                player.height = 120;
-            }
-        }
-
-        let score = 0;
-        let lives = 3;
-        let gameActive = false;
-        let invincibilityFrames = 0;
-        let currentStage = 1; 
-        let bgScrollPosition = 0;
-        let isTransitioning = false;
-
-        let obstaclesList = [];
-        let loopRef = null;
-        let obstacleSpawnTimer = 0;
-        let obstacleSpawnRate = 65; 
-
-        let mobileLeftActive = false;
-        let mobileRightActive = false;
-
-        const viewport = document.getElementById('viewport');
-        const bgTransitionLayer = document.getElementById('bg-transition-layer');
-        const sarahSprite = document.getElementById('player-sarah');
-        const scoreVal = document.getElementById('score-val');
-        const stageName = document.getElementById('stage-name');
-        const heartsBox = document.getElementById('hearts-box');
-        const overlay = document.getElementById('overlay');
-        const overlayTitle = document.getElementById('overlay-title');
-        const overlayDesc = document.getElementById('overlay-desc');
-        const actionBtn = document.getElementById('action-btn');
-
-        const spriteUp = new Image(); spriteUp.src = 'sarahup.png';
-        const spriteMid = new Image(); spriteMid.src = 'sarahmid.png';
-        const spriteDown = new Image(); spriteDown.src = 'sarahdown.png';
-
-        let keyboardKeys = {};
-        window.addEventListener('keydown', (e) => {
-            keyboardKeys[e.code] = true;
-            if (e.code === 'Space' && gameActive) {
-                e.preventDefault();
-                triggerFlyJump();
-            }
-            if(['ArrowUp', 'ArrowDown', 'Space'].includes(e.code)) e.preventDefault();
-        });
-        window.addEventListener('keyup', (e) => { keyboardKeys[e.code] = false; });
-
-        function handleMobileLeft(isActive, e) { if(e) e.preventDefault(); mobileLeftActive = isActive; }
-        function handleMobileRight(isActive, e) { if(e) e.preventDefault(); mobileRightActive = isActive; }
-
-        function handleMobileFlyTrigger(e) {
-            if(e) e.preventDefault();
-            if(!gameActive) {
-                startGame();
-            } else {
-                triggerFlyJump();
-            }
-        }
-
-        function triggerFlyJump() {
-            if (!gameActive) return;
-            player.vy = player.jumpStrength;
-        }
-
-        function startGame(e) {
-            if(e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-            score = 0;
-            lives = 3;
-            currentStage = 1;
-            gameActive = true;
-            invincibilityFrames = 0;
-            bgScrollPosition = 0;
-            isTransitioning = false;
-            
-            syncHitboxDimensions();
-            obstaclesList.forEach(obs => obs.el.remove());
-            obstaclesList = [];
-            
-            player.y = 120;
-            player.x = 60;
-            player.vy = 0;
-            player.vx = 0;
-
-            sarahSprite.style.transform = "rotate(0deg)"; 
-            scoreVal.innerText = '000';
-            stageName.innerText = "THE UNDERGROUND";
-            viewport.style.backgroundImage = "url('underground.jpeg')";
-            bgTransitionLayer.className = "";
-            bgTransitionLayer.style.backgroundImage = "none";
-            updateHeartsUI();
-
-            overlay.style.display = 'none';
-
-            cancelAnimationFrame(loopRef);
-            loopRef = requestAnimationFrame(gameTickLoop);
-        }
-
-        function gameTickLoop() {
-            if (!gameActive) return;
-
-            processPhysicsVelocity();
-            processStageProgression();
-            processObstaclesEngine();
-            processParallaxScrolling();
-
-            loopRef = requestAnimationFrame(gameTickLoop);
-        }
-
-        function processPhysicsVelocity() {
-            player.vx = 0;
-            if (keyboardKeys['KeyA'] || keyboardKeys['ArrowLeft'] || mobileLeftActive) {
-                player.vx = -player.speedX;
-            }
-            if (keyboardKeys['KeyD'] || keyboardKeys['ArrowRight'] || mobileRightActive) {
-                player.vx = player.speedX;
-            }
-
-            player.vy += player.gravity;
-            player.y += player.vy;
-            player.x += player.vx;
-
-            if (player.y < 0) { player.y = 0; player.vy = 0; }
-            const maxFloorY = viewport.clientHeight - player.height;
-            if (player.y > maxFloorY) { player.y = maxFloorY; player.vy = 0; }
-
-            if (player.x < 0) player.x = 0;
-            const maxRightX = viewport.clientWidth - player.width;
-            if (player.x > maxRightX) player.x = maxRightX;
-
-            if (player.vy < -1.5) {
-                sarahSprite.src = spriteUp.complete ? 'sarahup.png' : sarahSprite.src;
-            } else if (player.vy > 2) {
-                sarahSprite.src = spriteDown.complete ? 'sarahdown.png' : sarahSprite.src;
-            } else {
-                sarahSprite.src = spriteMid.complete ? 'sarahmid.png' : sarahSprite.src;
-            }
-
-            sarahSprite.style.top = `${player.y}px`;
-            sarahSprite.style.left = `${player.x}px`;
-
-            if (invincibilityFrames > 0) {
-                invincibilityFrames--;
-                if (invincibilityFrames <= 0) sarahSprite.classList.remove('invincible');
-            }
-        }
-
-        function processStageProgression() {
-            score += 0.08; 
-            let displayScore = Math.floor(score);
-            scoreVal.innerText = String(displayScore).padStart(3, '0');
-
-            if (displayScore >= 510 && currentStage !== 3) {
-                triggerStageTransition(3, "SPACE DEEP", "space.jpeg");
-            } else if (displayScore >= 210 && displayScore < 510 && currentStage !== 2) {
-                triggerStageTransition(2, "THE FOREST FIELDS", "forest.jpeg");
-            }
-        }
-
-        function triggerStageTransition(nextStage, nextStageName, nextBgImage) {
-            if (isTransitioning) return;
-            isTransitioning = true;
-            currentStage = nextStage;
-            stageName.innerText = nextStageName;
-
-            bgTransitionLayer.style.backgroundImage = `url('${nextBgImage}')`;
-            bgTransitionLayer.classList.add('fade-in');
-
-            setTimeout(() => {
-                viewport.style.backgroundImage = `url('${nextBgImage}')`;
-                bgTransitionLayer.classList.remove('fade-in');
-                bgTransitionLayer.style.backgroundImage = "none";
-                isTransitioning = false;
-            }, 800); 
-        }
-
-        function processParallaxScrolling() {
-            let scrollSpeed = 2.5 + Math.floor(Math.floor(score) / 100) * 0.5;
-            bgScrollPosition -= scrollSpeed;
-            
-            viewport.style.backgroundPosition = `${bgScrollPosition}px 0px`;
-            bgTransitionLayer.style.backgroundPosition = `${bgScrollPosition}px 0px`;
-        }
-
-        function processObstaclesEngine() {
-            obstacleSpawnTimer++;
-            if (obstacleSpawnTimer >= obstacleSpawnRate) {
-                obstacleSpawnTimer = 0;
-                spawnDynamicObstacle();
-            }
-
-            let movementSpeed = 6.8 + Math.floor(Math.floor(score) / 100) * 1.4;
-
-            for (let i = obstaclesList.length - 1; i >= 0; i--) {
-                let obs = obstaclesList[i];
-                obs.x -= movementSpeed;
-                obs.el.style.left = `${obs.x}px`;
-
-                if (checkCollision(player, obs)) {
-                    triggerPlayerHit();
-                }
-
-                if (obs.x < -80) {
-                    obs.el.remove();
-                    obstaclesList.splice(i, 1);
-                }
-            }
-        }
-
-        function spawnDynamicObstacle() {
-            const el = document.createElement('img');
-            el.className = 'obstacle';
-            
-            const options = ['spider.png', 'web.png', 'calisoga.png'];
-            const chosenAsset = options[Math.floor(Math.random() * options.length)];
-            el.src = chosenAsset;
-            
-            el.onerror = function() {
-                this.src = 'data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%2300bfff\'><rect x=\'4\' y=\'4\' width=\'16\' height=\'16\'/></svg>';
-            };
-
-            const spawnX = viewport.clientWidth + 20;
-            const spawnY = Math.random() * (viewport.clientHeight - 70);
-
-            el.style.left = `${spawnX}px`;
-            el.style.top = `${spawnY}px`;
-            viewport.appendChild(el);
-
-            let obsSize = (window.innerWidth <= 768 && window.innerHeight > window.innerWidth) ? 38 : 60;
-
-            obstaclesList.push({
-                el: el,
-                x: spawnX, y: spawnY,
-                width: obsSize, height: obsSize 
-            });
-        }
-
-        function checkCollision(rect1, rect2) {
-            let pad = (window.innerWidth <= 768 && window.innerHeight > window.innerWidth) ? 10 : 24;
-            return (
-                rect1.x + pad < rect2.x + rect2.width &&
-                rect1.x + rect1.width - pad > rect2.x &&
-                rect1.y + pad < rect2.y + rect2.height &&
-                rect1.y + rect1.height - pad > rect2.y
-            );
-        }
-
-        function triggerPlayerHit() {
-            if (invincibilityFrames > 0) return;
-
-            lives--;
-            updateHeartsUI();
-            invincibilityFrames = 60; 
-            player.vy = -3.5; 
-            sarahSprite.classList.add('invincible');
-
-            if (lives <= 0) triggerGameOverAnimation();
-        }
-
-        function updateHeartsUI() {
-            let heartStr = '';
-            for (let i = 0; i < 3; i++) {
-                heartStr += (i < lives) ? '❤️' : '🖤';
-            }
-            heartsBox.innerText = heartStr;
-        }
-
-        function triggerGameOverAnimation() {
-            gameActive = false;
-            cancelAnimationFrame(loopRef);
-            
-            let fallRotation = 0;
-            let animateFallInterval = setInterval(() => {
-                player.vy += 0.55; 
-                player.y += player.vy;
-                fallRotation += 20; 
-                
-                sarahSprite.style.top = `${player.y}px`;
-                sarahSprite.style.transform = `rotate(${fallRotation}deg)`;
-
-                if (player.y > viewport.clientHeight + 120) {
-                    clearInterval(animateFallInterval);
-                    displayGameOverModal();
-                }
-            }, 20);
-        }
-
-        function displayGameOverModal() {
-            overlayTitle.innerText = "QUEEFY!";
-            overlayDesc.innerHTML = `SARAH FLEW AWAY! YAY<br><br>Final Flight Record score: <span style='color:#30d5ff; font-weight:bold;'>${String(Math.floor(score)).padStart(3, '0')} PTS</span>`;
-            actionBtn.innerText = "INSERT COIN REBOOT";
-            overlay.style.display = 'flex';
-        }
-
-        // Recalculate dimensions live if the player changes phone orientation manually
-        window.addEventListener('resize', syncHitboxDimensions);
-    </script>
-</body>
-</html>
+            <img src="sarahmid.png" id="player-sarah" alt="Sarah Yamaguchi" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23ff
