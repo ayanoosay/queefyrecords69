@@ -68,7 +68,7 @@
         .brand-logo { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid rgba(255, 59, 180, 0.6); }
         .logo-text {
             font-size: 1.15rem; font-weight: 800; letter-spacing: -0.3px;
-            background: linear-gradient(135deg, #ffffff 0%, #ff73ca 50%, #30d5ff(100%));
+            background: linear-gradient(135deg, #ffffff 0%, #ff73ca 50%, #30d5ff 100%);
             background-size: 200% 200%;
             animation: liquidText 4s ease infinite;
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
@@ -86,7 +86,7 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* 🖥️ CABINET CABINET REWORKED WITH SAFE MAXIMUM LIMITS */
+        /* 🖥️ CABINET BOX FOR PC */
         .arcade-cabinet {
             background: #110924;
             border: 4px solid #30d5ff;
@@ -110,7 +110,7 @@
         
         .hearts-container { display: flex; gap: 6px; font-size: 1.5rem; }
 
-        /* 🎮 GIANT 16:9 SCREEN RATIO CONTAINER BOX */
+        /* 🎮 GIANT 16:9 CONTAINER BOX */
         .game-viewport {
             width: 100%;
             aspect-ratio: 16 / 9;
@@ -202,8 +202,9 @@
             z-index: 20;
         }
         .start-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #1b8dae; }
+        .start-btn.disabled { opacity: 0.4; pointer-events: none; }
 
-        /* 📱 ARCADEPAD LINK ROW DECK */
+        /* 📱 HORIZONTAL FIXED MOBILE ARCADEPAD LINK GRID */
         .mobile-controls {
             display: none;
             grid-template-columns: 1fr 1.2fr 1fr;
@@ -251,16 +252,17 @@
             box-shadow: 0 0 25px #ff3bb4;
         }
 
-        /* 📱 PORTRAIT SCULPT FIXED OVERRIDES */
+        /* 📱 RESPONSIVE PORTRAIT ANTI-CROP VIEWPORT ADJUSTMENTS */
         @media (max-width: 768px) {
             header { display: none; } 
             .mobile-controls { display: grid; margin-top: auto; }
             
             .arcade-cabinet {
                 position: absolute;
-                width: 72vh; 
-                height: 92vw;
-                max-width: 72vh;
+                /* Reworked frame scaling parameters to eliminate screen crop margins */
+                width: 82vh; 
+                height: 88vw;
+                max-width: 82vh;
                 padding: 12px;
                 transform: rotate(90deg) scale(1.3);
                 margin-top: 0;
@@ -317,9 +319,9 @@
             <div id="bg-transition-layer"></div>
 
             <div class="screen-overlay" id="overlay">
-                <h2 id="overlay-title">CALISOGA WEB</h2>
-                <p id="overlay-desc">GUIDE SARAH YAMAGUCHI THROUGH THE GRID FIELDS! MANEUVER SECURELY PAST HAZARDS AS SPATIAL ANOMALIES SCALE OVER TIME.<br><br>PC: SPACE = FLY UP, A/D or ARROWS = STRAFE SIDEWAYS<br>MOBILE: USE MOVEMENT BUTTON CLUSTERS BELOW CABINET</p>
-                <button class="start-btn" id="action-btn" onclick="startGame(event)">INSERT COIN</button>
+                <h2 id="overlay-title">LOADING ASSETS</h2>
+                <p id="overlay-desc">PRE-CACHING TEXTURES AND SYSTEM DATA NODES FROM QUEEFY HUBS...</p>
+                <button class="start-btn disabled" id="action-btn" onclick="startGame(event)">INITIALIZING...</button>
             </div>
 
             <img src="sarahmid.png" id="player-sarah" alt="Sarah Yamaguchi" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23ff73ca\'><rect x=\'4\' y=\'4\' width=\'16\' height=\'16\'/></svg>'">
@@ -343,7 +345,6 @@
         };
 
         function syncHitboxDimensions() {
-            // Detect portrait layout constraints safely regardless of rotated directions
             if (window.matchMedia("(max-width: 768px)").matches) {
                 player.width = 62;
                 player.height = 62;
@@ -384,6 +385,28 @@
         const spriteMid = new Image(); spriteMid.src = 'sarahmid.png';
         const spriteDown = new Image(); spriteDown.src = 'sarahdown.png';
 
+        // 📦 HIGH-FIDELITY RETRO IMAGE LOADING PIPELINE
+        const manifestAssets = ['underground.jpeg', 'forest.jpeg', 'space.jpeg', 'spider.png', 'web.png', 'calisoga.png', 'sarahup.png', 'sarahmid.png', 'sarahdown.png'];
+        let loadedCount = 0;
+
+        manifestAssets.forEach(src => {
+            const cacheImg = new Image();
+            cacheImg.src = src;
+            cacheImg.onload = cacheImg.onerror = () => {
+                loadedCount++;
+                if (loadedCount === manifestAssets.length) {
+                    unlockArcadeInterface();
+                }
+            };
+        });
+
+        function unlockArcadeInterface() {
+            overlayTitle.innerText = "CALISOGA WEB";
+            overlayDesc.innerHTML = "GUIDE SARAH YAMAGUCHI THROUGH THE GRID FIELDS! MANEUVER SECURELY PAST HAZARDS AS SPATIAL ANOMALIES SCALE OVER TIME.<br><br>PC: SPACE = FLY UP, A/D or ARROWS = STRAFE SIDEWAYS<br>MOBILE: USE MOVEMENT BUTTON CLUSTERS BELOW CABINET";
+            actionBtn.innerText = "INSERT COIN";
+            actionBtn.classList.remove('disabled');
+        }
+
         let keyboardKeys = {};
         window.addEventListener('keydown', (e) => {
             keyboardKeys[e.code] = true;
@@ -400,6 +423,7 @@
 
         function handleMobileFlyTrigger(e) {
             if(e) e.preventDefault();
+            if(actionBtn.classList.contains('disabled')) return;
             if(!gameActive) {
                 startGame();
             } else {
@@ -417,6 +441,8 @@
                 e.preventDefault();
                 e.stopPropagation();
             }
+            if(actionBtn.classList.contains('disabled')) return;
+            
             score = 0;
             lives = 3;
             currentStage = 1;
@@ -598,7 +624,7 @@
         }
 
         function triggerPlayerHit() {
-            if (invincibilityFrames > 0) return;
+            if (invincibilityFrames > 0 || !gameActive) return;
 
             lives--;
             updateHeartsUI();
@@ -617,20 +643,24 @@
             heartsBox.innerText = heartStr;
         }
 
+        // 🎬 STABLE CROSS-PLATFORM FIXED GAME OVER LOOP
         function triggerGameOverAnimation() {
             gameActive = false;
-            cancelAnimationFrame(loopRef);
             
             let fallRotation = 0;
+            let currentY = player.y;
+            let currentVy = player.vy;
+
             let animateFallInterval = setInterval(() => {
-                player.vy += 0.55; 
-                player.y += player.vy;
+                currentVy += 0.55; 
+                currentY += currentVy;
                 fallRotation += 20; 
                 
-                sarahSprite.style.top = `${player.y}px`;
+                sarahSprite.style.top = `${currentY}px`;
                 sarahSprite.style.transform = `rotate(${fallRotation}deg)`;
 
-                if (player.y > viewport.clientHeight + 120) {
+                // Dynamic bounding context relative evaluation checks
+                if (currentY > viewport.clientHeight + 80) {
                     clearInterval(animateFallInterval);
                     displayGameOverModal();
                 }
