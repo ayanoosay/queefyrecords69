@@ -337,6 +337,7 @@
         <div class="game-hud">
             <div class="hud-item">SCORE: <span id="score-val">000</span></div>
             <div class="hud-item"><span id="stage-name">THE UNDERGROUND</span></div>
+            <button id="mute-btn" onclick="toggleMute()" style="background:none; border:2px solid #ff3bb4; color:#ff3bb4; padding:5px 15px; cursor:pointer; font-weight:bold; border-radius:4px; font-size:0.9rem;">MUTE 🔊</button>
             <div class="hud-item hearts-container" id="hearts-box">❤️❤️❤️</div>
         </div>
 
@@ -416,6 +417,10 @@
         const overlayDesc = document.getElementById('overlay-desc');
         const actionBtn = document.getElementById('action-btn');
 
+        const bgMusic = new Audio('calisogaweb.mp3');
+        bgMusic.loop = true;
+        let isMuted = false;
+
         const spriteUp = new Image(); spriteUp.src = 'sarahup.png';
         const spriteMid = new Image(); spriteMid.src = 'sarahmid.png';
         const spriteDown = new Image(); spriteDown.src = 'sarahdown.png';
@@ -471,6 +476,11 @@
             player.vy = player.jumpStrength;
         }
 
+        function toggleMute() {
+        isMuted = !isMuted;
+        bgMusic.muted = isMuted;
+        document.getElementById('mute-btn').innerText = isMuted ? "UNMUTE 🔇" : "MUTE 🔊";
+        }
         function startGame(e) {
             if(e) {
                 e.preventDefault();
@@ -489,6 +499,8 @@
             syncHitboxDimensions();
             obstaclesList.forEach(obs => obs.el.remove());
             obstaclesList = [];
+
+            bgMusic.play().catch(e => console.log("Audio waiting for user gesture"));
             
             player.y = viewport.clientHeight / 3;
             player.x = isMobileSize() ? 35 : 100;
