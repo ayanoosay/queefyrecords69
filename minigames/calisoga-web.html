@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <link rel="icon" type="image/x-icon" href="../favicon.ico?v=2">
     
     <title>Calisoga Web | Arcade</title>
@@ -86,7 +86,7 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* 🖥️ CABINET WRAPPER CONTAINER BOX */
+        /* 🖥️ CABINET CABINET REWORKED WITH SAFE MAXIMUM LIMITS */
         .arcade-cabinet {
             background: #110924;
             border: 4px solid #30d5ff;
@@ -96,7 +96,6 @@
             box-shadow: 0 0 40px rgba(48, 213, 255, 0.3), inset 0 0 15px rgba(0,0,0,0.8);
             margin-top: 100px;
             position: relative;
-            transition: transform 0.3s ease;
         }
 
         .game-hud {
@@ -204,7 +203,7 @@
         }
         .start-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #1b8dae; }
 
-        /* 📱 HORIZONTAL FIXED MOBILE ARCADEPAD LINK GRID */
+        /* 📱 MOBILE ARCADEPAD SINGLE-ROW HORIZONTAL DECK BUTTON GRAPHICS */
         .mobile-controls {
             display: none;
             grid-template-columns: 1fr 1.2fr 1fr;
@@ -252,21 +251,25 @@
             box-shadow: 0 0 25px #ff3bb4;
         }
 
-        /* 📱 FORCE RESPONSIVE LANDSCAPE ROTATION MODIFIERS ON VERTICAL SCREENS */
+        /* 📱 RESPONSIVE PORTRAIT ROTATION SAFE VALUES FIX */
         @media (max-width: 768px) and (orientation: portrait) {
-            header { display: none; } /* Clear header space on portrait mobile */
+            header { display: none; } 
             
             .arcade-cabinet {
                 position: absolute;
-                width: 90vh; /* Match horizontal width to phone height viewport rules */
-                max-width: 90vh;
+                /* Restrict bounding framework relative to viewport height limits */
+                width: 88vh; 
+                height: 95vw;
+                max-width: 88vh;
                 padding: 12px;
-                /* Spin entire layout interface 90 degrees cleanly */
                 transform: rotate(90deg);
                 margin-top: 0;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
             }
 
-            .mobile-controls { display: grid; }
+            .mobile-controls { display: grid; margin-top: auto; }
             .game-viewport { width: 100%; aspect-ratio: 16 / 9; }
             .screen-overlay h2 { font-size: 1.6rem; }
             .screen-overlay p { font-size: 0.85rem; margin-bottom: 12px; }
@@ -276,10 +279,10 @@
             .start-btn { padding: 8px 24px; font-size: 0.95rem; }
         }
 
-        /* Normal landscape layout if they turn their phone sideways manually */
+        /* Fixed normal landscapes */
         @media (max-width: 932px) and (orientation: landscape) {
             header { display: none; }
-            .arcade-cabinet { margin-top: 20px; padding: 12px; max-width: 85vw; }
+            .arcade-cabinet { margin-top: 10px; padding: 12px; max-width: 92vw; }
             .mobile-controls { display: grid; }
             #player-sarah { width: 75px; height: 75px; }
             .obstacle { width: 45px; height: 45px; }
@@ -391,6 +394,7 @@
             }
         }
 
+        // Apply native gravity calculation curves
         function triggerFlyJump() {
             if (!gameActive) return;
             player.vy = player.jumpStrength;
@@ -569,7 +573,7 @@
         }
 
         function checkCollision(rect1, rect2) {
-            // Mobile screen boundaries check normalization
+            // Adaptive hitbox padding relative to device configuration scales
             let pad = (window.innerWidth <= 768) ? 14 : 24;
             return (
                 rect1.x + pad < rect2.x + rect2.width &&
