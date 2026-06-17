@@ -203,7 +203,7 @@
         }
         .start-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #1b8dae; }
 
-        /* 📱 MOBILE ARCADEPAD SINGLE-ROW HORIZONTAL DECK BUTTON GRAPHICS */
+        /* 📱 HORIZONTAL FIXED MOBILE ARCADEPAD LINK GRID */
         .mobile-controls {
             display: none;
             grid-template-columns: 1fr 1.2fr 1fr;
@@ -251,18 +251,18 @@
             box-shadow: 0 0 25px #ff3bb4;
         }
 
-        /* 📱 RESPONSIVE PORTRAIT ROTATION SAFE VALUES FIX */
+        /* 📱 FORCE RESPONSIVE SCALE-UP LANDSCAPE ROTATION MODIFIERS ON PORTRAIT PHONES */
         @media (max-width: 768px) and (orientation: portrait) {
             header { display: none; } 
             
             .arcade-cabinet {
                 position: absolute;
-                /* Restrict bounding framework relative to viewport height limits */
-                width: 88vh; 
-                height: 95vw;
-                max-width: 88vh;
+                width: 72vh; /* Decreased ratio parameters giving safe canvas breathing padding */
+                height: 92vw;
+                max-width: 72vh;
                 padding: 12px;
-                transform: rotate(90deg);
+                /* 🔍 SPIN 90 DEGREES AND SCALE THE WINDOW BY 130% TO ENLARGE HUD/SCREEN SCREEN */
+                transform: rotate(90deg) scale(1.3);
                 margin-top: 0;
                 display: flex;
                 flex-direction: column;
@@ -271,12 +271,17 @@
 
             .mobile-controls { display: grid; margin-top: auto; }
             .game-viewport { width: 100%; aspect-ratio: 16 / 9; }
-            .screen-overlay h2 { font-size: 1.6rem; }
-            .screen-overlay p { font-size: 0.85rem; margin-bottom: 12px; }
-            #player-sarah { width: 80px; height: 80px; } 
-            .obstacle { width: 50px; height: 50px; }
-            .hud-item { font-size: 1rem; }
-            .start-btn { padding: 8px 24px; font-size: 0.95rem; }
+            .screen-overlay h2 { font-size: 1.4rem; }
+            .screen-overlay p { font-size: 0.75rem; margin-bottom: 8px; }
+            
+            /* ✂️ DOWNSIZE SPRITES SO THE SCALED CABINET FEELS PROPORTIONAL AND COMFORTABLE */
+            #player-sarah { width: 62px; height: 62px; } 
+            .obstacle { width: 38px; height: 38px; }
+            
+            .hud-item { font-size: 0.9rem; }
+            .start-btn { padding: 6px 18px; font-size: 0.85rem; }
+            .mob-btn { padding: 10px 4px; font-size: 0.85rem; }
+            .fly-cluster { padding: 12px 4px; font-size: 1rem; }
         }
 
         /* Fixed normal landscapes */
@@ -293,6 +298,10 @@
     </style>
 </head>
 <body>
+
+    <div id="custom-fist-cursor">
+        <img src="fist.png" alt="Wet Fist" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23ff3bb4\'><rect x=\'6\' y=\'6\' width=\'12\' height=\'12\'/></svg>'">
+    </div>
 
     <header>
         <a href="index.html" class="brand">
@@ -316,7 +325,7 @@
 
             <div class="screen-overlay" id="overlay">
                 <h2 id="overlay-title">CALISOGA WEB</h2>
-                <p id="overlay-desc">GUIDE SARAH YAMAGUCHI THROUGH THE GRID FIELDS! MANEUVER SECURELY PAST HAZARDS AS SPATIAL ANOMALIES SCALE OVER TIME.<br><br>PC: SPACE = FLY UP, A/D or ARROWS = STRAFE SIDEWAYS<br>MOBILE: USE MOVEMENT BUTTON CLUSTERS BELOW CABINET</p>
+                <p id="overlay-desc">HELP SARAH TO GET THROUGH THE STAGES AND FLY FREE!<br><br>PC: SPACE = FLY UP, A/D or ARROWS = STRAFE SIDEWAYS<br>MOBILE: USE MOVEMENT BUTTONS</p>
                 <button class="start-btn" id="action-btn" onclick="startGame(event)">INSERT COIN</button>
             </div>
 
@@ -339,6 +348,17 @@
             jumpStrength: -8.8,   
             gravity: 0.46         
         };
+
+        // Dynamically shift runtime object hitboxes when running under smaller mobile layout values
+        function syncHitboxDimensions() {
+            if (window.innerWidth <= 768 && window.innerHeight > window.innerWidth) {
+                player.width = 62;
+                player.height = 62;
+            } else {
+                player.width = 120;
+                player.height = 120;
+            }
+        }
 
         let score = 0;
         let lives = 3;
@@ -394,7 +414,6 @@
             }
         }
 
-        // Apply native gravity calculation curves
         function triggerFlyJump() {
             if (!gameActive) return;
             player.vy = player.jumpStrength;
@@ -413,11 +432,12 @@
             bgScrollPosition = 0;
             isTransitioning = false;
             
+            syncHitboxDimensions();
             obstaclesList.forEach(obs => obs.el.remove());
             obstaclesList = [];
             
-            player.y = 160;
-            player.x = 100;
+            player.y = 120;
+            player.x = 60;
             player.vy = 0;
             player.vx = 0;
 
@@ -565,16 +585,17 @@
             el.style.top = `${spawnY}px`;
             viewport.appendChild(el);
 
+            let obsSize = (window.innerWidth <= 768 && window.innerHeight > window.innerWidth) ? 38 : 60;
+
             obstaclesList.push({
                 el: el,
                 x: spawnX, y: spawnY,
-                width: 60, height: 60 
+                width: obsSize, height: obsSize 
             });
         }
 
         function checkCollision(rect1, rect2) {
-            // Adaptive hitbox padding relative to device configuration scales
-            let pad = (window.innerWidth <= 768) ? 14 : 24;
+            let pad = (window.innerWidth <= 768 && window.innerHeight > window.innerWidth) ? 10 : 24;
             return (
                 rect1.x + pad < rect2.x + rect2.width &&
                 rect1.x + rect1.width - pad > rect2.x &&
@@ -624,11 +645,14 @@
         }
 
         function displayGameOverModal() {
-            overlayTitle.innerText = "DIALOUT LOSS";
-            overlayDesc.innerHTML = `Matrix integrity compromised across stages.<br><br>Final Flight Record score: <span style='color:#30d5ff; font-weight:bold;'>${String(Math.floor(score)).padStart(3, '0')} PTS</span>`;
+            overlayTitle.innerText = "QUEEFY!";
+            overlayDesc.innerHTML = `SARAH FLEW AWAY! YAY<br><br>Final Flight Record score: <span style='color:#30d5ff; font-weight:bold;'>${String(Math.floor(score)).padStart(3, '0')} PTS</span>`;
             actionBtn.innerText = "INSERT COIN REBOOT";
             overlay.style.display = 'flex';
         }
+
+        // Recalculate dimensions live if the player changes phone orientation manually
+        window.addEventListener('resize', syncHitboxDimensions);
     </script>
 </body>
 </html>
