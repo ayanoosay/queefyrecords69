@@ -86,7 +86,6 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* 🖥️ PRESTIGE CABINET BASE BOX MODEL CONTAINER */
         .arcade-cabinet {
             background: #110924;
             border: 4px solid #30d5ff;
@@ -113,7 +112,6 @@
         
         .hearts-container { display: flex; gap: 6px; font-size: 1.5rem; }
 
-        /* 🎮 GIANT VIEWPORT MONITOR CONTAINER */
         .game-viewport {
             width: 100%;
             aspect-ratio: 16 / 9;
@@ -245,7 +243,6 @@
             color: #000;
         }
 
-        /* 🔄 CSS FORCED ROTATION & SCALING ENGINE FOR PORTRAIT SMARTPHONES */
         @media screen and (max-width: 768px) and (orientation: portrait) {
             body {
                 justify-content: center;
@@ -253,8 +250,8 @@
             }
             .arcade-cabinet {
                 position: absolute;
-                width: 90vh !important;  /* Strictly bounds to physical height */
-                height: 94vw !important; /* Strictly bounds to physical width (prevents cropping!) */
+                width: 90vh !important;
+                height: 94vw !important;
                 max-width: none;
                 transform: rotate(90deg);
                 transform-origin: center center;
@@ -264,8 +261,8 @@
                 flex-direction: column;
             }
             .game-viewport {
-                aspect-ratio: auto !important; /* Removes 16:9 so it doesn't overflow */
-                flex-grow: 1; /* Naturally fills the exact remaining safe space */
+                aspect-ratio: auto !important;
+                flex-grow: 1;
                 min-height: 0;
             }
             header { display: none; }
@@ -283,7 +280,6 @@
             .start-btn { padding: 8px 20px !important; font-size: 0.85rem !important; }
         }
 
-        /* 📱 MOBILE RESPONSIVE (TRUE NATIVE LANDSCAPE VIEWPORTS) */
         @media screen and (max-width: 900px) and (orientation: landscape) {
             header { display: none; }
             .arcade-cabinet { 
@@ -314,7 +310,6 @@
             .start-btn { padding: 8px 24px; font-size: 0.9rem; }
         }
 
-        /* Legacy fallback check */
         @media (max-width: 768px) and (min-aspect-ratio: 13/9) {
             header { display: none; }
             .mobile-controls { display: grid; }
@@ -397,6 +392,7 @@
         let currentStage = 1; 
         let bgScrollPosition = 0;
         let isTransitioning = false;
+        let lastTimestamp = null; // ← delta time tracker
 
         let obstaclesList = [];
         let loopRef = null;
@@ -477,10 +473,11 @@
         }
 
         function toggleMute() {
-        isMuted = !isMuted;
-        bgMusic.muted = isMuted;
-        document.getElementById('mute-btn').innerText = isMuted ? "UNMUTE 🔇" : "MUTE 🔊";
+            isMuted = !isMuted;
+            bgMusic.muted = isMuted;
+            document.getElementById('mute-btn').innerText = isMuted ? "UNMUTE 🔇" : "MUTE 🔊";
         }
+
         function startGame(e) {
             if(e) {
                 e.preventDefault();
@@ -495,6 +492,7 @@
             invincibilityFrames = 0;
             bgScrollPosition = 0;
             isTransitioning = false;
+            lastTimestamp = null; // ← reset delta time on new game
             
             syncHitboxDimensions();
             obstaclesList.forEach(obs => obs.el.remove());
@@ -522,18 +520,24 @@
             loopRef = requestAnimationFrame(gameTickLoop);
         }
 
-        function gameTickLoop() {
+        // ← timestamp passed in from rAF, used to calculate delta
+        function gameTickLoop(timestamp) {
             if (!gameActive) return;
 
-            processPhysicsVelocity();
-            processStageProgression();
-            processObstaclesEngine();
-            processParallaxScrolling();
+            // Delta time: normalize to 60fps so values of 1.0 = one 60fps frame
+            if (!lastTimestamp) lastTimestamp = timestamp;
+            const delta = Math.min((timestamp - lastTimestamp) / (1000 / 60), 3);
+            lastTimestamp = timestamp;
+
+            processPhysicsVelocity(delta);
+            processStageProgression(delta);
+            processObstaclesEngine(delta);
+            processParallaxScrolling(delta);
 
             loopRef = requestAnimationFrame(gameTickLoop);
         }
 
-        function processPhysicsVelocity() {
+        function processPhysicsVelocity(delta) {
             player.vx = 0;
             if (keyboardKeys['KeyA'] || keyboardKeys['ArrowLeft'] || mobileLeftActive) {
                 player.vx = -player.speedX;
@@ -542,9 +546,9 @@
                 player.vx = player.speedX;
             }
 
-            player.vy += player.gravity;
-            player.y += player.vy;
-            player.x += player.vx;
+            player.vy += player.gravity * delta; // ← scaled
+            player.y += player.vy * delta;        // ← scaled
+            player.x += player.vx * delta;        // ← scaled
 
             if (player.y < 0) { player.y = 0; player.vy = 0; }
             const maxFloorY = viewport.clientHeight - player.height;
@@ -566,14 +570,13 @@
             sarahSprite.style.left = `${player.x}px`;
 
             if (invincibilityFrames > 0) {
-                invincibilityFrames--;
+                invincibilityFrames -= delta; // ← scaled
                 if (invincibilityFrames <= 0) sarahSprite.classList.remove('invincible');
             }
         }
 
-        function processStageProgression() {
-            // Speed up score to shorten the total game time
-            score += 0.12; 
+        function processStageProgression(delta) {
+            score += 0.12 * delta; // ← scaled
             let displayScore = Math.floor(score);
             scoreVal.innerText = String(displayScore).padStart(3, '0');
 
@@ -603,17 +606,17 @@
             }, 800); 
         }
 
-        function processParallaxScrolling() {
+        function processParallaxScrolling(delta) {
             let scrollSpeed = isMobileSize() ? 1.5 : 2.5;
             scrollSpeed += Math.floor(Math.floor(score) / 100) * 0.5;
-            bgScrollPosition -= scrollSpeed;
+            bgScrollPosition -= scrollSpeed * delta; // ← scaled
             
             viewport.style.backgroundPosition = `${bgScrollPosition}px 0px`;
             bgTransitionLayer.style.backgroundPosition = `${bgScrollPosition}px 0px`;
         }
 
-        function processObstaclesEngine() {
-            obstacleSpawnTimer++;
+        function processObstaclesEngine(delta) {
+            obstacleSpawnTimer += delta; // ← scaled
             if (obstacleSpawnTimer >= obstacleSpawnRate) {
                 obstacleSpawnTimer = 0;
                 spawnDynamicObstacle();
@@ -624,7 +627,7 @@
 
             for (let i = obstaclesList.length - 1; i >= 0; i--) {
                 let obs = obstaclesList[i];
-                obs.x -= movementSpeed;
+                obs.x -= movementSpeed * delta; // ← scaled
                 obs.el.style.left = `${obs.x}px`;
 
                 if (checkCollision(player, obs)) {
@@ -653,7 +656,6 @@
             let obsSize = window.matchMedia("(max-width: 768px) and (orientation: portrait)").matches ? 34 : (isMobileSize() ? 36 : 70);
 
             const spawnX = viewport.clientWidth + 20;
-            // Ensure spawns dynamically respect the flex-grown vertical height
             const spawnY = Math.random() * (viewport.clientHeight - obsSize);
 
             el.style.left = `${spawnX}px`;
